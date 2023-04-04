@@ -5,10 +5,12 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@nextui-org/react": "^1.0.0-beta.12",
     "@nrwl/next": "^15.8.9",
     "next": "13.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "replicate": "^0.7.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
