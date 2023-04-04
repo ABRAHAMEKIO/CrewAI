@@ -1,49 +1,55 @@
-import { Text, Button, Container, Image, useTheme, Textarea } from "@nextui-org/react";
+import {Button, Container, Image, Row, Textarea, useTheme} from "@nextui-org/react";
+import {Header1, Header2} from "../components/header";
 
-const Header1 = (props) => {
-  const { content } = props;
-  return <Text
-    h1
-    size={32}
-    css={{
-      textGradient: "45deg, $blue600 -20%, $pink600 50%",
-    }}
-    weight="bold"
-  >{content}</Text>
-}
-
-const Header2 = (props) => {
-  const { content } = props;
-  return <Text
-    h2
-    size={26}
-    css={{
-      textGradient: "45deg, $purple600 -20%, $pink600 100%",
-    }}
-    weight="bold"
-  >
-    {content}
-  </Text>
-}
-
-const Header3 = (props) => {
-  const { content } = props;
-  return <Text
-    h3
-    size={22}
-    css={{
-      textGradient: "45deg, $yellow600 -20%, $red600 100%",
-    }}
-    weight="bold"
-  >
-    {content}
-  </Text>
-}
+export const LockIcon = ({
+                           fill = 'currentColor',
+                           filled,
+                           size,
+                           height,
+                           width,
+                           label,
+                           ...props
+                         }) => {
+  return (
+    <svg
+      data-name="Iconly/Curved/Lock"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size || width || 24}
+      height={size || height || 24}
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <g
+        fill="none"
+        stroke={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit={10}
+        strokeWidth={1.5}
+      >
+        <path
+          data-name="Stroke 1"
+          d="M16.471 9.403V7.25a4.561 4.561 0 00-9.121-.016v2.169"
+        />
+        <path data-name="Stroke 3" d="M11.91 14.156v2.221" />
+        <path
+          data-name="Stroke 5"
+          d="M11.91 8.824c-5.745 0-7.66 1.568-7.66 6.271s1.915 6.272 7.66 6.272 7.661-1.568 7.661-6.272-1.921-6.271-7.661-6.271z"
+        />
+      </g>
+    </svg>
+  );
+};
 export function Index() {
   const { theme } = useTheme();
 
   return (
-    <Container className="radialBackground">
+    <Container>
+      <Row justify="flex-end">
+        <Button iconRight={<LockIcon fill="currentColor" />} color="secondary">
+        Connect Wallet
+        </Button>
+      </Row>
       <Header1 content="CrewAI - A prompt-to-mint AI"/>
       <Header2 content="No need for sophisticated tool, use your word to create NFT"/>
       <Textarea
