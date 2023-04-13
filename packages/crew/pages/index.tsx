@@ -1,5 +1,12 @@
 import {Button, Container, Image, Row, Textarea, useTheme} from "@nextui-org/react";
 import {Header1, Header2} from "../components/header";
+import {EffectCallback, FormEvent, useEffect, useState} from "react";
+import io from 'socket.io-client';
+let socket;
+
+import { server } from '../config';
+import {Command} from "../domain/midjourney/wsCommands";
+import MidjourneyClient, {WebhookSuccessResponse} from "../domain/midjourney/midjourneyClient";
 
 export const LockIcon = ({
                            fill = 'currentColor',
@@ -14,8 +21,8 @@ export const LockIcon = ({
     <svg
       data-name="Iconly/Curved/Lock"
       xmlns="http://www.w3.org/2000/svg"
-      width={size || width || 24}
-      height={size || height || 24}
+      width={size || width || "24"}
+      height={size || height || "24"}
       viewBox="0 0 24 24"
       {...props}
     >
@@ -42,12 +49,39 @@ export const LockIcon = ({
 };
 export function Index() {
   const { theme } = useTheme();
+  const [socketId, setSocketId] = useState(null);
+  const [response, setResponse] = useState(null as WebhookSuccessResponse)
+  const [loading, setLoading] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const midjourneyClient = new MidjourneyClient("", `${server}/api/thenextleg/imagine`);
+
+  // @ts-ignore
+  useEffect(() => async () => {
+    await fetch(`${server}/api/socket`);
+    socket = io();
+
+    socket.on(Command.ModelResults.toString(), (val: WebhookSuccessResponse) => {
+      setResponse(val);
+      setLoading(false);
+    })
+
+    socket.on(Command.Connected.toString(), () => {
+      console.log('connected');
+      setSocketId(socket.id);
+    })
+    return null;
+  }, []);
+
+  async function handleSubmit(event: FormEvent<HTMLButtonElement>): Promise<void> {
+    await midjourneyClient.imagine(prompt, socketId, "");
+    setLoading(true);
+  }
 
   return (
     <Container>
       <Row justify="flex-end">
-        <Button iconRight={<LockIcon fill="currentColor" filled size height
-                                     width label />} color="secondary">
+        <Button iconRight={<LockIcon fill="currentColor" filled size="24" height="24"
+                                     width="24" label />} color="secondary">
         Connect Wallet
         </Button>
       </Row>
@@ -56,15 +90,18 @@ export function Index() {
       <Textarea
         label="Write your awesome AI prose here"
         placeholder="A raccoon that can speak and wield a sword"
+        onChange={(e) => setPrompt(e.target.value)}
       />
-      <Image
-        width={320}
-        height={180}
-        src="https://github.com/CrewAI.png"
-        alt="Default Image"
-        objectFit="none"
-      />
-      <Button color="gradient">Mint</Button>
+      {socketId && <p>Socket ID: {socketId}</p>}
+      {response &&
+        <Image
+          width={1200}
+          src={response?.imageUrl}
+          alt="Your amazing generative art"
+        />
+      }
+      {loading && <p>Loading...</p>}
+      <Button color="gradient" onClick={handleSubmit}>Draw</Button>
     </Container>
   );
 }
