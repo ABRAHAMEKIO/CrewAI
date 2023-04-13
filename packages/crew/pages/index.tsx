@@ -46,7 +46,8 @@ export function Index() {
   return (
     <Container>
       <Row justify="flex-end">
-        <Button iconRight={<LockIcon fill="currentColor" />} color="secondary">
+        <Button iconRight={<LockIcon fill="currentColor" filled size height
+                                     width label />} color="secondary">
         Connect Wallet
         </Button>
       </Row>
