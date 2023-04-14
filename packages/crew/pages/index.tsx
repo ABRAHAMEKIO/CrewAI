@@ -1,10 +1,11 @@
 import {Button, Container, Image, Row, Textarea, useTheme} from "@nextui-org/react";
 import {Header1, Header2} from "../components/header";
 import {EffectCallback, FormEvent, useEffect, useState} from "react";
+import { useRouter } from "next/router";
 import io from 'socket.io-client';
 let socket;
 
-import { server } from '../config';
+import { server, wsServer } from '../config';
 import {Command} from "../domain/midjourney/wsCommands";
 import MidjourneyClient, {WebhookSuccessResponse} from "../domain/midjourney/midjourneyClient";
 
@@ -56,20 +57,22 @@ export function Index() {
   const midjourneyClient = new MidjourneyClient("", `${server}/api/thenextleg/imagine`);
 
   // @ts-ignore
-  useEffect(() => async () => {
-    await fetch(`${server}/api/socket`);
-    socket = io();
+  useEffect(() => {
+    fetch(`${server}/api/socket`).then(() => {
+      socket = io(wsServer);
 
-    socket.on(Command.ModelResults.toString(), (val: WebhookSuccessResponse) => {
-      setResponse(val);
-      setLoading(false);
-    })
+      socket.on(Command.ModelResults.toString(), (val: WebhookSuccessResponse) => {
+        setResponse(val);
+        setLoading(false);
+      })
 
-    socket.on(Command.Connected.toString(), () => {
-      console.log('connected');
-      setSocketId(socket.id);
-    })
-    return null;
+      socket.on(Command.Connected.toString(), () => {
+        console.log('connected');
+        setSocketId(socket.id);
+      })
+    }).catch((e) => {
+      console.error(e);
+    });
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLButtonElement>): Promise<void> {

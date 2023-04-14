@@ -33,7 +33,9 @@
         },
         "production": {
           "buildTarget": "crew:build:production",
-          "dev": false
+          "dev": false,
+          "port": 8080,
+          "hostname": "0.0.0.0"
         }
       }
     },
