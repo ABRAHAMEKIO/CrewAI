@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from 'axios';
 
 export interface Request {
   cmd: string;
@@ -13,6 +13,10 @@ export interface SuccessResponse {
   createdAt: string;
 }
 
+interface ServerSuccessResponse {
+  data: SuccessResponse;
+}
+
 export interface WebhookSuccessResponse {
   content: string;
   imageUrl: string;
@@ -24,41 +28,48 @@ export interface WebhookSuccessResponse {
   buttonMessageId: string;
 }
 export default class MidjourneyClient {
-  BASE_URL: string = "https://api.thenextleg.io";
+  BASE_URL = 'https://api.thenextleg.io';
+
   authToken: string;
+
   proxyUrl: string;
 
-  constructor(authToken: string, proxyUrl = "") {
+  constructor(authToken: string, proxyUrl = '') {
     this.authToken = authToken;
     this.proxyUrl = proxyUrl;
   }
 
-  async imagine(msg: string, ref: string, webhookOverride: string): Promise<SuccessResponse> {
-    const data : Request = {
-      "cmd": "imagine",
+  async imagine(
+    msg: string,
+    ref: string,
+    webhookOverride: string
+  ): Promise<SuccessResponse> {
+    const data: Request = {
+      cmd: 'imagine',
       msg,
       ref,
-      webhookOverride
-    }
+      webhookOverride,
+    };
 
     const headers = {
-        'Authorization': `Bearer ${this.authToken}`,
-        'Content-Type': 'application/json'
-      };
+      Authorization: `Bearer ${this.authToken}`,
+      'Content-Type': 'application/json',
+    };
 
-    if(this.proxyUrl) {
-      delete headers["Authorization"];
+    if (this.proxyUrl) {
+      delete headers.Authorization;
     }
 
     const config = {
-      method: "POST",
+      method: 'POST',
       url: this.proxyUrl || this.BASE_URL,
       headers,
-      data
-    }
+      data,
+      transformResponse: (r: ServerSuccessResponse) => r.data,
+    };
 
-    const response : Promise<Promise<{ data: SuccessResponse }>> | any = await axios(config);
+    const response: AxiosResponse<SuccessResponse> =
+      await axios.request<SuccessResponse>(config);
     return response.data;
   }
-
 }

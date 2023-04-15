@@ -1,11 +1,16 @@
-import { Box } from "./Box";
+import React from 'react';
+import Box from './Box';
 
-export const Layout = ({ children }) => (
-  <Box
-    css={{
-      maxW: "100%"
-    }}
-  >
-    {children}
-  </Box>
-)
+function Layout({ children }: { children: JSX.Element[] }): JSX.Element {
+  return (
+    <Box
+      css={{
+        maxW: '100%',
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
+
+export default Layout;
