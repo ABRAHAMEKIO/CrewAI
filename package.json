@@ -65,6 +65,6 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*{.md,json}": "npx prettier --write"
+    "*{.md,json,yml}": "npx prettier --write"
   }
 }
