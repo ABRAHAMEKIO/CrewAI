@@ -3,6 +3,7 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import './styles.css';
 import { createTheme, NextUIProvider } from '@nextui-org/react';
+import { MixpanelProvider } from 'react-mixpanel-browser';
 
 const theme = createTheme({
   type: 'dark', // it could be "light" or "dark"
@@ -37,13 +38,15 @@ const theme = createTheme({
 function CustomApp({ Component, pageProps }: AppProps) {
   return (
     <NextUIProvider theme={theme}>
-      <Head>
-        <title>Welcome to crew!</title>
-      </Head>
-      <main className="app">
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <Component {...pageProps} />
-      </main>
+      <MixpanelProvider token={process.env.NEXT_PUBLIC_MIXPANEL_ID || ''}>
+        <Head>
+          <title>Welcome to crew!</title>
+        </Head>
+        <main className="app">
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <Component {...pageProps} />
+        </main>
+      </MixpanelProvider>
     </NextUIProvider>
   );
 }

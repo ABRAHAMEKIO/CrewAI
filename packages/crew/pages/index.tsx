@@ -1,14 +1,16 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Container,
   Image,
   Link,
   Navbar,
+  PressEvent,
   Text,
   Textarea,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
+import { useMixpanel } from 'react-mixpanel-browser';
 import { Header1, Header2 } from '../components/Heading';
 
 import { server, wsServer } from '../config';
@@ -21,6 +23,7 @@ import Layout from '../components/Layout';
 let socket;
 
 function Index() {
+  const mixpanel = useMixpanel();
   const [socketId, setSocketId] = useState(null);
   const [response, setResponse] = useState(null as WebhookSuccessResponse);
   const [loading, setLoading] = useState(false);
@@ -31,6 +34,13 @@ function Index() {
   );
 
   useEffect(() => {
+    if (mixpanel.config.token) {
+      // Check that a token was provided (useful if you have environments without Mixpanel)
+      mixpanel.track('home_page_view');
+    }
+  });
+
+  useEffect(() => {
     fetch(`${server}/api/socket`)
       .then(() => {
         socket = io(wsServer);
@@ -38,6 +48,13 @@ function Index() {
         socket.on(
           MidjourneyCommand.ModelResults.toString(),
           (val: WebhookSuccessResponse) => {
+            if (mixpanel.config.token) {
+              // Check that a token was provided (useful if you have environments without Mixpanel)
+              // TODO: use enum for all metrics
+              mixpanel.track('image_generation_success', {
+                ...val,
+              });
+            }
             setResponse(val);
             setLoading(false);
           }
@@ -53,11 +70,15 @@ function Index() {
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, []);
+  }, [mixpanel]);
 
-  async function handleSubmit(
-    event: FormEvent<HTMLButtonElement>
-  ): Promise<void> {
+  async function handleSubmit(event: PressEvent): Promise<void> {
+    if (mixpanel.config.token) {
+      // Check that a token was provided (useful if you have environments without Mixpanel)
+      mixpanel.track('image_generation_requested', {
+        prompt,
+      });
+    }
     await midjourneyClient.imagine(prompt, socketId, '');
     setLoading(true);
   }
@@ -106,7 +127,7 @@ function Index() {
           />
         )}
         {loading && <p>Loading...</p>}
-        <Button color="gradient" onClick={(e) => handleSubmit(e)}>
+        <Button color="gradient" onPress={(e) => handleSubmit(e)}>
           Draw
         </Button>
       </Container>
