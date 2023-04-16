@@ -3,15 +3,13 @@ import {
   Button,
   Container,
   Image,
-  Link,
-  Navbar,
   PressEvent,
-  Text,
   Textarea,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
 import { Header1, Header2 } from '../components/Heading';
+import NavigationBar from '../components/NavigationBar';
 
 import { server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
@@ -94,31 +92,7 @@ function Index() {
 
   return (
     <Layout>
-      <Navbar isBordered variant="floating">
-        <Navbar.Brand>
-          <Text b color="inherit" hideIn="xs">
-            CrewAI
-          </Text>
-        </Navbar.Brand>
-        <Navbar.Content hideIn="xs">
-          <Navbar.Link href="#">Features</Navbar.Link>
-          <Navbar.Link isActive href="#">
-            Customers
-          </Navbar.Link>
-          <Navbar.Link href="#">Pricing</Navbar.Link>
-          <Navbar.Link href="#">Company</Navbar.Link>
-        </Navbar.Content>
-        <Navbar.Content>
-          <Navbar.Link color="inherit" href="#">
-            Login
-          </Navbar.Link>
-          <Navbar.Item>
-            <Button auto flat as={Link} href="#">
-              Sign Up
-            </Button>
-          </Navbar.Item>
-        </Navbar.Content>
-      </Navbar>
+      <NavigationBar />
       <Container>
         <Header1 content="CrewAI - A prompt-to-mint AI" />
         <Header2 content="No need for sophisticated tool, use your word to create NFT" />

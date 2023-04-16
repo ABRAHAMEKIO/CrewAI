@@ -9,6 +9,7 @@ export function Header1(props: { content: string }): JSX.Element {
       size={32}
       css={{
         textGradient: '45deg, $blue600 -20%, $pink600 50%',
+        marginTop: '1em',
       }}
       weight="bold"
     >
@@ -24,6 +25,7 @@ export function Header2(props: { content: string }): JSX.Element {
       size={26}
       css={{
         textGradient: '45deg, $purple600 -20%, $pink600 100%',
+        marginTop: '0.5em',
       }}
       weight="bold"
     >
@@ -40,6 +42,7 @@ export function Header3(props: { content: string }): JSX.Element {
       size={22}
       css={{
         textGradient: '45deg, $yellow600 -20%, $red600 100%',
+        marginTop: '0.25em',
       }}
       weight="bold"
     >
