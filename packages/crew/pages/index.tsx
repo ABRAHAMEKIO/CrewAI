@@ -94,16 +94,16 @@ function Index() {
     <Layout>
       <NavigationBar />
       <Container>
-        <Header1 content="CrewAI - A prompt-to-mint AI" />
-        <Header2 content="No need for sophisticated tool, use your word to create NFT" />
+        <Header1 content="Playground" />
+        <Header2 content="Write your first GenAI prompt" />
         <Textarea
           width="100%"
           cacheMeasurements={false}
-          label="Write your awesome AI prose here"
+          label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
           placeholder="A raccoon that can speak and wield a sword"
           onChange={(e) => setPrompt(e.target.value)}
         />
-        {socketId && <p>Socket ID: {socketId}</p>}
+        {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
         {!error && response && (
           <Image
             width={1200}
