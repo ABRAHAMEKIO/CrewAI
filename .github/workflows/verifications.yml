@@ -17,5 +17,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run static check
-        run: npm run check
+        run: npx nx lint crew
       # TODO: implement unit test CI for later
