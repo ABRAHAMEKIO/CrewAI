@@ -19,6 +19,7 @@ import MidjourneyClient, {
   WebhookSuccessResponse,
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
+import { successBeep, errorBeep } from '../domain/sounds/beep';
 
 let socket;
 
@@ -57,9 +58,12 @@ function Index() {
               });
             }
             if (val.imageUrl) {
+              setError(false);
               setResponse(val);
+              successBeep();
             } else {
               setError(true);
+              errorBeep();
             }
             setLoading(false);
           }
