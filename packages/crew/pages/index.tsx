@@ -27,6 +27,7 @@ function Index() {
   const [socketId, setSocketId] = useState(null);
   const [response, setResponse] = useState(null as WebhookSuccessResponse);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [prompt, setPrompt] = useState('');
   const midjourneyClient = new MidjourneyClient(
     '',
@@ -55,7 +56,11 @@ function Index() {
                 ...val,
               });
             }
-            setResponse(val);
+            if (val.imageUrl) {
+              setResponse(val);
+            } else {
+              setError(true);
+            }
             setLoading(false);
           }
         );
@@ -114,21 +119,27 @@ function Index() {
         <Header1 content="CrewAI - A prompt-to-mint AI" />
         <Header2 content="No need for sophisticated tool, use your word to create NFT" />
         <Textarea
+          width="100%"
+          cacheMeasurements={false}
           label="Write your awesome AI prose here"
           placeholder="A raccoon that can speak and wield a sword"
           onChange={(e) => setPrompt(e.target.value)}
         />
         {socketId && <p>Socket ID: {socketId}</p>}
-        {response && (
+        {!error && response && (
           <Image
             width={1200}
             src={response?.imageUrl}
             alt="Your amazing generative art"
           />
         )}
-        {loading && <p>Loading...</p>}
-        <Button color="gradient" onPress={(e) => handleSubmit(e)}>
-          Draw
+        {error && <p>Error while generating image</p>}
+        <Button
+          color="gradient"
+          onPress={(e) => handleSubmit(e)}
+          disabled={loading}
+        >
+          {loading ? 'Loading' : 'Draw'}
         </Button>
       </Container>
     </Layout>
