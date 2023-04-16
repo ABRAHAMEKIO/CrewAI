@@ -36,7 +36,7 @@ function Index() {
   );
 
   useEffect(() => {
-    if (mixpanel.config.token) {
+    if (mixpanel && mixpanel.config && mixpanel.config.token) {
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('home_page_view');
     }
@@ -50,7 +50,7 @@ function Index() {
         socket.on(
           MidjourneyCommand.ModelResults.toString(),
           (val: WebhookSuccessResponse) => {
-            if (mixpanel.config.token) {
+            if (mixpanel && mixpanel.config && mixpanel.config.token) {
               // Check that a token was provided (useful if you have environments without Mixpanel)
               // TODO: use enum for all metrics
               mixpanel.track('image_generation_success', {
@@ -82,7 +82,7 @@ function Index() {
   }, [mixpanel]);
 
   async function handleSubmit(event: PressEvent): Promise<void> {
-    if (mixpanel.config.token) {
+    if (mixpanel && mixpanel.config && mixpanel.config.token) {
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('image_generation_requested', {
         prompt,
