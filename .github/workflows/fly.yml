@@ -1,7 +1,7 @@
 name: Fly Deploy
 on:
   workflow_run:
-    workflows: ['Quality Checks']
+    workflows: ['Static check and unit tests']
     branches: [main]
     types:
       - success
