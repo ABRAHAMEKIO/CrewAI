@@ -1,4 +1,4 @@
-name: Quality Checks
+name: Continuous Delivery
 on: [push, pull_request]
 
 jobs:
@@ -19,3 +19,13 @@ jobs:
       - name: Run static check
         run: npx nx lint crew
       # TODO: implement unit test CI for later
+  deploy:
+    needs: check
+    name: Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only -c packages/crew/fly.toml --dockerfile packages/crew/Dockerfile
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
