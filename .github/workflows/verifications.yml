@@ -1,4 +1,4 @@
-name: Verify the application for static check and unit tests
+name: Quality Checks
 on: [push, pull_request]
 
 jobs:
