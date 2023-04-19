@@ -18,6 +18,7 @@ import MidjourneyClient, {
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
+import FileUpload from '../components/FileUpload';
 
 let socket;
 
@@ -103,6 +104,7 @@ function Index() {
           placeholder="A raccoon that can speak and wield a sword"
           onChange={(e) => setPrompt(e.target.value)}
         />
+        <FileUpload />
         {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
         {!error && response && (
           <Image
