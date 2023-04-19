@@ -11,6 +11,7 @@ import {
   Input,
   Tooltip,
   Text,
+  Modal,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
@@ -41,7 +42,14 @@ function Index() {
   );
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
+  const [isBracketComplete, setBracketComplete] = useState([]);
+  const [spaceDetected, setSpaceDetected] = useState(false);
   const [resultPrompt, setResultPrompt] = useState('');
+  const [errorFormatParams, setErrorFormatParams] = useState(false);
+  const [messageError, setMessageError] = useState('');
+  const closeModal = () => {
+    setErrorFormatParams(false);
+  };
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -89,13 +97,6 @@ function Index() {
       });
   }, [mixpanel]);
 
-  useEffect(() => {
-    if (mixpanel && mixpanel.config && mixpanel.config.token) {
-      // Check that a token was provided (useful if you have environments without Mixpanel)
-      mixpanel.track('home_page_view');
-    }
-  });
-
   async function handleSubmit(event: PressEvent): Promise<void> {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
       // Check that a token was provided (useful if you have environments without Mixpanel)
@@ -115,18 +116,29 @@ function Index() {
       const x = promptText[i];
       const x1 = promptText[i + 1];
 
-      if (promptText.length >= 4) {
-        if (x === '{' && x1 === '{') {
-          tempIndexParams.push(i + 2);
-        }
+      if (x === '{' && x1 === '{') {
+        tempIndexParams.push(i + 2);
+        setBracketComplete([1]);
+      }
 
-        if (x === '}' && x1 === '}') {
+      if (x === '}' && x1 === '}') {
+        if (tempIndexParams.length > 0) {
+          setBracketComplete([1, 2]);
+
           tempIndexParams.push(i);
-
-          // push word in brackets
-          paramsCollections.push(
-            promptText.slice(tempIndexParams[0], tempIndexParams[1])
+          const words = promptText.slice(
+            tempIndexParams[0],
+            tempIndexParams[1]
           );
+
+          if (words.includes(' ')) {
+            setSpaceDetected(true);
+          } else {
+            paramsCollections.push(
+              // push word in brackets
+              words
+            );
+          }
 
           // reset temp indexing params
           tempIndexParams.length = 0;
@@ -179,7 +191,11 @@ function Index() {
     });
 
     const promptTemplate = Handlebars.compile(prompt);
-    if (promptTemplate) {
+    if (isBracketComplete.length <= 1 || spaceDetected) {
+      setErrorFormatParams(true);
+      setSpaceDetected(false);
+      setMessageError("Parameter format isn't valid");
+    } else if (promptTemplate && errorFormatParams === false) {
       const result = promptTemplate(paramsData);
       setResultPrompt(result);
     }
@@ -207,8 +223,33 @@ function Index() {
     <Layout>
       <NavigationBar />
       <Container>
-        <Grid.Container gap={2} justify="center">
-          <Grid md={4} direction="column" css={{ p: 0 }}>
+        <Modal
+          closeButton
+          aria-labelledby="modal-title"
+          open={errorFormatParams}
+          onClose={closeModal}
+        >
+          <Modal.Header>
+            <Text id="modal-title" size={18} weight="bold">
+              WARNING
+            </Text>
+          </Modal.Header>
+          <Modal.Body>
+            <Text>{messageError}</Text>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              auto
+              flat
+              color="gradient"
+              onPress={() => setErrorFormatParams(false)}
+            >
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <Grid.Container justify="center">
+          <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
@@ -232,13 +273,16 @@ function Index() {
             )}
             {params &&
               params.map((item) => (
-                <Grid.Container gap={1} justify="space-between">
+                <Grid.Container gap={1} justify="space-between" key={item}>
                   <Grid xs={4}>
                     <Tooltip content={item} placement="top" color="secondary">
                       <Text
                         css={{
                           my: 10,
                           textGradient: '45deg, $purple600 -20%, $pink600 100%',
+                          maxWidth: '6em',
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
                         }}
                       >
                         {item}
@@ -263,28 +307,26 @@ function Index() {
                 </Grid.Container>
               ))}
             {error && <p>Error while generating image</p>}
-            <div style={{ marginBottom: 20 }}>
-              <Link href="#promptPresets" css={{ float: 'right' }}>
-                Open Prompt Presets
-              </Link>
-            </div>
-            <div>
-              <Button
-                color="gradient"
-                onPress={(e) => handleSubmit(e)}
-                disabled={loading}
-                css={{ float: 'right' }}
-              >
-                {loading ? 'Loading' : 'Draw'}
-              </Button>
-            </div>
+            <Link href="#promptPresets" css={{ float: 'right' }}>
+              Open Prompt Presets
+            </Link>
+            <Spacer y={1.5} />
+            <Button
+              color="gradient"
+              onPress={(e) => handleSubmit(e)}
+              disabled={loading}
+              css={{ float: 'right', maxWidth: '2rem' }}
+            >
+              {loading ? 'Loading' : 'Draw'}
+            </Button>
           </Grid>
-          <Grid direction="row" css={{ px: '6.25em' }} alignItems="center">
-            {!error && response && (
-              <>
-                <div style={{ marginTop: '6em' }}>
+          {!error && response && (
+            <>
+              <Spacer x={4} />
+              <Grid direction="column" md={4} alignItems="center">
+                <div style={{ marginTop: '4vh' }}>
                   <Image
-                    width={1200}
+                    css={{ maxWidth: 550 }}
                     src={response?.imageUrl}
                     alt="Your amazing generative art"
                   />
@@ -296,9 +338,9 @@ function Index() {
                   <Button>V 3</Button>
                   <Button>V 4</Button>
                 </Button.Group>
-              </>
-            )}
-          </Grid>
+              </Grid>
+            </>
+          )}
         </Grid.Container>
       </Container>
     </Layout>
