@@ -8,10 +8,6 @@ import {
   Grid,
   Spacer,
   Link,
-  Input,
-  Tooltip,
-  Text,
-  Modal,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
@@ -26,6 +22,9 @@ import MidjourneyClient, {
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
+import bracketsRecognize from '../helpers/bracketsRecognize';
+import CustomModal from '../components/CustomModal';
+import InputParameters from '../components/InputParameters';
 
 let socket;
 
@@ -42,13 +41,11 @@ function Index() {
   );
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
-  const [isBracketComplete, setBracketComplete] = useState([]);
-  const [spaceDetected, setSpaceDetected] = useState(false);
   const [resultPrompt, setResultPrompt] = useState('');
-  const [errorFormatParams, setErrorFormatParams] = useState(false);
-  const [messageError, setMessageError] = useState('');
-  const closeModal = () => {
-    setErrorFormatParams(false);
+  const [modal, setModal] = useState(false);
+  const ToggleModal = () => setModal(!modal);
+  const InputParametersData = (value: string) => {
+    setResultPrompt(value);
   };
 
   useEffect(() => {
@@ -108,146 +105,50 @@ function Index() {
     setLoading(true);
   }
 
-  function bracketsRecognize(promptText: string) {
-    const paramsCollections = [];
-    const tempIndexParams = [];
-
-    for (let i = 0; i < promptText.length; i += 1) {
-      const x = promptText[i];
-      const x1 = promptText[i + 1];
-
-      if (x === '{' && x1 === '{') {
-        tempIndexParams.push(i + 2);
-        setBracketComplete([1]);
-      }
-
-      if (x === '}' && x1 === '}') {
-        if (tempIndexParams.length > 0) {
-          setBracketComplete([1, 2]);
-
-          tempIndexParams.push(i);
-          const words = promptText.slice(
-            tempIndexParams[0],
-            tempIndexParams[1]
-          );
-
-          if (words.includes(' ')) {
-            setSpaceDetected(true);
-          } else {
-            paramsCollections.push(
-              // push word in brackets
-              words
-            );
-          }
-
-          // reset temp indexing params
-          tempIndexParams.length = 0;
-        }
-      }
-    }
-
-    return paramsCollections;
-  }
-
-  // TODO: implement to result prompt
-  // function boldInputValue(result: string) {
-  //   const getParamsValue = Object.keys(paramsData).map((key) => [
-  //     paramsData[key],
-  //   ]);
-  //   const regexFormat = new RegExp(`(${getParamsValue.join('|')})`, 'ig');
-
-  //   return result.replace(regexFormat, '<b>$1</b>');
-  // }
-
   function handleChangePrompt(value: string) {
-    const recognizedParams = bracketsRecognize(value);
+    const res = bracketsRecognize(value);
 
-    recognizedParams.map((val) => {
-      if (paramsData[val] === undefined) {
-        paramsData[val] = '';
-      }
-      return val;
-    });
+    if (res.data !== null) {
+      res.data.map((val) => {
+        if (paramsData[val] === undefined) {
+          paramsData[val] = '...';
+        }
+        return val;
+      });
 
-    if (value === '') {
-      setParams([]);
-      setPrompt('');
-      setResultPrompt('');
-    } else {
-      setParams(recognizedParams);
       setPrompt(value);
-      setResultPrompt('typing....');
+      setParams(res.data);
+    } else {
+      setModal(true);
     }
   }
 
   function handleBlurPrompt(value: string) {
-    const recognizedParams = bracketsRecognize(value);
+    const res = bracketsRecognize(value);
 
-    recognizedParams.map((val) => {
-      if (paramsData[val] === '') {
-        paramsData[val] = '...';
-      }
-      return val;
-    });
-
-    const promptTemplate = Handlebars.compile(prompt);
-    if (isBracketComplete.length <= 1 || spaceDetected) {
-      setErrorFormatParams(true);
-      setSpaceDetected(false);
-      setMessageError("Parameter format isn't valid");
-    } else if (promptTemplate && errorFormatParams === false) {
+    if (res.data !== null) {
+      const promptTemplate = Handlebars.compile(prompt);
       const result = promptTemplate(paramsData);
       setResultPrompt(result);
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const property in paramsData) {
+        if (!res.data.includes(property)) delete paramsData[property];
+      }
     }
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const property in paramsData) {
-      if (!recognizedParams.includes(property)) delete paramsData[property];
-    }
-  }
-
-  function handleChangeInputParams(value: Array<string>) {
-    const paramsKey = value[0];
-    const paramsValue = value[1];
-
-    paramsData[paramsKey] = paramsValue;
-
-    const promptTemplate = Handlebars.compile(prompt);
-    const result = promptTemplate(paramsData);
-
-    // const makeBoldInputValue = boldInputValue(result);
-    setResultPrompt(result);
   }
 
   return (
     <Layout>
       <NavigationBar />
       <Container>
-        <Modal
-          closeButton
-          aria-labelledby="modal-title"
-          open={errorFormatParams}
-          onClose={closeModal}
-        >
-          <Modal.Header>
-            <Text id="modal-title" size={18} weight="bold">
-              WARNING
-            </Text>
-          </Modal.Header>
-          <Modal.Body>
-            <Text>{messageError}</Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              auto
-              flat
-              color="gradient"
-              onPress={() => setErrorFormatParams(false)}
-            >
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
+        {modal && (
+          <CustomModal
+            modalOpen={modal}
+            modalClose={ToggleModal}
+            message="parameter format cannot contain spaces."
+          />
+        )}
         <Grid.Container justify="center">
           <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
@@ -259,53 +160,23 @@ function Index() {
               placeholder="A raccoon that can speak and wield a sword"
               onChange={(e) => handleChangePrompt(e.target.value)}
               onBlur={(e) => handleBlurPrompt(e.target.value)}
+              onFocus={() => setResultPrompt('typing...')}
             />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {resultPrompt && (
-              <div
-                // eslint-disable-next-line react/no-danger
-                dangerouslySetInnerHTML={{
-                  __html:
-                    'When you click try sample, you will executive this prompt ' +
-                    `"${resultPrompt}"`,
-                }}
+              <p>
+                When you click try sample, you will executive this prompt &quot;
+                {resultPrompt}&quot;
+              </p>
+            )}
+            {params && (
+              <InputParameters
+                prompt={prompt}
+                params={params}
+                paramsData={paramsData}
+                resultPrompt={InputParametersData}
               />
             )}
-            {params &&
-              params.map((item) => (
-                <Grid.Container gap={1} justify="space-between" key={item}>
-                  <Grid xs={4}>
-                    <Tooltip content={item} placement="top" color="secondary">
-                      <Text
-                        css={{
-                          my: 10,
-                          textGradient: '45deg, $purple600 -20%, $pink600 100%',
-                          maxWidth: '6em',
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {item}
-                      </Text>
-                    </Tooltip>
-                  </Grid>
-                  <Grid xs={8}>
-                    <Input
-                      clearable
-                      aria-label={item}
-                      value={paramsData[item]}
-                      placeholder="..."
-                      fullWidth
-                      onChange={(e) =>
-                        handleChangeInputParams([
-                          e.target.ariaLabel,
-                          e.target.value,
-                        ])
-                      }
-                    />
-                  </Grid>
-                </Grid.Container>
-              ))}
             {error && <p>Error while generating image</p>}
             <Link href="#promptPresets" css={{ float: 'right' }}>
               Open Prompt Presets
