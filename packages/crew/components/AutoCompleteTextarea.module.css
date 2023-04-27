@@ -1,0 +1,27 @@
+.input {
+  width: 100%;
+}
+
+.autosuggest {
+  display: inline-block;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.autosuggest ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.autosuggest li {
+  padding: 5px;
+  font-family: monospace; /* set the suggestion text to a monospace font */
+  color: #777; /* set the suggestion text to a greyish color */
+}
+
+.autosuggest li:hover {
+  background-color: #ddd;
+  cursor: pointer; /* show a pointer cursor when hovering over a suggestion */
+}

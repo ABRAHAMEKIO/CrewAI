@@ -10,12 +10,16 @@ import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
 import { Header1, Header2 } from '../components/Heading';
 import NavigationBar from '../components/NavigationBar';
+import AutoCompleteTextarea from '../components/AutoCompleteTextarea';
 
 import { server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import MidjourneyClient, {
   WebhookSuccessResponse,
 } from '../domain/midjourney/midjourneyClient';
+import OpenAIClient, {
+  CompletionSuccessResponse,
+} from '../domain/openai/openAIClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
 
@@ -32,6 +36,7 @@ function Index() {
     '',
     `${server}/api/thenextleg/imagine`
   );
+  const openAIClient = new OpenAIClient('', `${server}/api/openapi`);
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -96,12 +101,16 @@ function Index() {
       <Container>
         <Header1 content="Playground" />
         <Header2 content="Write your first GenAI prompt" />
-        <Textarea
+        {/* <Textarea
           width="100%"
           cacheMeasurements={false}
           label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
           placeholder="A raccoon that can speak and wield a sword"
           onChange={(e) => setPrompt(e.target.value)}
+        /> */}
+        <AutoCompleteTextarea
+          setPrompt={(e: string) => setPrompt(e)}
+          openAIClient={openAIClient}
         />
         {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
         {!error && response && (

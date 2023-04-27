@@ -16,6 +16,7 @@
     "next": "13.1.1",
     "react": "18.2.0",
     "react-async-hook": "^4.0.0",
+    "react-autosuggest": "^10.1.0",
     "react-dom": "18.2.0",
     "react-mixpanel-browser": "^3.3.0",
     "replicate": "^0.7.0",
