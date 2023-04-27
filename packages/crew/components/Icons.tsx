@@ -170,6 +170,68 @@ function Folder({ fill, size, width = 24, height = 24, ...props }) {
   );
 }
 
+function HeartIcon({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      fill="none"
+      height={size || height}
+      viewBox="0 0 20 20"
+      width={size || width}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9.719,17.073l-6.562-6.51c-0.27-0.268-0.504-0.567-0.696-0.888C1.385,7.89,1.67,5.613,3.155,4.14c0.864-0.856,2.012-1.329,3.233-1.329c1.924,0,3.115,1.12,3.612,1.752c0.499-0.634,1.689-1.752,3.612-1.752c1.221,0,2.369,0.472,3.233,1.329c1.484,1.473,1.771,3.75,0.693,5.537c-0.19,0.32-0.425,0.618-0.695,0.887l-6.562,6.51C10.125,17.229,9.875,17.229,9.719,17.073 M6.388,3.61C5.379,3.61,4.431,4,3.717,4.707C2.495,5.92,2.259,7.794,3.145,9.265c0.158,0.265,0.351,0.51,0.574,0.731L10,16.228l6.281-6.232c0.224-0.221,0.416-0.466,0.573-0.729c0.887-1.472,0.651-3.346-0.571-4.56C15.57,4,14.621,3.61,13.612,3.61c-1.43,0-2.639,0.786-3.268,1.863c-0.154,0.264-0.536,0.264-0.69,0C9.029,4.397,7.82,3.61,6.388,3.61"
+        stroke={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChatIcon({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      fill="none"
+      height={size || height}
+      viewBox="0 0 16 16"
+      width={size || width}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"
+        stroke={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ArrowUpIcon({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      fill="none"
+      height={size || height}
+      viewBox="0 0 16 16"
+      width={size || width}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"
+        stroke={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
   scale: <ScaleIcon fill="var(--nextui-colors-warning)" size={30} />,
@@ -178,6 +240,9 @@ const icons = {
   server: <ServerIcon fill="var(--nextui-colors-success)" size={30} />,
   user: <TagUserIcon fill="var(--nextui-colors-error)" size={30} />,
   folder: <Folder fill="white" size={30} />,
+  heart: <HeartIcon fill="var(--nextui-colors-secondary)" size={24} />,
+  chat: <ChatIcon fill="var(--nextui-colors-secondary)" size={20} />,
+  arrowUp: <ArrowUpIcon fill="var(--nextui-colors-secondary)" size={20} />,
 };
 export default icons;
 /* eslint-enable react/jsx-props-no-spreading */
