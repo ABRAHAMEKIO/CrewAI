@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Image } from '@nextui-org/react';
+import { Input, Image, Progress, Spacer } from '@nextui-org/react';
 import http from 'axios';
 // UploadService.js
 const UploadService = {
@@ -60,21 +60,7 @@ function FileUpload() {
   return (
     <>
       <Input label="File" type="file" onChange={selectFile} />
-
-      {currentFile && (
-        <div className="progress my-3">
-          <div
-            className="progress-bar progress-bar-info"
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            style={{ width: `${progress}%` }}
-          >
-            {progress}%
-          </div>
-        </div>
-      )}
+      <Spacer y={1} />
       {fileLocation && (
         <Image
           width={300}
@@ -83,6 +69,14 @@ function FileUpload() {
           alt="Prompt Image"
           objectFit="cover"
         />
+      )}
+
+      {currentFile && (
+        <>
+          <Spacer y={1} />
+          <Progress color="primary" value={progress} />
+          <Spacer y={1} />
+        </>
       )}
 
       {message && (
