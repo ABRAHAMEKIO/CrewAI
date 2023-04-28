@@ -1,7 +1,7 @@
 import { Button, Text, Modal } from '@nextui-org/react';
 import React from 'react';
 
-function CustomModal(props: {
+function ErrorValidationModal(props: {
   modalOpen: boolean;
   modalClose: () => void;
   message: string;
@@ -26,4 +26,4 @@ function CustomModal(props: {
   );
 }
 
-export default CustomModal;
+export default ErrorValidationModal;

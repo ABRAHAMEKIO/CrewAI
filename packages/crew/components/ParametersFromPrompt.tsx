@@ -2,13 +2,13 @@ import { Input, Text, Tooltip, Grid } from '@nextui-org/react';
 import React from 'react';
 import Handlebars from 'handlebars/dist/cjs/handlebars';
 
-function InputParameters(props: {
+function ParametersFromPrompt(props: {
   prompt: string;
   params: Array<string>;
   paramsData: object;
-  resultPrompt: (value: string) => void;
+  finalPrompt: (value: string) => void;
 }): JSX.Element {
-  const { prompt, params, paramsData, resultPrompt } = props;
+  const { prompt, params, paramsData, finalPrompt } = props;
 
   function handleChangeInputParams(value: Array<string>) {
     const paramsKey = value[0];
@@ -19,7 +19,7 @@ function InputParameters(props: {
     const promptTemplate = Handlebars.compile(prompt);
     const result = promptTemplate(paramsData);
 
-    resultPrompt(result);
+    finalPrompt(result);
   }
 
   function handleBlurInputParams(value: Array<string>) {
@@ -33,7 +33,7 @@ function InputParameters(props: {
     const promptTemplate = Handlebars.compile(prompt);
     const result = promptTemplate(paramsData);
 
-    resultPrompt(result);
+    finalPrompt(result);
   }
   return (
     <>
@@ -75,4 +75,4 @@ function InputParameters(props: {
   );
 }
 
-export default InputParameters;
+export default ParametersFromPrompt;

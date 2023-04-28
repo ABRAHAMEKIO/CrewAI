@@ -5,14 +5,14 @@ export default function bracketsRecognize(promptText: string) {
   let invalidFormat = false;
 
   for (let i = 0; i < promptText.length; i += 1) {
-    const x = promptText[i];
+    const x0 = promptText[i];
     const x1 = promptText[i + 1];
 
-    if (x === '{' && x1 === '{') {
+    if (x0 === '{' && x1 === '{') {
       stack.push('{{');
       tempIndexParams.pop();
       tempIndexParams.push(i + 2);
-    } else if (x === '}' && x1 === '}' && stack[stack.length - 1] === '{{') {
+    } else if (x0 === '}' && x1 === '}' && stack[stack.length - 1] === '{{') {
       stack.pop();
       tempIndexParams.push(i);
 

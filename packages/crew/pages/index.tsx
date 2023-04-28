@@ -23,8 +23,8 @@ import MidjourneyClient, {
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
 import bracketsRecognize from '../helpers/bracketsRecognize';
-import CustomModal from '../components/CustomModal';
-import InputParameters from '../components/InputParameters';
+import ErrorValidationModal from '../components/ErrorValidationModal';
+import ParametersFromPrompt from '../components/ParametersFromPrompt';
 
 let socket;
 
@@ -41,11 +41,11 @@ function Index() {
   );
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
-  const [resultPrompt, setResultPrompt] = useState('');
-  const [modal, setModal] = useState(false);
-  const ToggleModal = () => setModal(!modal);
-  const InputParametersData = (value: string) => {
-    setResultPrompt(value);
+  const [finalPrompt, setFinalPrompt] = useState('');
+  const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
+  const ParametersValue = (value: string) => {
+    setFinalPrompt(value);
   };
 
   useEffect(() => {
@@ -98,10 +98,10 @@ function Index() {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('image_generation_requested', {
-        resultPrompt,
+        finalPrompt,
       });
     }
-    await midjourneyClient.imagine(resultPrompt, socketId, '');
+    await midjourneyClient.imagine(finalPrompt, socketId, '');
     setLoading(true);
   }
 
@@ -119,7 +119,7 @@ function Index() {
       setPrompt(value);
       setParams(res.data);
     } else {
-      setModal(true);
+      setErrorValidationModal(true);
     }
   }
 
@@ -129,7 +129,7 @@ function Index() {
     if (res.data !== null) {
       const promptTemplate = Handlebars.compile(prompt);
       const result = promptTemplate(paramsData);
-      setResultPrompt(result);
+      setFinalPrompt(result);
 
       // eslint-disable-next-line no-restricted-syntax
       for (const property in paramsData) {
@@ -142,11 +142,11 @@ function Index() {
     <Layout>
       <NavigationBar />
       <Container>
-        {modal && (
-          <CustomModal
-            modalOpen={modal}
+        {errorValidationModal && (
+          <ErrorValidationModal
+            modalOpen={errorValidationModal}
             modalClose={ToggleModal}
-            message="parameter format cannot contain spaces."
+            message="parameters format cannot contain spaces."
           />
         )}
         <Grid.Container justify="center">
@@ -160,21 +160,21 @@ function Index() {
               placeholder="A raccoon that can speak and wield a sword"
               onChange={(e) => handleChangePrompt(e.target.value)}
               onBlur={(e) => handleBlurPrompt(e.target.value)}
-              onFocus={() => setResultPrompt('typing...')}
+              onFocus={() => setFinalPrompt('typing...')}
             />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
-            {resultPrompt && (
+            {finalPrompt && (
               <p>
                 When you click try sample, you will executive this prompt &quot;
-                {resultPrompt}&quot;
+                {finalPrompt}&quot;
               </p>
             )}
             {params && (
-              <InputParameters
+              <ParametersFromPrompt
                 prompt={prompt}
                 params={params}
                 paramsData={paramsData}
-                resultPrompt={InputParametersData}
+                finalPrompt={ParametersValue}
               />
             )}
             {error && <p>Error while generating image</p>}
