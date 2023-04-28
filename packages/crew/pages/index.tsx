@@ -164,13 +164,6 @@ function Index() {
               onFocus={() => setFinalPrompt('typing...')}
             />
             <FileUpload />
-            {!error && response && (
-              <Image
-                width={1200}
-                src={response?.imageUrl}
-                alt="Your amazing generative art"
-              />
-            )}
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {finalPrompt && (
               <p>
