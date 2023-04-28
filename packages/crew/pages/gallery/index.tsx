@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Grid,
@@ -12,15 +12,23 @@ import {
   Image,
 } from '@nextui-org/react';
 import ReactStars from 'react-rating-stars-component';
+import DetailImageModal from '../../components/DetailImageModal';
 import Layout from '../../components/Layout';
 import NavigationBar from '../../components/NavigationBar';
 import icons from '../../components/Icons';
 
 function Index() {
+  const [detailImageModal, setDetailImageModal] = useState(false);
+  const ToggleModal = () => setDetailImageModal(!detailImageModal);
+
   return (
     <Layout>
       <NavigationBar />
       <Container lg>
+        <DetailImageModal
+          modalOpen={detailImageModal}
+          modalClose={ToggleModal}
+        />
         <Spacer y={1} />
         <Row wrap="wrap" justify="space-between" css={{ zIndex: 1 }}>
           <Dropdown>
@@ -48,7 +56,7 @@ function Index() {
             const arr = [];
             for (let i = 0; i < 10; i += 1) {
               arr.push(
-                <Grid>
+                <Grid key={i}>
                   <Badge
                     isSquared
                     color="secondary"
@@ -68,7 +76,7 @@ function Index() {
             const arr = [];
             for (let i = 0; i < 10; i += 1) {
               arr.push(
-                <Grid md={3} direction="column">
+                <Grid md={3} direction="column" key={i}>
                   <Card css={{ mw: '330px' }}>
                     <Card.Header>
                       <Text b>Title</Text>
@@ -78,6 +86,7 @@ function Index() {
                         css={{ mw: 320 }}
                         src="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true"
                         alt="Default Image"
+                        onClick={ToggleModal}
                       />
                     </Card.Body>
                     <Card.Footer>
