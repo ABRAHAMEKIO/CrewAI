@@ -1,42 +1,30 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import multer from 'multer';
-import AWS from 'aws-sdk';
-import fs from 'fs';
-import { awsId, awsSecret, awsBucket } from '../../../config';
+import multerS3 from 'multer-s3';
+import { S3Client } from '@aws-sdk/client-s3';
+import { awsId, awsSecret, awsBucket, awsRegion } from '../../../config';
 
-const s3 = new AWS.S3({
-  accessKeyId: awsId,
-  secretAccessKey: awsSecret,
+// config: https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/modules/credentials.html
+const s3 = new S3Client({
+  region: awsRegion,
+  credentials: {
+    accessKeyId: awsId,
+    secretAccessKey: awsSecret,
+  },
 });
 
-const s3Upload = async (req, res) => {
-  const { path } = req.file;
-  const params = {
-    ACL: 'public-read',
-    Bucket: awsBucket,
-    Body: fs.createReadStream(path),
-    Key: `${req.file.originalname}`,
-  };
-
-  s3.upload(params, (err, data) => {
-    if (err) {
-      return res.status(404).json({ error: `Error Upload Image` });
-    }
-    if (!data) {
-      return res.status(404).json({ error: `Error Upload Image` });
-    }
-    fs.unlinkSync(path);
-    return res.status(200).json({
-      url: data.Location,
-    });
-  });
-};
-
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: './',
-    filename: (req, file, cb) => cb(null, file.originalname),
+  storage: multerS3({
+    s3,
+    bucket: awsBucket,
+    acl: 'public-read',
+    metadata(req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key(req, file, cb) {
+      cb(null, `${Date.now().toString()}_${file.originalname}`);
+    },
   }),
 });
 
@@ -54,7 +42,9 @@ const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
 // 'file' is params name
 apiRoute.use(upload.single('file'));
 
-apiRoute.post(s3Upload);
+apiRoute.post((req, res) => {
+  res.status(200).json({ data: 'success' });
+});
 
 export default apiRoute;
 
