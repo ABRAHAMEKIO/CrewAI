@@ -22,6 +22,7 @@ import MidjourneyClient, {
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
+import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
@@ -162,6 +163,7 @@ function Index() {
               onBlur={(e) => handleBlurPrompt(e.target.value)}
               onFocus={() => setFinalPrompt('typing...')}
             />
+            <FileUpload />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {finalPrompt && (
               <p>
