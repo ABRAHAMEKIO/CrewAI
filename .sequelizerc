@@ -1,0 +1,10 @@
+// .sequelizerc
+
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve('packages', 'crew' ,'db','config', 'database.js'),
+  'models-path': path.resolve('packages', 'crew' ,'db','models'),
+  'seeders-path': path.resolve('packages', 'crew' ,'db','seeders'),
+  'migrations-path': path.resolve('packages', 'crew', 'db','migrations')
+};

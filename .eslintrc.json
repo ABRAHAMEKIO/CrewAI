@@ -1,12 +1,18 @@
 {
   "root": true,
-  "ignorePatterns": ["**/*"],
+  "ignorePatterns": ["**/*", "sync.js"],
   "plugins": ["@nrwl/nx", "prettier"],
   "rules": {
     "prettier/prettier": "error",
     "import/extensions": "off",
-    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
-    "import/no-extraneous-dependencies": ["off", {"extensions": ["spec.js", "spec.jsx", "spec.ts", "spec.tsx"]}]
+    "react/jsx-filename-extension": [
+      2,
+      { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
+    ],
+    "import/no-extraneous-dependencies": [
+      "off",
+      { "extensions": ["spec.js", "spec.jsx", "spec.ts", "spec.tsx"] }
+    ]
   },
   "extends": [
     "eslint:recommended",
