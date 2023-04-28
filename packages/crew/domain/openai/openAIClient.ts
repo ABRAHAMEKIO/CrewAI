@@ -79,7 +79,7 @@ export default class OpenAIClient {
       data = {
         model: model ?? 'text-davinci-003',
         prompt,
-        max_tokens: maxTokens ?? 60,
+        max_tokens: maxTokens ?? 256,
         temperature: temperature ?? 0,
         top_p: topP ?? 1,
         n: n ?? 1,

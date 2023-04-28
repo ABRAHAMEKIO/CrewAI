@@ -52,21 +52,22 @@ function AutoCompleteTextarea(props: {
   //   debouncedApiCall(value);
   // }, [value, debouncedApiCall]);
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(async () => {
-      console.log('Performing search with', value);
-      if (value) {
-        const response = await openAIClient.completions(value);
-        console.log('client response:');
-        console.log(response);
-        if (response?.choices.length > 0) {
-          setSuggestionsList(response.choices.map((e) => e.text));
-        }
-      }
-    }, 500);
+  // useEffect(() => {
+  //   const debounceTimer = setTimeout(async () => {
+  //     console.log('Performing search with', value);
+  //     if (value) {
+  //       await openAIClient.completions(value).then((response) => {
+  //         console.log('client response:');
+  //         console.log(response.choices);
+  //         if (response?.choices.length > 0) {
+  //           setSuggestionsList(response.choices.map((e) => e.text));
+  //         }
+  //       });
+  //     }
+  //   }, 500);
 
-    return () => clearTimeout(debounceTimer);
-  }, [value, openAIClient]);
+  //   return () => clearTimeout(debounceTimer);
+  // }, [value, openAIClient]);
 
   // const handleSearch = (event) => {
   //   setSearchTerm(event.target.value);
@@ -93,11 +94,30 @@ function AutoCompleteTextarea(props: {
     return [];
   };
 
-  const onChange = (event, { newValue }) => {
+  let debounceTimer;
+  const fetchSuggestions = () => {
+    debounceTimer = setTimeout(async () => {
+      console.log('Performing search with', value);
+      if (value) {
+        await openAIClient.completions(value).then((response) => {
+          console.log('client response:');
+          console.log(response);
+          if (response?.choices.length > 0) {
+            setSuggestionsList(response.choices.map((e) => e.text));
+          }
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  };
+
+  const onChange = async (event, { newValue }) => {
     setValue(newValue);
-    getSuggestions(newValue);
+    // getSuggestions(newValue);
     // setSuggestionsList(getSuggestions(newValue));
     setPrompt(newValue);
+    fetchSuggestions();
   };
 
   const onSuggestionsFetchRequested = ({ val }) => {
@@ -112,7 +132,8 @@ function AutoCompleteTextarea(props: {
   const shouldRenderSuggestions = () => true;
 
   const onSuggestionSelected = (event, { suggestionValue }) => {
-    setValue(suggestionValue);
+    setValue(value + suggestionValue);
+    setPrompt(value);
   };
 
   const inputProps = {

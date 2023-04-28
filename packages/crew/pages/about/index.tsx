@@ -27,6 +27,7 @@ function Index() {
         <Image
           src="https://github.com/empeje.png"
           width={400}
+          height={400}
           alt="mpj's avatar"
         />
         <p>
@@ -40,6 +41,7 @@ function Index() {
         <Image
           src="https://github.com/hudakurniawan.png"
           width={400}
+          height={400}
           alt="huda's avatar"
         />
         <p>
