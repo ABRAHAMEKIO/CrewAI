@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
@@ -28,7 +28,31 @@ const upload = multer({
   }),
 });
 
-const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
+// ref: https://www.npmjs.com/package/next-connect
+interface ExtendedRequest {
+  method: string;
+  file: {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    size: bigint;
+    bucket: string;
+    key: string;
+    acl: string;
+    contentType: string;
+    contentDisposition: never;
+    contentEncoding: never;
+    storageClass: string;
+    serverSideEncryption: never;
+    metadata: {
+      fieldName: string;
+    };
+    location: string;
+  };
+}
+
+const apiRoute = nextConnect<ExtendedRequest, NextApiResponse>({
   onError(error, req, res) {
     res
       .status(501)
@@ -40,10 +64,12 @@ const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
 });
 
 // 'file' is params name
-apiRoute.use(upload.single('file'));
-
-apiRoute.post((req, res) => {
-  res.status(200).json({ data: 'success' });
+apiRoute.post(upload.single('file'), (req, res) => {
+  res.status(200).json({
+    file: {
+      location: req.file.location,
+    },
+  });
 });
 
 export default apiRoute;

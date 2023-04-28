@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input } from '@nextui-org/react';
+import { Input, Image } from '@nextui-org/react';
 import http from 'axios';
 // UploadService.js
 const UploadService = {
@@ -15,15 +15,13 @@ const UploadService = {
       onUploadProgress,
     });
   },
-  getFiles: () => {
-    // return Promise.resolve(true);
-  },
 };
 
 function FileUpload() {
   const [currentFile, setCurrentFile] = useState<File>();
   const [progress, setProgress] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
+  const [fileLocation, setFileLocation] = useState<string>('');
 
   const selectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
@@ -42,7 +40,7 @@ function FileUpload() {
       })
         .then((response) => {
           setMessage(response.data.message);
-          return UploadService.getFiles();
+          setFileLocation(response?.data?.file?.location);
         })
         .catch((err) => {
           setProgress(0);
@@ -76,6 +74,15 @@ function FileUpload() {
             {progress}%
           </div>
         </div>
+      )}
+      {fileLocation && (
+        <Image
+          width={300}
+          height={300}
+          src={fileLocation}
+          alt="Prompt Image"
+          objectFit="cover"
+        />
       )}
 
       {message && (
