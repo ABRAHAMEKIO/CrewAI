@@ -1,10 +1,41 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import multer from 'multer';
+import AWS from 'aws-sdk';
+import fs from 'fs';
+import { awsId, awsSecret, awsBucket } from '../../../config';
+
+const s3 = new AWS.S3({
+  accessKeyId: awsId,
+  secretAccessKey: awsSecret,
+});
+
+const s3Upload = async (req, res) => {
+  const { path } = req.file;
+  const params = {
+    ACL: 'public-read',
+    Bucket: awsBucket,
+    Body: fs.createReadStream(path),
+    Key: `${req.file.originalname}`,
+  };
+
+  s3.upload(params, (err, data) => {
+    if (err) {
+      return res.status(404).json({ error: `Error Upload Image` });
+    }
+    if (!data) {
+      return res.status(404).json({ error: `Error Upload Image` });
+    }
+    fs.unlinkSync(path);
+    return res.status(200).json({
+      url: data.Location,
+    });
+  });
+};
 
 const upload = multer({
   storage: multer.diskStorage({
-    destination: './tmp/uploads',
+    destination: './',
     filename: (req, file, cb) => cb(null, file.originalname),
   }),
 });
@@ -20,11 +51,10 @@ const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
   },
 });
 
+// 'file' is params name
 apiRoute.use(upload.single('file'));
 
-apiRoute.post((req, res) => {
-  res.status(200).json({ data: 'success' });
-});
+apiRoute.post(s3Upload);
 
 export default apiRoute;
 
