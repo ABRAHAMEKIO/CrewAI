@@ -19,6 +19,7 @@ function Index() {
         <Image
           src="https://github.com/CrewAI.png"
           width={400}
+          height={400}
           alt="CrewAI's avatar"
         />
         <p>

@@ -150,6 +150,26 @@ function ScaleIcon({ fill, size, width = 24, height = 24, ...props }) {
   );
 }
 
+function Folder({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      fill="none"
+      height={size || height}
+      viewBox="0 0 24 24"
+      width={size || width}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M13.4499 4.8802H16.5199C20.2099 4.8802 22.0099 6.8502 21.9999 10.8902V15.7602C21.9999 19.6202 19.6199 22.0002 15.7499 22.0002H8.2399C4.3899 22.0002 1.9999 19.6202 1.9999 15.7502V8.2402C1.9999 4.1002 3.8399 2.0002 7.4699 2.0002H9.0499C9.9809 1.9902 10.8499 2.4202 11.4199 3.1502L12.2999 4.3202C12.5799 4.6702 12.9999 4.8802 13.4499 4.8802ZM7.3699 15.2902H16.6299C17.0399 15.2902 17.3699 14.9502 17.3699 14.5402C17.3699 14.1202 17.0399 13.7902 16.6299 13.7902H7.3699C6.9499 13.7902 6.6199 14.1202 6.6199 14.5402C6.6199 14.9502 6.9499 15.2902 7.3699 15.2902Z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
+
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
   scale: <ScaleIcon fill="var(--nextui-colors-warning)" size={30} />,
@@ -157,6 +177,7 @@ const icons = {
   flash: <FlashIcon fill="var(--nextui-colors-primary)" size={30} />,
   server: <ServerIcon fill="var(--nextui-colors-success)" size={30} />,
   user: <TagUserIcon fill="var(--nextui-colors-error)" size={30} />,
+  folder: <Folder fill="white" size={30} />,
 };
 export default icons;
 /* eslint-enable react/jsx-props-no-spreading */
