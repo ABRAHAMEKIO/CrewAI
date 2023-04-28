@@ -5,9 +5,13 @@ import {
   Image,
   PressEvent,
   Textarea,
+  Grid,
+  Spacer,
+  Link,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
+import Handlebars from 'handlebars/dist/cjs/handlebars';
 import { Header1, Header2 } from '../components/Heading';
 import NavigationBar from '../components/NavigationBar';
 
@@ -18,6 +22,9 @@ import MidjourneyClient, {
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
+import bracketsRecognize from '../helpers/bracketsRecognize';
+import ErrorValidationModal from '../components/ErrorValidationModal';
+import ParametersFromPrompt from '../components/ParametersFromPrompt';
 
 let socket;
 
@@ -32,6 +39,14 @@ function Index() {
     '',
     `${server}/api/thenextleg/imagine`
   );
+  const [params, setParams] = useState([]);
+  const [paramsData] = useState({});
+  const [finalPrompt, setFinalPrompt] = useState('');
+  const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
+  const ParametersValue = (value: string) => {
+    setFinalPrompt(value);
+  };
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -83,42 +98,121 @@ function Index() {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('image_generation_requested', {
-        prompt,
+        finalPrompt,
       });
     }
-    await midjourneyClient.imagine(prompt, socketId, '');
+    await midjourneyClient.imagine(finalPrompt, socketId, '');
     setLoading(true);
+  }
+
+  function handleChangePrompt(value: string) {
+    const res = bracketsRecognize(value);
+
+    if (res.data !== null) {
+      res.data.map((val) => {
+        if (paramsData[val] === undefined) {
+          paramsData[val] = '...';
+        }
+        return val;
+      });
+
+      setPrompt(value);
+      setParams(res.data);
+    } else {
+      setErrorValidationModal(true);
+    }
+  }
+
+  function handleBlurPrompt(value: string) {
+    const res = bracketsRecognize(value);
+
+    if (res.data !== null) {
+      const promptTemplate = Handlebars.compile(prompt);
+      const result = promptTemplate(paramsData);
+      setFinalPrompt(result);
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const property in paramsData) {
+        if (!res.data.includes(property)) delete paramsData[property];
+      }
+    }
   }
 
   return (
     <Layout>
       <NavigationBar />
       <Container>
-        <Header1 content="Playground" />
-        <Header2 content="Write your first GenAI prompt" />
-        <Textarea
-          width="100%"
-          cacheMeasurements={false}
-          label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
-          placeholder="A raccoon that can speak and wield a sword"
-          onChange={(e) => setPrompt(e.target.value)}
-        />
-        {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
-        {!error && response && (
-          <Image
-            width={1200}
-            src={response?.imageUrl}
-            alt="Your amazing generative art"
+        {errorValidationModal && (
+          <ErrorValidationModal
+            modalOpen={errorValidationModal}
+            modalClose={ToggleModal}
+            message="parameters format cannot contain spaces."
           />
         )}
-        {error && <p>Error while generating image</p>}
-        <Button
-          color="gradient"
-          onPress={(e) => handleSubmit(e)}
-          disabled={loading}
-        >
-          {loading ? 'Loading' : 'Draw'}
-        </Button>
+        <Grid.Container justify="center">
+          <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
+            <Header1 content="Playground" />
+            <Header2 content="Write your first GenAI prompt" />
+            <Textarea
+              width="100%"
+              cacheMeasurements={false}
+              label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
+              placeholder="A raccoon that can speak and wield a sword"
+              onChange={(e) => handleChangePrompt(e.target.value)}
+              onBlur={(e) => handleBlurPrompt(e.target.value)}
+              onFocus={() => setFinalPrompt('typing...')}
+            />
+            {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
+            {finalPrompt && (
+              <p>
+                When you click try sample, you will executive this prompt &quot;
+                {finalPrompt}&quot;
+              </p>
+            )}
+            {params && (
+              <ParametersFromPrompt
+                prompt={prompt}
+                params={params}
+                paramsData={paramsData}
+                finalPrompt={ParametersValue}
+              />
+            )}
+            {error && <p>Error while generating image</p>}
+            <Link href="#promptPresets" css={{ float: 'right' }}>
+              Open Prompt Presets
+            </Link>
+            <Spacer y={1.5} />
+            <Button
+              color="gradient"
+              onPress={(e) => handleSubmit(e)}
+              disabled={loading}
+              css={{ float: 'right', maxWidth: '2rem' }}
+            >
+              {loading ? 'Loading' : 'Draw'}
+            </Button>
+          </Grid>
+          {!error && response && (
+            <>
+              <Spacer x={4} />
+              <Grid direction="column" md={4} alignItems="center">
+                <div style={{ marginTop: '4vh' }}>
+                  <Image
+                    css={{ maxWidth: 550 }}
+                    src={response?.imageUrl}
+                    alt="Your amazing generative art"
+                  />
+                </div>
+                <Spacer y={1} />
+                <Button.Group color="gradient" ghost>
+                  <Button>V 1</Button>
+                  <Button>V 2</Button>
+                  <Button>V 3</Button>
+                  <Button>V 4</Button>
+                </Button.Group>
+              </Grid>
+            </>
+          )}
+        </Grid.Container>
       </Container>
     </Layout>
   );
