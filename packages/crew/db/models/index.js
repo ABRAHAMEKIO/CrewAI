@@ -1,10 +1,10 @@
+require('dotenv').config({ path: 'packages/crew/.env' });
+
 const { Sequelize, DataTypes } = require('sequelize-cockroachdb');
 const fs = require('fs');
 const path = require('path');
 
-const config = require('../../config');
-
-const sequelize = new Sequelize(config.databaseUrl, {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   dialectOptions: {
     ssl: {
