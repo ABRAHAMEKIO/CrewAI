@@ -45,6 +45,7 @@ function Index() {
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [seedFileName, setSeedFileName] = useState('');
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
@@ -108,7 +109,11 @@ function Index() {
       });
     }
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
-      await midjourneyClient.imagine(finalPrompt, socketId, '');
+      await midjourneyClient.imagine(
+        `${seedFileName} ${finalPrompt}`,
+        socketId,
+        ''
+      );
     if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
       setError(true);
       setErrorMessage(
@@ -178,7 +183,9 @@ function Index() {
               onBlur={(e) => handleBlurPrompt(e.target.value)}
               onFocus={() => setFinalPrompt('typing...')}
             />
-            <FileUpload />
+            <FileUpload
+              onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
+            />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {finalPrompt && (
               <p>

@@ -17,7 +17,11 @@ const UploadService = {
   },
 };
 
-function FileUpload() {
+function FileUpload({
+  onUploadFinished,
+}: {
+  onUploadFinished: (fileLocation: string) => void;
+}) {
   const [currentFile, setCurrentFile] = useState<File>();
   const [progress, setProgress] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
@@ -40,7 +44,9 @@ function FileUpload() {
       })
         .then((response) => {
           setMessage(response.data.message);
-          setFileLocation(response?.data?.file?.location);
+          const savedFileLocation = response?.data?.file?.location;
+          setFileLocation(savedFileLocation);
+          onUploadFinished(savedFileLocation);
         })
         .catch((err) => {
           setProgress(0);
@@ -55,7 +61,7 @@ function FileUpload() {
         });
     };
     upload();
-  }, [currentFile]);
+  }, [currentFile, onUploadFinished]);
 
   return (
     <>
