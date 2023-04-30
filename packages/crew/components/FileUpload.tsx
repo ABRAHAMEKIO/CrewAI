@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Input, Image, Progress, Spacer } from '@nextui-org/react';
 import http from 'axios';
 // UploadService.js
@@ -34,6 +34,11 @@ function FileUpload({
     setProgress(0);
   };
 
+  const memoizedCallback = useCallback(
+    (savedFileLocation) => onUploadFinished(savedFileLocation),
+    [onUploadFinished]
+  );
+
   useEffect(() => {
     const upload = () => {
       setProgress(0);
@@ -46,7 +51,7 @@ function FileUpload({
           setMessage(response.data.message);
           const savedFileLocation = response?.data?.file?.location;
           setFileLocation(savedFileLocation);
-          onUploadFinished(savedFileLocation);
+          memoizedCallback(savedFileLocation);
         })
         .catch((err) => {
           setProgress(0);
@@ -61,7 +66,7 @@ function FileUpload({
         });
     };
     upload();
-  }, [currentFile, onUploadFinished]);
+  }, [currentFile, memoizedCallback]);
 
   return (
     <>
