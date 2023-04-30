@@ -35,11 +35,9 @@ function Index() {
   const [response, setResponse] = useState(null as WebhookSuccessResponse);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [prompt, setPrompt] = useState('');
-  const midjourneyClient = new MidjourneyClient(
-    '',
-    `${server}/api/thenextleg/imagine`
-  );
+  const midjourneyClient = new MidjourneyClient('', `${server}/api/thenextleg`);
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
