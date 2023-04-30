@@ -27,46 +27,38 @@ function FileUpload({
   const [message, setMessage] = useState<string>('');
   const [fileLocation, setFileLocation] = useState<string>('');
 
+  const upload = () => {
+    setProgress(0);
+    if (!currentFile) return;
+
+    UploadService.upload(currentFile, (event) => {
+      setProgress(Math.round((100 * event.loaded) / event.total));
+    })
+      .then((response) => {
+        setMessage(response.data.message);
+        const savedFileLocation = response?.data?.file?.location;
+        setFileLocation(savedFileLocation);
+        onUploadFinished(savedFileLocation);
+      })
+      .catch((err) => {
+        setProgress(0);
+
+        if (err.response && err.response.data && err.response.data.message) {
+          setMessage(err.response.data.message);
+        } else {
+          setMessage('Could not upload the File!');
+        }
+
+        setCurrentFile(undefined);
+      });
+  };
   const selectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
     const selectedFiles = files as FileList;
     setCurrentFile(selectedFiles?.[0]);
     setProgress(0);
-  };
-
-  const memoizedCallback = useCallback(
-    (savedFileLocation) => onUploadFinished(savedFileLocation),
-    [onUploadFinished]
-  );
-
-  useEffect(() => {
-    const upload = () => {
-      setProgress(0);
-      if (!currentFile) return;
-
-      UploadService.upload(currentFile, (event) => {
-        setProgress(Math.round((100 * event.loaded) / event.total));
-      })
-        .then((response) => {
-          setMessage(response.data.message);
-          const savedFileLocation = response?.data?.file?.location;
-          setFileLocation(savedFileLocation);
-          memoizedCallback(savedFileLocation);
-        })
-        .catch((err) => {
-          setProgress(0);
-
-          if (err.response && err.response.data && err.response.data.message) {
-            setMessage(err.response.data.message);
-          } else {
-            setMessage('Could not upload the File!');
-          }
-
-          setCurrentFile(undefined);
-        });
-    };
     upload();
-  }, [currentFile, memoizedCallback]);
+  };
 
   return (
     <>
