@@ -62,7 +62,6 @@ export default class MidjourneyClient {
       url: path ? `${baseUrl}/${path}` : baseUrl,
       headers,
       data,
-      transformResponse: (r: ServerSuccessResponse) => r.data,
     };
     return config;
   }

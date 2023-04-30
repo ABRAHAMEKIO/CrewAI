@@ -73,10 +73,12 @@ function Index() {
             }
             if (val.imageUrl) {
               setError(false);
+              setErrorMessage('');
               setResponse(val);
               successBeep();
             } else {
               setError(true);
+              setErrorMessage(val.content);
               errorBeep();
             }
             setLoading(false);
@@ -167,8 +169,11 @@ function Index() {
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {finalPrompt && (
               <p>
-                When you click try sample, you will executive this prompt &quot;
-                {finalPrompt}&quot;
+                <em>
+                  When you click <strong>try sample</strong>, you will executive
+                  this prompt &quot;
+                  {finalPrompt}&quot;
+                </em>
               </p>
             )}
             {params && (
@@ -179,7 +184,9 @@ function Index() {
                 finalPrompt={ParametersValue}
               />
             )}
-            {error && <p>Error while generating image</p>}
+            {!loading && error && (
+              <p>Error while generating image: {errorMessage}</p>
+            )}
             <Link href="#promptPresets" css={{ float: 'right' }}>
               Open Prompt Presets
             </Link>
@@ -190,7 +197,7 @@ function Index() {
               disabled={loading}
               css={{ float: 'right', maxWidth: '2rem' }}
             >
-              {loading ? 'Loading' : 'Draw'}
+              {loading ? 'Loading' : 'Try sample'}
             </Button>
           </Grid>
           {!error && response && (
