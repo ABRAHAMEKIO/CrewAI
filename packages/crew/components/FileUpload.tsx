@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Input, Image, Progress, Spacer } from '@nextui-org/react';
 import http from 'axios';
 // UploadService.js
@@ -27,11 +27,11 @@ function FileUpload({
   const [message, setMessage] = useState<string>('');
   const [fileLocation, setFileLocation] = useState<string>('');
 
-  const upload = () => {
+  const upload = (selectedFile) => {
     setProgress(0);
-    if (!currentFile) return;
+    if (!selectedFile) return;
 
-    UploadService.upload(currentFile, (event) => {
+    UploadService.upload(selectedFile, (event) => {
       setProgress(Math.round((100 * event.loaded) / event.total));
     })
       .then((response) => {
@@ -57,7 +57,7 @@ function FileUpload({
     const selectedFiles = files as FileList;
     setCurrentFile(selectedFiles?.[0]);
     setProgress(0);
-    upload();
+    upload(selectedFiles?.[0]);
   };
 
   return (
