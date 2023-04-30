@@ -5,6 +5,7 @@ import {
   Image,
   PressEvent,
   Textarea,
+  Text,
   Grid,
   Spacer,
   Link,
@@ -18,6 +19,8 @@ import NavigationBar from '../components/NavigationBar';
 import { server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import MidjourneyClient, {
+  IsNaughtySuccessResponse,
+  SuccessResponse,
   WebhookSuccessResponse,
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
@@ -104,8 +107,18 @@ function Index() {
         finalPrompt,
       });
     }
-    await midjourneyClient.imagine(finalPrompt, socketId, '');
-    setLoading(true);
+    const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
+      await midjourneyClient.imagine(finalPrompt, socketId, '');
+    if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
+      setError(true);
+      setErrorMessage(
+        `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
+      );
+      errorBeep();
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
   }
 
   function handleChangePrompt(value: string) {
@@ -170,7 +183,7 @@ function Index() {
             {finalPrompt && (
               <p>
                 <em>
-                  When you click <strong>try sample</strong>, you will executive
+                  When you click <strong>try sample</strong>, you will execute
                   this prompt &quot;
                   {finalPrompt}&quot;
                 </em>
@@ -185,7 +198,9 @@ function Index() {
               />
             )}
             {!loading && error && (
-              <p>Error while generating image: {errorMessage}</p>
+              <Text color="error">
+                Error while generating image: {errorMessage}
+              </Text>
             )}
             <Link href="#promptPresets" css={{ float: 'right' }}>
               Open Prompt Presets

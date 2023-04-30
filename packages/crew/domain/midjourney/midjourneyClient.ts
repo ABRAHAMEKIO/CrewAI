@@ -13,13 +13,13 @@ export interface SuccessResponse {
   createdAt: string;
 }
 
-interface ServerSuccessResponse {
-  data: SuccessResponse;
-}
-
 export interface IsNaughtySuccessResponse {
   isNaughty: boolean;
   phrase: string;
+}
+
+interface ServerSuccessResponse {
+  data: SuccessResponse | IsNaughtySuccessResponse;
 }
 
 export interface WebhookSuccessResponse {
@@ -62,6 +62,9 @@ export default class MidjourneyClient {
       url: path ? `${baseUrl}/${path}` : baseUrl,
       headers,
       data,
+      validateStatus(status) {
+        return status < 500; // Resolve only if the status code is less than 500
+      },
     };
     return config;
   }
@@ -71,7 +74,7 @@ export default class MidjourneyClient {
     ref: string,
     webhookOverride: string,
     quality?: number
-  ): Promise<SuccessResponse> {
+  ): Promise<SuccessResponse | IsNaughtySuccessResponse> {
     const data: Request = {
       msg: quality ? `${msg} --quality=${quality}` : msg,
       ref,
@@ -79,9 +82,9 @@ export default class MidjourneyClient {
     };
 
     const config = this.getConfig(data, 'imagine');
-
-    const response: AxiosResponse<SuccessResponse> =
-      await axios.request<SuccessResponse>(config);
+    const response = await axios.request<
+      SuccessResponse | IsNaughtySuccessResponse
+    >(config);
     return response.data;
   }
 
