@@ -1,21 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Container,
-  Grid,
-  Text,
-  Card,
-  Row,
-  Badge,
-  Dropdown,
-  Spacer,
-  Avatar,
-  Image,
-} from '@nextui-org/react';
-import ReactStars from 'react-rating-stars-component';
+import { Container, Grid, Row, Dropdown, Spacer } from '@nextui-org/react';
+import Tag from '../../components/Tag';
 import DetailImageModal from '../../components/DetailImageModal';
 import Layout from '../../components/Layout';
 import NavigationBar from '../../components/NavigationBar';
-import icons from '../../components/Icons';
+import GalleryItemCard from '../../components/GalleryItemCard';
 
 function Index() {
   const [detailImageModal, setDetailImageModal] = useState(false);
@@ -57,14 +46,7 @@ function Index() {
             for (let i = 0; i < 10; i += 1) {
               arr.push(
                 <Grid key={i}>
-                  <Badge
-                    isSquared
-                    color="secondary"
-                    variant="bordered"
-                    size="lg"
-                  >
-                    Tags {i}
-                  </Badge>
+                  <Tag name={i.toString()} />
                 </Grid>
               );
             }
@@ -77,57 +59,9 @@ function Index() {
             for (let i = 0; i < 10; i += 1) {
               arr.push(
                 <Grid md={3} direction="column" key={i}>
-                  <Card css={{ mw: '330px' }}>
-                    <Card.Header>
-                      <Text b>Title</Text>
-                    </Card.Header>
-                    <Card.Body>
-                      <Image
-                        css={{ mw: 320 }}
-                        src="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true"
-                        alt="Default Image"
-                        onClick={ToggleModal}
-                      />
-                    </Card.Body>
-                    <Card.Footer>
-                      <Row wrap="wrap" justify="space-between" align="center">
-                        <div>
-                          <Text size="sm" b>
-                            (123)
-                          </Text>
-                          <ReactStars
-                            count={5}
-                            size={24}
-                            value={4}
-                            edit={false}
-                            activeColor="#ffd700"
-                          />
-                        </div>
-                        <div>
-                          <Grid.Container gap={1} justify="center">
-                            <Grid>
-                              <Avatar icon={icons.heart} squared />
-                              <Text size="sm" css={{ textAlign: 'center' }}>
-                                (123)
-                              </Text>
-                            </Grid>
-                            <Grid>
-                              <Avatar icon={icons.arrowUp} squared />
-                              <Text size="sm" css={{ textAlign: 'center' }}>
-                                (123)
-                              </Text>
-                            </Grid>
-                            <Grid>
-                              <Avatar icon={icons.chat} squared />
-                              <Text size="sm" css={{ textAlign: 'center' }}>
-                                (123)
-                              </Text>
-                            </Grid>
-                          </Grid.Container>
-                        </div>
-                      </Row>
-                    </Card.Footer>
-                  </Card>
+                  <div onClick={ToggleModal} aria-hidden="true">
+                    <GalleryItemCard imgSrc="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true" />
+                  </div>
                 </Grid>
               );
             }
