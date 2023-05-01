@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Input, Image, Progress, Spacer } from '@nextui-org/react';
 import http from 'axios';
 // UploadService.js
@@ -17,45 +17,48 @@ const UploadService = {
   },
 };
 
-function FileUpload() {
+function FileUpload({
+  onUploadFinished,
+}: {
+  onUploadFinished: (fileLocation: string) => void;
+}) {
   const [currentFile, setCurrentFile] = useState<File>();
   const [progress, setProgress] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
   const [fileLocation, setFileLocation] = useState<string>('');
 
+  const upload = (selectedFile) => {
+    setProgress(0);
+    if (!selectedFile) return;
+
+    UploadService.upload(selectedFile, (event) => {
+      setProgress(Math.round((100 * event.loaded) / event.total));
+    })
+      .then((response) => {
+        setMessage(response.data.message);
+        const savedFileLocation = response?.data?.file?.location;
+        setFileLocation(savedFileLocation);
+        onUploadFinished(savedFileLocation);
+      })
+      .catch((err) => {
+        setProgress(0);
+
+        if (err.response && err.response.data && err.response.data.message) {
+          setMessage(err.response.data.message);
+        } else {
+          setMessage('Could not upload the File!');
+        }
+
+        setCurrentFile(undefined);
+      });
+  };
   const selectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
     const selectedFiles = files as FileList;
     setCurrentFile(selectedFiles?.[0]);
     setProgress(0);
+    upload(selectedFiles?.[0]);
   };
-
-  useEffect(() => {
-    const upload = () => {
-      setProgress(0);
-      if (!currentFile) return;
-
-      UploadService.upload(currentFile, (event) => {
-        setProgress(Math.round((100 * event.loaded) / event.total));
-      })
-        .then((response) => {
-          setMessage(response.data.message);
-          setFileLocation(response?.data?.file?.location);
-        })
-        .catch((err) => {
-          setProgress(0);
-
-          if (err.response && err.response.data && err.response.data.message) {
-            setMessage(err.response.data.message);
-          } else {
-            setMessage('Could not upload the File!');
-          }
-
-          setCurrentFile(undefined);
-        });
-    };
-    upload();
-  }, [currentFile]);
 
   return (
     <>

@@ -13,7 +13,8 @@ export default async function handler(req, res): Promise<SuccessResponse> {
   const imageCommandResponse = await midjourneyClient.imagine(
     msg,
     ref,
-    WEBHOOK_OVERRIDE || ''
+    WEBHOOK_OVERRIDE || '',
+    0.5 // lower the quality for free user
   );
   return res.status(200).json(imageCommandResponse);
 }

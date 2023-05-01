@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
 
 export interface Request {
-  cmd: string;
+  cmd?: string;
   msg: string;
-  ref: string;
-  webhookOverride: string;
+  ref?: string;
+  webhookOverride?: string;
 }
 
 export interface SuccessResponse {
@@ -13,8 +13,13 @@ export interface SuccessResponse {
   createdAt: string;
 }
 
+export interface IsNaughtySuccessResponse {
+  isNaughty: boolean;
+  phrase: string;
+}
+
 interface ServerSuccessResponse {
-  data: SuccessResponse;
+  data: SuccessResponse | IsNaughtySuccessResponse;
 }
 
 export interface WebhookSuccessResponse {
@@ -28,7 +33,7 @@ export interface WebhookSuccessResponse {
   buttonMessageId: string;
 }
 export default class MidjourneyClient {
-  BASE_URL = 'https://api.thenextleg.io';
+  BASE_URL = 'https://api.thenextleg.io/v2';
 
   authToken: string;
 
@@ -39,18 +44,7 @@ export default class MidjourneyClient {
     this.proxyUrl = proxyUrl;
   }
 
-  async imagine(
-    msg: string,
-    ref: string,
-    webhookOverride: string
-  ): Promise<SuccessResponse> {
-    const data: Request = {
-      cmd: 'imagine',
-      msg,
-      ref,
-      webhookOverride,
-    };
-
+  getConfig(data, path = null) {
     const headers = {
       Authorization: `Bearer ${this.authToken}`,
       'Content-Type': 'application/json',
@@ -60,16 +54,68 @@ export default class MidjourneyClient {
       delete headers.Authorization;
     }
 
+    const baseUrl = this.proxyUrl || this.BASE_URL;
+
     const config = {
       method: 'POST',
-      url: this.proxyUrl || this.BASE_URL,
+      // add path to url only if it is not call to proxy
+      url: path ? `${baseUrl}/${path}` : baseUrl,
       headers,
       data,
-      transformResponse: (r: ServerSuccessResponse) => r.data,
+      validateStatus(status) {
+        return status < 500; // Resolve only if the status code is less than 500
+      },
     };
+    return config;
+  }
+
+  async imagine(
+    msg: string,
+    ref: string,
+    webhookOverride: string,
+    quality?: number
+  ): Promise<SuccessResponse | IsNaughtySuccessResponse> {
+    const data: Request = {
+      msg: quality ? `${msg} --quality=${quality}` : msg,
+      ref,
+      webhookOverride,
+    };
+
+    const config = this.getConfig(data, 'imagine');
+    const response = await axios.request<
+      SuccessResponse | IsNaughtySuccessResponse
+    >(config);
+    return response.data;
+  }
+
+  async relax(
+    msg: string,
+    ref: string,
+    webhookOverride: string
+  ): Promise<SuccessResponse> {
+    const data: Request = {
+      cmd: 'relax',
+      msg,
+      ref,
+      webhookOverride,
+    };
+
+    const config = this.getConfig(data, 'slash-commands');
 
     const response: AxiosResponse<SuccessResponse> =
       await axios.request<SuccessResponse>(config);
+    return response.data;
+  }
+
+  async isThisNaughty(msg: string): Promise<IsNaughtySuccessResponse> {
+    const data: Request = {
+      msg,
+    };
+
+    const config = this.getConfig(data, 'isThisNaughty');
+
+    const response: AxiosResponse<IsNaughtySuccessResponse> =
+      await axios.request<IsNaughtySuccessResponse>(config);
     return response.data;
   }
 }

@@ -5,6 +5,7 @@ import {
   Image,
   PressEvent,
   Textarea,
+  Text,
   Grid,
   Spacer,
   Link,
@@ -18,6 +19,8 @@ import NavigationBar from '../components/NavigationBar';
 import { server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import MidjourneyClient, {
+  IsNaughtySuccessResponse,
+  SuccessResponse,
   WebhookSuccessResponse,
 } from '../domain/midjourney/midjourneyClient';
 import Layout from '../components/Layout';
@@ -35,15 +38,14 @@ function Index() {
   const [response, setResponse] = useState(null as WebhookSuccessResponse);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [prompt, setPrompt] = useState('');
-  const midjourneyClient = new MidjourneyClient(
-    '',
-    `${server}/api/thenextleg/imagine`
-  );
+  const midjourneyClient = new MidjourneyClient('', `${server}/api/thenextleg`);
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [seedFileName, setSeedFileName] = useState('');
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
@@ -51,6 +53,8 @@ function Index() {
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
+      /* eslint-disable no-console */
+      console.log('mixpanel is being called');
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('home_page_view');
     }
@@ -73,10 +77,12 @@ function Index() {
             }
             if (val.imageUrl) {
               setError(false);
+              setErrorMessage('');
               setResponse(val);
               successBeep();
             } else {
               setError(true);
+              setErrorMessage(val.content);
               errorBeep();
             }
             setLoading(false);
@@ -102,8 +108,22 @@ function Index() {
         finalPrompt,
       });
     }
-    await midjourneyClient.imagine(finalPrompt, socketId, '');
-    setLoading(true);
+    const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
+      await midjourneyClient.imagine(
+        `${seedFileName} ${finalPrompt}`,
+        socketId,
+        ''
+      );
+    if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
+      setError(true);
+      setErrorMessage(
+        `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
+      );
+      errorBeep();
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
   }
 
   function handleChangePrompt(value: string) {
@@ -163,12 +183,17 @@ function Index() {
               onBlur={(e) => handleBlurPrompt(e.target.value)}
               onFocus={() => setFinalPrompt('typing...')}
             />
-            <FileUpload />
+            <FileUpload
+              onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
+            />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {finalPrompt && (
               <p>
-                When you click try sample, you will executive this prompt &quot;
-                {finalPrompt}&quot;
+                <em>
+                  When you click <strong>try sample</strong>, you will execute
+                  this prompt &quot;
+                  {finalPrompt}&quot;
+                </em>
               </p>
             )}
             {params && (
@@ -179,7 +204,11 @@ function Index() {
                 finalPrompt={ParametersValue}
               />
             )}
-            {error && <p>Error while generating image</p>}
+            {!loading && error && (
+              <Text color="error">
+                Error while generating image: {errorMessage}
+              </Text>
+            )}
             <Link href="#promptPresets" css={{ float: 'right' }}>
               Open Prompt Presets
             </Link>
@@ -190,7 +219,7 @@ function Index() {
               disabled={loading}
               css={{ float: 'right', maxWidth: '2rem' }}
             >
-              {loading ? 'Loading' : 'Draw'}
+              {loading ? 'Loading' : 'Try sample'}
             </Button>
           </Grid>
           {!error && response && (
