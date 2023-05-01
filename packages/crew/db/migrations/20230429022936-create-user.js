@@ -9,26 +9,33 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       username: {
-        type: Sequelize.STRING,
-      },
-      interests: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       email: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      interests: {
+        allowNull: true,
         type: Sequelize.STRING,
       },
       occupation: {
+        allowNull: true,
         type: Sequelize.STRING,
       },
       usage: {
+        allowNull: true,
         type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
+        defaultValue: new Date(),
         type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
+        defaultValue: new Date(),
         type: Sequelize.DATE,
       },
     });
