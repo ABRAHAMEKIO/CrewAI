@@ -1,3 +1,4 @@
+// @ts-check
 require('dotenv').config({ path: 'packages/crew/.env' });
 
 module.exports = {
