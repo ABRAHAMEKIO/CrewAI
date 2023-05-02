@@ -173,7 +173,7 @@ function Index() {
         )}
         <Grid.Container justify="center">
           <Grid md={8} direction="column" css={{ p: 0 }}>
-            <Information />
+            {/* <Information /> */}
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
