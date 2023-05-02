@@ -29,6 +29,7 @@ import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
+import ImagineResponse from '../components/ImagineResponse';
 
 let socket;
 
@@ -92,6 +93,7 @@ function Index() {
         socket.on(MidjourneyCommand.Connected.toString(), () => {
           // eslint-disable-next-line no-console
           console.info('connected');
+          console.info('socketId: ', socket.id);
           setSocketId(socket.id);
         });
       })
@@ -222,27 +224,7 @@ function Index() {
               {loading ? 'Loading' : 'Try sample'}
             </Button>
           </Grid>
-          {!error && response && (
-            <>
-              <Spacer x={4} />
-              <Grid direction="column" md={4} alignItems="center">
-                <div style={{ marginTop: '4vh' }}>
-                  <Image
-                    css={{ maxWidth: 550 }}
-                    src={response?.imageUrl}
-                    alt="Your amazing generative art"
-                  />
-                </div>
-                <Spacer y={1} />
-                <Button.Group color="gradient" ghost>
-                  <Button>V 1</Button>
-                  <Button>V 2</Button>
-                  <Button>V 3</Button>
-                  <Button>V 4</Button>
-                </Button.Group>
-              </Grid>
-            </>
-          )}
+          {!error && response && <ImagineResponse response={response} />}
         </Grid.Container>
       </Container>
     </Layout>
