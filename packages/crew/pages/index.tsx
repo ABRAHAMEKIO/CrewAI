@@ -7,6 +7,7 @@ import {
   Text,
   Grid,
   Spacer,
+  Collapse,
   Link,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
@@ -46,6 +47,7 @@ function Index() {
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
+  const [historyResponse, setHistoryResponse] = useState([]);
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
@@ -79,6 +81,8 @@ function Index() {
               setError(false);
               setErrorMessage('');
               setResponse(val);
+              historyResponse.push(val);
+              setHistoryResponse(historyResponse);
               successBeep();
             } else {
               setError(true);
@@ -92,6 +96,8 @@ function Index() {
         socket.on(MidjourneyCommand.Connected.toString(), () => {
           // eslint-disable-next-line no-console
           console.info('connected');
+          // eslint-disable-next-line no-console
+          console.info(`${socket.id}`);
           setSocketId(socket.id);
         });
       })
@@ -99,7 +105,7 @@ function Index() {
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, [mixpanel]);
+  }, [historyResponse, mixpanel]);
 
   async function handleSubmit(event: PressEvent): Promise<void> {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -170,8 +176,8 @@ function Index() {
             message="parameters format cannot contain spaces."
           />
         )}
-        <Grid.Container justify="center">
-          <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
+        <Grid.Container justify="center" gap={6}>
+          <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
@@ -222,7 +228,19 @@ function Index() {
               {loading ? 'Loading' : 'Try sample'}
             </Button>
           </Grid>
-          {!error && response && <ImagineResponse response={response} />}
+          {!error && response && historyResponse && (
+            <Grid xs={12} sm={6}>
+              <Grid.Container justify="center" gap={2}>
+                <Collapse.Group>
+                  {historyResponse.map((resp, index) => (
+                    <Collapse title={`Response - ${index + 1}`}>
+                      <ImagineResponse response={resp} />
+                    </Collapse>
+                  ))}
+                </Collapse.Group>
+              </Grid.Container>
+            </Grid>
+          )}
         </Grid.Container>
       </Container>
     </Layout>

@@ -1,11 +1,4 @@
-import {
-  Button,
-  Grid,
-  Image,
-  PressEvent,
-  Spacer,
-  Text,
-} from '@nextui-org/react';
+import { Button, Image, Spacer, Text } from '@nextui-org/react';
 import React, { useState } from 'react';
 import MidjourneyClient, {
   IsNaughtySuccessResponse,
@@ -43,9 +36,9 @@ function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
   }
 
   return (
-    <>
+    <div>
       <Spacer x={4} />
-      <Grid direction="column" md={4} alignItems="center">
+      <div>
         <div style={{ marginTop: '4vh' }}>
           <Image
             css={{ maxWidth: 550 }}
@@ -66,8 +59,8 @@ function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
             Error while generating image: {errorMessage}
           </Text>
         )}
-      </Grid>
-    </>
+      </div>
+    </div>
   );
 }
 
