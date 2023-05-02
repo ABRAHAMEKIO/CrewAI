@@ -29,7 +29,6 @@ import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
-import Information from '../components/Information';
 
 let socket;
 
