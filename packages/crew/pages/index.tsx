@@ -29,7 +29,6 @@ import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
-import Information from '../components/Information';
 
 let socket;
 
@@ -173,7 +172,6 @@ function Index() {
         )}
         <Grid.Container justify="center">
           <Grid md={8} direction="column" css={{ p: 0 }}>
-            <Information />
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
