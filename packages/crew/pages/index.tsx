@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Button,
   Container,
-  Image,
   PressEvent,
   Textarea,
   Text,
@@ -93,7 +92,6 @@ function Index() {
         socket.on(MidjourneyCommand.Connected.toString(), () => {
           // eslint-disable-next-line no-console
           console.info('connected');
-          console.info('socketId: ', socket.id);
           setSocketId(socket.id);
         });
       })

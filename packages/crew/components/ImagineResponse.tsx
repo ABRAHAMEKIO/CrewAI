@@ -55,18 +55,11 @@ function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
         </div>
         <Spacer y={1} />
         <Button.Group color="gradient" ghost>
-          <Button type="button" onPress={() => handleButton('v1')}>
-            V 1
-          </Button>
-          <Button type="button" onPress={() => handleButton('v2')}>
-            V 2
-          </Button>
-          <Button type="button" onPress={() => handleButton('v3')}>
-            V 3
-          </Button>
-          <Button type="button" onPress={() => handleButton('v4')}>
-            V 4
-          </Button>
+          {response.buttons.map((button) => (
+            <Button type="button" onPress={() => handleButton(button)}>
+              {button}
+            </Button>
+          ))}
         </Button.Group>
         {!loading && error && (
           <Text color="error">
