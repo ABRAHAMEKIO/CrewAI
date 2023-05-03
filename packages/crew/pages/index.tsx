@@ -28,6 +28,7 @@ import { successBeep, errorBeep } from '../domain/sounds/beep';
 import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
+import CreateGroupModal from '../components/CreateGroupModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
 import ImagineResponse, {
   decodeReference,
@@ -50,12 +51,14 @@ function Index() {
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [createGroupModal, setCreateGroupModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
   const [historyResponse, setHistoryResponse] = useState<
     WebhookSuccessResponse[]
   >([]);
-
-  const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
+  const ErrorValidationToggleModal = () =>
+    setErrorValidationModal(!errorValidationModal);
+  const CreateGroupToggleModal = () => setCreateGroupModal(!createGroupModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
   };
@@ -191,12 +194,20 @@ function Index() {
         {errorValidationModal && (
           <ErrorValidationModal
             modalOpen={errorValidationModal}
-            modalClose={ToggleModal}
+            modalClose={ErrorValidationToggleModal}
             message="parameters format cannot contain spaces."
           />
         )}
-        <Grid.Container justify="center" gap={6}>
-          <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
+        {createGroupModal && (
+          <CreateGroupModal
+            modalOpen={createGroupModal}
+            modalClose={CreateGroupToggleModal}
+            creatorPrompt={prompt}
+            creatorParams={paramsData}
+          />
+        )}
+        <Grid.Container justify="center">
+          <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
@@ -273,6 +284,13 @@ function Index() {
                               onPress={() => setSeedFileName(resp.imageUrl)}
                             >
                               Use Image As Prompt
+                            </Button>
+                            <Button
+                              color="gradient"
+                              onPress={() => setCreateGroupModal(true)}
+                              disabled={loading}
+                            >
+                              Create Group
                             </Button>
                           </div>
                         )}

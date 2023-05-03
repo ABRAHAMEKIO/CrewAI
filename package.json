@@ -21,6 +21,7 @@
     "next-connect": "^0.13.0",
     "pg": "^8.10.0",
     "process": "^0.11.10",
+    "random-string-generator": "^1.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-mixpanel-browser": "^3.3.0",
