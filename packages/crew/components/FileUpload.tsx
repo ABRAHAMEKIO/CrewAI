@@ -19,8 +19,10 @@ const UploadService = {
 
 function FileUpload({
   onUploadFinished,
+  seedImage,
 }: {
   onUploadFinished: (fileLocation: string) => void;
+  seedImage: string;
 }) {
   const [currentFile, setCurrentFile] = useState<File>();
   const [progress, setProgress] = useState<number>(0);
@@ -64,11 +66,11 @@ function FileUpload({
     <>
       <Input label="File" type="file" onChange={selectFile} />
       <Spacer y={1} />
-      {fileLocation && (
+      {(fileLocation || seedImage) && (
         <Image
           width={300}
           height={300}
-          src={fileLocation}
+          src={fileLocation || seedImage}
           alt="Prompt Image"
           objectFit="cover"
         />
