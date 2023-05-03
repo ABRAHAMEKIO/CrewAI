@@ -8,21 +8,39 @@ import MidjourneyClient, {
 import { errorBeep } from '../domain/sounds/beep';
 import { server } from '../config';
 
+export interface Reference {
+  socketId: string;
+  button: string;
+}
+
+function encodeReference(ref: Reference): string {
+  return `${ref.socketId};${ref.button}`;
+}
+
+export function decodeReference(response: WebhookSuccessResponse): Reference {
+  const [socketId = '', button = ''] = response.ref.split(';');
+  return {
+    socketId,
+    button,
+  };
+}
+
 // props :response
 function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
   const midjourneyClient = new MidjourneyClient('', `${server}/api/thenextleg`);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const reference = decodeReference(response);
 
   async function handleButton(button: string): Promise<void> {
+    const ref = encodeReference({
+      socketId: reference.socketId,
+      button,
+    });
+
     const buttonResponse: SuccessResponse | IsNaughtySuccessResponse =
-      await midjourneyClient.button(
-        button,
-        response.buttonMessageId,
-        response.ref,
-        ''
-      );
+      await midjourneyClient.button(button, response.buttonMessageId, ref, '');
     if ('isNaughty' in buttonResponse && buttonResponse.isNaughty) {
       setError(true);
       setErrorMessage(

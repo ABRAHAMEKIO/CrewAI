@@ -29,7 +29,10 @@ import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
-import ImagineResponse from '../components/ImagineResponse';
+import ImagineResponse, {
+  decodeReference,
+  Reference,
+} from '../components/ImagineResponse';
 
 let socket;
 
@@ -47,7 +50,10 @@ function Index() {
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
-  const [historyResponse, setHistoryResponse] = useState([]);
+  const [historyResponse, setHistoryResponse] = useState<
+    WebhookSuccessResponse[]
+  >([]);
+
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
@@ -165,6 +171,13 @@ function Index() {
     }
   }
 
+  function isUpscale(reference: Reference): boolean {
+    const btn = reference.button;
+    const first = btn.charAt(0);
+    const second = btn.charAt(1);
+    return first === 'U' && ['1', '2', '3', '4'].includes(second);
+  }
+
   return (
     <Layout>
       <NavigationBar />
@@ -190,6 +203,7 @@ function Index() {
               onFocus={() => setFinalPrompt('typing...')}
             />
             <FileUpload
+              seedImage={seedFileName}
               onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
             />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
@@ -233,8 +247,23 @@ function Index() {
               <Grid.Container justify="center" gap={2}>
                 <Collapse.Group>
                   {historyResponse.map((resp, index) => (
-                    <Collapse title={`Response - ${index + 1}`}>
+                    // expanded={index + 1 === historyResponse.length}
+                    <Collapse title={decodeReference(resp).button}>
                       <ImagineResponse response={resp} />
+                      {isUpscale(decodeReference(resp)) && (
+                        <div>
+                          <Spacer x={4} />
+                          <Button
+                            type="button"
+                            bordered
+                            color="gradient"
+                            auto
+                            onPress={() => setSeedFileName(resp.imageUrl)}
+                          >
+                            Use Image As Prompt
+                          </Button>
+                        </div>
+                      )}
                     </Collapse>
                   ))}
                 </Collapse.Group>
