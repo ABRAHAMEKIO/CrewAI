@@ -35,6 +35,7 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app ./
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
+RUN mkdir -p dist/packages/crew/.next/cache/images && chmod -R 777 dist/packages/crew/.next/
 
 USER nextjs
 

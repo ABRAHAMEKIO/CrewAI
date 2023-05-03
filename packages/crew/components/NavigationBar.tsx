@@ -5,6 +5,10 @@ import icons from './Icons';
 
 const navItems = [
   {
+    title: 'Gallery',
+    link: '/gallery',
+  },
+  {
     title: 'Contact',
     link: '/contact',
   },
