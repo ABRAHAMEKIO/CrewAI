@@ -1,14 +1,13 @@
 import { DataTypes, Model, Optional, UUIDV4 } from 'sequelize';
 import sequelizeConnection from '../config/connection';
-import User from './user';
 
 interface GroupAttributes {
   id?: string;
   name?: string;
   prompt?: Text;
   masterKey?: string;
-  parametersFormPrompt?: Text;
-  userId?: User;
+  parametersFromPrompt?: Text;
+  imageUrl?: string;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -29,7 +28,9 @@ class Group
 
   public masterKey!: string;
 
-  public parametersFormPrompt!: Text;
+  public parametersFromPrompt!: Text;
+
+  public imageUrl!: string;
 
   public readonly createdAt!: Date;
 
@@ -56,13 +57,13 @@ Group.init(
       allowNull: false,
       type: DataTypes.STRING,
     },
-    parametersFormPrompt: {
+    parametersFromPrompt: {
       allowNull: true,
       type: DataTypes.TEXT,
     },
-    userId: {
+    imageUrl: {
       allowNull: false,
-      type: DataTypes.NUMBER,
+      type: DataTypes.STRING,
     },
   },
   {
@@ -71,7 +72,5 @@ Group.init(
     underscored: false,
   }
 );
-
-Group.belongsTo(User, { foreignKey: 'userId' });
 
 export default Group;

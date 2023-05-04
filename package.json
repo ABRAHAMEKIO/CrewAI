@@ -26,6 +26,7 @@
     "react-dom": "18.2.0",
     "react-mixpanel-browser": "^3.3.0",
     "react-rating-stars-component": "^2.2.0",
+    "react-share": "^4.4.1",
     "replicate": "^0.7.0",
     "sequelize": "^6.31.0",
     "socket.io": "^4.6.1",

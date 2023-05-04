@@ -53,6 +53,7 @@ function Index() {
   const [errorValidationModal, setErrorValidationModal] = useState(false);
   const [createGroupModal, setCreateGroupModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
+  const [cretorImageUrl, setCreatorImageurl] = useState(null);
   const [historyResponse, setHistoryResponse] = useState<
     WebhookSuccessResponse[]
   >([]);
@@ -204,6 +205,7 @@ function Index() {
             modalClose={CreateGroupToggleModal}
             creatorPrompt={prompt}
             creatorParams={paramsData}
+            creatorImageUrl={cretorImageUrl}
           />
         )}
         <Grid.Container justify="center">
@@ -287,7 +289,10 @@ function Index() {
                             </Button>
                             <Button
                               color="gradient"
-                              onPress={() => setCreateGroupModal(true)}
+                              onPress={() => {
+                                setCreateGroupModal(true);
+                                setCreatorImageurl(resp.imageUrl);
+                              }}
                               disabled={loading}
                             >
                               Create Group

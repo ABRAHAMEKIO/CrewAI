@@ -17,15 +17,11 @@ module.exports = {
       masterKey: {
         type: Sequelize.STRING,
       },
-      parametersFormPrompt: {
+      parametersFromPrompt: {
         type: Sequelize.TEXT,
       },
-      userId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id',
-        },
+      imageUrl: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
