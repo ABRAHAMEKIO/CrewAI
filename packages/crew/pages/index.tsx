@@ -34,6 +34,7 @@ import ImagineResponse, {
   Reference,
   ImageResponseContext,
 } from '../components/ImagineResponse';
+import FormSuggestion from '../components/FormSuggestion';
 
 let socket;
 
@@ -54,6 +55,7 @@ function Index() {
   const [historyResponse, setHistoryResponse] = useState<
     WebhookSuccessResponse[]
   >([]);
+  const [advancedPrompt, setAdvancedPrompt] = useState('');
 
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
@@ -123,7 +125,7 @@ function Index() {
     }
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
       await midjourneyClient.imagine(
-        `${seedFileName} ${finalPrompt}`,
+        `${seedFileName} ${finalPrompt} ${advancedPrompt}`,
         socketId,
         ''
       );
@@ -184,6 +186,10 @@ function Index() {
     [loading, setLoading]
   );
 
+  function handleSuggestion(suggestion: string[]) {
+    setAdvancedPrompt(suggestion.join(','));
+  }
+
   return (
     <Layout>
       <NavigationBar />
@@ -200,6 +206,7 @@ function Index() {
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
+              style={{ padding: '2rem' }}
               width="100%"
               cacheMeasurements={false}
               label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
@@ -208,6 +215,12 @@ function Index() {
               onBlur={(e) => handleBlurPrompt(e.target.value)}
               onFocus={() => setFinalPrompt('typing...')}
             />
+            <Spacer x={1} />
+            <FormSuggestion
+              suggestions={['Photo', 'Realistic', 'Bokeh']}
+              onSelected={(data: string[]) => handleSuggestion(data)}
+            />
+            <Spacer x={1} />
             <FileUpload
               seedImage={seedFileName}
               onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
