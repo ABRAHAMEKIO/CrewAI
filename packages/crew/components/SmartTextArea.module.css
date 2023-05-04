@@ -1,0 +1,17 @@
+.smart_text_area {
+  box-shadow: none;
+  display: block;
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 0px;
+  font-size: var(--nextui--inputFontSize);
+  background: transparent;
+  color: var(--nextui--inputTextColor);
+  border-radius: 0px;
+  min-width: 0px;
+  appearance: none;
+  font-family: inherit;
+  line-height: inherit;
+}

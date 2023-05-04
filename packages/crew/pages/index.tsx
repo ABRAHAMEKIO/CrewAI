@@ -29,6 +29,7 @@ import { successBeep, errorBeep } from '../domain/sounds/beep';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
+import SmartTextArea from '../components/SmartTextArea';
 
 let socket;
 
@@ -179,7 +180,7 @@ function Index() {
           <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
-            {/* <Textarea
+            <Textarea
               width="100%"
               cacheMeasurements={false}
               label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
@@ -187,8 +188,12 @@ function Index() {
               onChange={(e) => handleChangePrompt(e.target.value)}
               onBlur={(e) => handleBlurPrompt(e.target.value)}
               onFocus={() => setFinalPrompt('typing...')}
+            />
+            {/* <AutoCompleteTextarea
+              setPrompt={(e: string) => setPrompt(e)}
+              openAIClient={openAIClient}
             /> */}
-            <AutoCompleteTextarea
+            <SmartTextArea
               setPrompt={(e: string) => setPrompt(e)}
               openAIClient={openAIClient}
             />
