@@ -8,3 +8,4 @@ export const awsSecret = process.env.AWS_SECRET_ACCESS_KEY;
 export const awsBucket = process.env.AWS_BUCKET;
 export const awsRegion = process.env.AWS_REGION;
 export const mixPanelId = process.env.NEXT_PUBLIC_MIXPANEL_ID;
+export const magicLinkPk = process.env.NEXT_PUBLIC_MAGIC_LINK_PK;

@@ -8,6 +8,7 @@ interface UserAttributes {
   interests?: string | null;
   occupation?: string | null;
   usage?: string | null;
+  issuer?: string | null;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -28,6 +29,8 @@ class User extends Model<UserAttributes, UserInput> implements UserAttributes {
   public occupation!: string;
 
   public usage!: string;
+
+  public issuer!: string;
 
   public readonly createdAt!: Date;
 
@@ -59,6 +62,10 @@ User.init(
       type: DataTypes.STRING,
     },
     usage: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    issuer: {
       allowNull: true,
       type: DataTypes.STRING,
     },

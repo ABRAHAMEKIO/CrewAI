@@ -1,0 +1,45 @@
+import { Magic } from '@magic-sdk/admin';
+import User from '../../../db/models/user';
+
+const magic = new Magic(process.env.MAGIC_LINK_SECRET_KEY);
+
+const validate = async (req, res) => {
+  if (req.method === 'POST') {
+    try {
+      const didToken = req.headers.authorization.substring(7);
+      const metaData = await magic.users.getMetadataByToken(didToken);
+      const username = req.body.email.match(/^([^@]*)@/);
+      const user = await User.findOne({
+        where: { issuer: metaData.issuer },
+      });
+
+      if (user) {
+        return res.status(200).json({
+          user,
+          metadata: metaData,
+          newUser: false,
+        });
+      }
+      const newUser = await User.create({
+        issuer: metaData.issuer,
+        email: req.body.email,
+        username: username
+          ? username[1]
+          : `dummy_${(Math.random() + 1).toString(36).substring(7)}`,
+      });
+      return res.status(200).json({
+        user: newUser,
+        metadata: metaData,
+        newUser: true,
+      });
+    } catch (e) {
+      return res.status(405).json({ error: e });
+    }
+  } else {
+    return res
+      .status(405)
+      .json({ error: `Method '${req.method}' Not Allowed` });
+  }
+};
+
+export default validate;

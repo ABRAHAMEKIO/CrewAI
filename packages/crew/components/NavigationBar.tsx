@@ -143,12 +143,9 @@ function NavigationBar() {
         ))}
       </Navbar.Collapse>
       <Navbar.Content>
-        <Navbar.Link color="inherit" href="#">
-          Login
-        </Navbar.Link>
         <Navbar.Item>
-          <Button auto flat as={Link} href="#">
-            Sign Up
+          <Button auto flat as={Link} href="/login">
+            Login
           </Button>
         </Navbar.Item>
       </Navbar.Content>
