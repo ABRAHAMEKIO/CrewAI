@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Button,
   Container,
@@ -32,6 +32,7 @@ import ParametersFromPrompt from '../components/ParametersFromPrompt';
 import ImagineResponse, {
   decodeReference,
   Reference,
+  ImageResponseContext,
 } from '../components/ImagineResponse';
 
 let socket;
@@ -178,6 +179,11 @@ function Index() {
     return first === 'U' && ['1', '2', '3', '4'].includes(second);
   }
 
+  const imageResponseContextValue = useMemo(
+    () => [loading, setLoading],
+    [loading, setLoading]
+  );
+
   return (
     <Layout>
       <NavigationBar />
@@ -245,27 +251,34 @@ function Index() {
           {!error && response && historyResponse && (
             <Grid xs={12} sm={6}>
               <Grid.Container justify="center" gap={2}>
-                <Collapse.Group>
-                  {historyResponse.map((resp, index) => (
-                    // expanded={index + 1 === historyResponse.length}
-                    <Collapse title={decodeReference(resp).button}>
-                      <ImagineResponse response={resp} />
-                      {isUpscale(decodeReference(resp)) && (
-                        <div>
-                          <Spacer x={4} />
-                          <Button
-                            type="button"
-                            bordered
-                            color="gradient"
-                            auto
-                            onPress={() => setSeedFileName(resp.imageUrl)}
-                          >
-                            Use Image As Prompt
-                          </Button>
-                        </div>
-                      )}
-                    </Collapse>
-                  ))}
+                <Collapse.Group borderWeight="bold">
+                  <ImageResponseContext.Provider
+                    value={imageResponseContextValue}
+                  >
+                    {historyResponse.map((resp, index) => (
+                      <Collapse
+                        index={index}
+                        title={decodeReference(resp).button}
+                        expanded={index + 1 === historyResponse.length}
+                      >
+                        <ImagineResponse response={resp} />
+                        {isUpscale(decodeReference(resp)) && (
+                          <div>
+                            <Spacer x={4} />
+                            <Button
+                              type="button"
+                              bordered
+                              color="gradient"
+                              auto
+                              onPress={() => setSeedFileName(resp.imageUrl)}
+                            >
+                              Use Image As Prompt
+                            </Button>
+                          </div>
+                        )}
+                      </Collapse>
+                    ))}
+                  </ImageResponseContext.Provider>
                 </Collapse.Group>
               </Grid.Container>
             </Grid>
