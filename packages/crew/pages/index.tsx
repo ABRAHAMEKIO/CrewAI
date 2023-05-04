@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import {
   Button,
   Container,
-  Image,
   PressEvent,
   Textarea,
+  Text,
   Grid,
   Spacer,
+  Collapse,
   Link,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
@@ -14,22 +15,26 @@ import { useMixpanel } from 'react-mixpanel-browser';
 import Handlebars from 'handlebars/dist/cjs/handlebars';
 import { Header1, Header2 } from '../components/Heading';
 import NavigationBar from '../components/NavigationBar';
-import AutoCompleteTextarea from '../components/AutoCompleteTextarea';
 
 import { server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import MidjourneyClient, {
+  IsNaughtySuccessResponse,
+  SuccessResponse,
   WebhookSuccessResponse,
 } from '../domain/midjourney/midjourneyClient';
-import OpenAIClient, {
-  CompletionSuccessResponse,
-} from '../domain/openai/openAIClient';
+import OpenAIClient from '../domain/openai/openAIClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
+import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
 import SmartTextArea from '../components/SmartTextArea';
+import ImagineResponse, {
+  decodeReference,
+  Reference,
+} from '../components/ImagineResponse';
 
 let socket;
 
@@ -39,16 +44,19 @@ function Index() {
   const [response, setResponse] = useState(null as WebhookSuccessResponse);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [prompt, setPrompt] = useState('');
-  const midjourneyClient = new MidjourneyClient(
-    '',
-    `${server}/api/thenextleg/imagine`
-  );
   const openAIClient = new OpenAIClient('', `${server}/api/openapi`);
+  const midjourneyClient = new MidjourneyClient('', `${server}/api/thenextleg`);
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [seedFileName, setSeedFileName] = useState('');
+  const [historyResponse, setHistoryResponse] = useState<
+    WebhookSuccessResponse[]
+  >([]);
+
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
@@ -56,6 +64,8 @@ function Index() {
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
+      /* eslint-disable no-console */
+      console.log('mixpanel is being called');
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('home_page_view');
     }
@@ -78,10 +88,14 @@ function Index() {
             }
             if (val.imageUrl) {
               setError(false);
+              setErrorMessage('');
               setResponse(val);
+              historyResponse.push(val);
+              setHistoryResponse(historyResponse);
               successBeep();
             } else {
               setError(true);
+              setErrorMessage(val.content);
               errorBeep();
             }
             setLoading(false);
@@ -91,6 +105,8 @@ function Index() {
         socket.on(MidjourneyCommand.Connected.toString(), () => {
           // eslint-disable-next-line no-console
           console.info('connected');
+          // eslint-disable-next-line no-console
+          console.info(`${socket.id}`);
           setSocketId(socket.id);
         });
       })
@@ -98,7 +114,7 @@ function Index() {
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, [mixpanel]);
+  }, [historyResponse, mixpanel]);
 
   async function handleSubmit(event: PressEvent): Promise<void> {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -107,8 +123,22 @@ function Index() {
         finalPrompt,
       });
     }
-    await midjourneyClient.imagine(finalPrompt, socketId, '');
-    setLoading(true);
+    const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
+      await midjourneyClient.imagine(
+        `${seedFileName} ${finalPrompt}`,
+        socketId,
+        ''
+      );
+    if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
+      setError(true);
+      setErrorMessage(
+        `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
+      );
+      errorBeep();
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
   }
 
   function handleChangePrompt(value: string) {
@@ -144,6 +174,13 @@ function Index() {
     }
   }
 
+  function isUpscale(reference: Reference): boolean {
+    const btn = reference.button;
+    const first = btn.charAt(0);
+    const second = btn.charAt(1);
+    return first === 'U' && ['1', '2', '3', '4'].includes(second);
+  }
+
   return (
     <Layout>
       <NavigationBar />
@@ -176,8 +213,8 @@ function Index() {
             message="parameters format cannot contain spaces."
           />
         )}
-        <Grid.Container justify="center">
-          <Grid md={4} xs={12} direction="column" css={{ p: 0 }}>
+        <Grid.Container justify="center" gap={6}>
+          <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
@@ -189,19 +226,22 @@ function Index() {
               onBlur={(e) => handleBlurPrompt(e.target.value)}
               onFocus={() => setFinalPrompt('typing...')}
             />
-            {/* <AutoCompleteTextarea
-              setPrompt={(e: string) => setPrompt(e)}
-              openAIClient={openAIClient}
-            /> */}
             <SmartTextArea
               setPrompt={(e: string) => setPrompt(e)}
               openAIClient={openAIClient}
             />
+            <FileUpload
+              seedImage={seedFileName}
+              onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
+            />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
             {finalPrompt && (
               <p>
-                When you click try sample, you will executive this prompt &quot;
-                {finalPrompt}&quot;
+                <em>
+                  When you click <strong>try sample</strong>, you will execute
+                  this prompt &quot;
+                  {finalPrompt}&quot;
+                </em>
               </p>
             )}
             {params && (
@@ -212,7 +252,11 @@ function Index() {
                 finalPrompt={ParametersValue}
               />
             )}
-            {error && <p>Error while generating image</p>}
+            {!loading && error && (
+              <Text color="error">
+                Error while generating image: {errorMessage}
+              </Text>
+            )}
             <Link href="#promptPresets" css={{ float: 'right' }}>
               Open Prompt Presets
             </Link>
@@ -223,29 +267,36 @@ function Index() {
               disabled={loading}
               css={{ float: 'right', maxWidth: '2rem' }}
             >
-              {loading ? 'Loading' : 'Draw'}
+              {loading ? 'Loading' : 'Try sample'}
             </Button>
           </Grid>
-          {!error && response && (
-            <>
-              <Spacer x={4} />
-              <Grid direction="column" md={4} alignItems="center">
-                <div style={{ marginTop: '4vh' }}>
-                  <Image
-                    css={{ maxWidth: 550 }}
-                    src={response?.imageUrl}
-                    alt="Your amazing generative art"
-                  />
-                </div>
-                <Spacer y={1} />
-                <Button.Group color="gradient" ghost>
-                  <Button>V 1</Button>
-                  <Button>V 2</Button>
-                  <Button>V 3</Button>
-                  <Button>V 4</Button>
-                </Button.Group>
-              </Grid>
-            </>
+          {!error && response && historyResponse && (
+            <Grid xs={12} sm={6}>
+              <Grid.Container justify="center" gap={2}>
+                <Collapse.Group>
+                  {historyResponse.map((resp, index) => (
+                    // expanded={index + 1 === historyResponse.length}
+                    <Collapse title={decodeReference(resp).button}>
+                      <ImagineResponse response={resp} />
+                      {isUpscale(decodeReference(resp)) && (
+                        <div>
+                          <Spacer x={4} />
+                          <Button
+                            type="button"
+                            bordered
+                            color="gradient"
+                            auto
+                            onPress={() => setSeedFileName(resp.imageUrl)}
+                          >
+                            Use Image As Prompt
+                          </Button>
+                        </div>
+                      )}
+                    </Collapse>
+                  ))}
+                </Collapse.Group>
+              </Grid.Container>
+            </Grid>
           )}
         </Grid.Container>
       </Container>

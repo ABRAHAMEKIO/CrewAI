@@ -17,7 +17,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # Example:
 # ARG NEXT_PUBLIC_EXAMPLE="value here"
 
-RUN npx nx build crew
+RUN --mount=type=secret,id=NEXT_PUBLIC_MIXPANEL_ID \
+    NEXT_PUBLIC_MIXPANEL_ID="$(cat /run/secrets/NEXT_PUBLIC_MIXPANEL_ID)" npx nx build crew
 
 # If using npm comment out above and use below instead
 # RUN npm run build
@@ -34,10 +35,12 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app ./
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
+RUN mkdir -p dist/packages/crew/.next/cache/images && chmod -R 777 dist/packages/crew/.next/
 
 USER nextjs
 
 CMD ["npx", "nx", "serve", "crew", "--prod"]
+CMD npx sequelize db:migrate && npx nx serve crew --prod
 
 # If using npm comment out above and use below instead
 # CMD ["npm", "run", "start"]

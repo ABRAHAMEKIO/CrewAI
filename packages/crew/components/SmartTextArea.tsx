@@ -15,7 +15,6 @@ function SmartTextArea(props: {
   const [input, setInput] = React.useState('');
   const [suggestion, setSuggestion] = React.useState('');
   const [content, setContent] = React.useState(placeholderTag);
-  // const content = useRef('');
 
   let debounceTimerOnContentChanged;
   const onContentChanged = useRefCallback((e) => {
@@ -33,14 +32,10 @@ function SmartTextArea(props: {
           await openAIClient.completions(userInput).then((response) => {
             if (response?.choices.length > 0) {
               const suggestionResponse = response?.choices[0].text;
-              console.log('suggestion response:');
-              console.log(suggestionResponse);
               // if (suggestionResponse && suggestionResponse !== suggestion) {
               setSuggestion(suggestionResponse);
               const suggestionTag = `<span class="sug" style="color: #757575;
               user-select: none;" contenteditable="false">${suggestionResponse}</span>`;
-              console.log('suggestion tag:');
-              console.log(suggestionTag);
               setContent(userInput + suggestionTag);
             }
           });
