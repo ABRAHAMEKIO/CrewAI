@@ -40,6 +40,7 @@ RUN mkdir -p dist/packages/crew/.next/cache/images && chmod -R 777 dist/packages
 USER nextjs
 
 CMD ["npx", "nx", "serve", "crew", "--prod"]
+CMD npx sequelize db:migrate && npx nx serve crew --prod
 
 # If using npm comment out above and use below instead
 # CMD ["npm", "run", "start"]

@@ -7,6 +7,13 @@ export interface Request {
   webhookOverride?: string;
 }
 
+export interface ButtonRequest {
+  button: string;
+  buttonMessageId: string;
+  ref?: string;
+  webhookOverride?: string;
+}
+
 export interface SuccessResponse {
   success: boolean;
   messageId: string;
@@ -116,6 +123,26 @@ export default class MidjourneyClient {
 
     const response: AxiosResponse<IsNaughtySuccessResponse> =
       await axios.request<IsNaughtySuccessResponse>(config);
+    return response.data;
+  }
+
+  async button(
+    button: string,
+    buttonMessageId: string,
+    ref: string,
+    webhookOverride: string
+  ): Promise<SuccessResponse | IsNaughtySuccessResponse> {
+    const data: ButtonRequest = {
+      button,
+      buttonMessageId,
+      ref,
+      webhookOverride,
+    };
+
+    const config = this.getConfig(data, 'button');
+    const response = await axios.request<
+      SuccessResponse | IsNaughtySuccessResponse
+    >(config);
     return response.data;
   }
 }

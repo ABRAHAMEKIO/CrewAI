@@ -15,7 +15,10 @@ export default function handler(req, res) {
   const { body } = req;
   const { ref } = body;
 
-  io.to(ref).emit(
+  // socketId;button
+  const [socketId] = ref.split(';');
+
+  io.to(socketId).emit(
     MidjourneyCommand.ModelResults.toString(),
     body as WebhookSuccessResponse
   );

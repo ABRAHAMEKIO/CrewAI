@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Button,
   Container,
-  Image,
   PressEvent,
   Textarea,
   Text,
   Grid,
   Spacer,
+  Collapse,
   Link,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
@@ -29,7 +29,11 @@ import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
-import Information from '../components/Information';
+import ImagineResponse, {
+  decodeReference,
+  Reference,
+  ImageResponseContext,
+} from '../components/ImagineResponse';
 
 let socket;
 
@@ -47,6 +51,10 @@ function Index() {
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
+  const [historyResponse, setHistoryResponse] = useState<
+    WebhookSuccessResponse[]
+  >([]);
+
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
@@ -80,6 +88,8 @@ function Index() {
               setError(false);
               setErrorMessage('');
               setResponse(val);
+              historyResponse.push(val);
+              setHistoryResponse(historyResponse);
               successBeep();
             } else {
               setError(true);
@@ -93,6 +103,8 @@ function Index() {
         socket.on(MidjourneyCommand.Connected.toString(), () => {
           // eslint-disable-next-line no-console
           console.info('connected');
+          // eslint-disable-next-line no-console
+          console.info(`${socket.id}`);
           setSocketId(socket.id);
         });
       })
@@ -100,7 +112,7 @@ function Index() {
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, [mixpanel]);
+  }, [historyResponse, mixpanel]);
 
   async function handleSubmit(event: PressEvent): Promise<void> {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -160,6 +172,18 @@ function Index() {
     }
   }
 
+  function isUpscale(reference: Reference): boolean {
+    const btn = reference.button;
+    const first = btn.charAt(0);
+    const second = btn.charAt(1);
+    return first === 'U' && ['1', '2', '3', '4'].includes(second);
+  }
+
+  const imageResponseContextValue = useMemo(
+    () => [loading, setLoading],
+    [loading, setLoading]
+  );
+
   return (
     <Layout>
       <NavigationBar />
@@ -171,9 +195,8 @@ function Index() {
             message="parameters format cannot contain spaces."
           />
         )}
-        <Grid.Container justify="center">
-          <Grid md={8} direction="column" css={{ p: 0 }}>
-            <Information />
+        <Grid.Container justify="center" gap={6}>
+          <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
             <Textarea
@@ -186,6 +209,7 @@ function Index() {
               onFocus={() => setFinalPrompt('typing...')}
             />
             <FileUpload
+              seedImage={seedFileName}
               onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
             />
             {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
@@ -224,26 +248,40 @@ function Index() {
               {loading ? 'Loading' : 'Try sample'}
             </Button>
           </Grid>
-          {!error && response && (
-            <>
-              <Spacer x={4} />
-              <Grid direction="column" md={4} alignItems="center">
-                <div style={{ marginTop: '4vh' }}>
-                  <Image
-                    css={{ maxWidth: 550 }}
-                    src={response?.imageUrl}
-                    alt="Your amazing generative art"
-                  />
-                </div>
-                <Spacer y={1} />
-                <Button.Group color="gradient" ghost>
-                  <Button>V 1</Button>
-                  <Button>V 2</Button>
-                  <Button>V 3</Button>
-                  <Button>V 4</Button>
-                </Button.Group>
-              </Grid>
-            </>
+          {!error && response && historyResponse && (
+            <Grid xs={12} sm={6}>
+              <Grid.Container justify="center" gap={2}>
+                <Collapse.Group borderWeight="bold">
+                  <ImageResponseContext.Provider
+                    value={imageResponseContextValue}
+                  >
+                    {historyResponse.map((resp, index) => (
+                      <Collapse
+                        index={index}
+                        title={decodeReference(resp).button}
+                        expanded={index + 1 === historyResponse.length}
+                      >
+                        <ImagineResponse response={resp} />
+                        {isUpscale(decodeReference(resp)) && (
+                          <div>
+                            <Spacer x={4} />
+                            <Button
+                              type="button"
+                              bordered
+                              color="gradient"
+                              auto
+                              onPress={() => setSeedFileName(resp.imageUrl)}
+                            >
+                              Use Image As Prompt
+                            </Button>
+                          </div>
+                        )}
+                      </Collapse>
+                    ))}
+                  </ImageResponseContext.Provider>
+                </Collapse.Group>
+              </Grid.Container>
+            </Grid>
           )}
         </Grid.Container>
       </Container>
