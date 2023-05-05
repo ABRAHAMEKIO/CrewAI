@@ -58,17 +58,32 @@ function Tag({
 
 function FormSuggestion({
   suggestions,
-  onSelected,
+  assignValues,
+  onValue,
+  onRemove,
+  onAdd,
 }: {
   suggestions: string[];
-  onSelected: (str: string[]) => void;
+  assignValues?: string[];
+  onValue?: (str: string[]) => void;
+  onRemove?: (str: string) => void;
+  onAdd?: (str: string) => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [options, setOptions] = useState<string[]>(suggestions);
 
+  useEffect(() => {
+    setOptions(suggestions);
+  }, [suggestions]);
+
+  useEffect(() => {
+    setSelected((prevSelected) => [...prevSelected, ...assignValues]);
+  }, [assignValues]);
+
   function add(tag) {
     setSelected([...selected, tag]);
-    onSelected([...selected, tag]);
+    onValue([...selected, tag]);
+    onAdd(tag);
 
     const index = options.indexOf(tag);
 
@@ -80,13 +95,14 @@ function FormSuggestion({
 
   function remove(tag) {
     setOptions([...options, tag]);
+    onRemove(tag);
 
     const index = selected.indexOf(tag);
 
     if (index > -1) {
       selected.splice(index, 1);
       setSelected([...selected]);
-      onSelected([...selected]);
+      onValue([...selected]);
     }
   }
 
@@ -138,5 +154,12 @@ function FormSuggestion({
     </div>
   );
 }
+
+FormSuggestion.defaultProps = {
+  assignValues: [],
+  onValue: () => null,
+  onRemove: () => null,
+  onAdd: () => null,
+};
 
 export default FormSuggestion;
