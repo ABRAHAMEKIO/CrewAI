@@ -232,6 +232,111 @@ function ArrowUpIcon({ fill, size, width = 24, height = 24, ...props }) {
   );
 }
 
+function CloseIcon({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      height={size || height}
+      width={size || width}
+      {...props}
+    >
+      <g id="Close_Square" data-name="Close Square" transform="translate(2 2)">
+        <path
+          id="Stroke_1"
+          data-name="Stroke 1"
+          d="M4.792,0,0,4.792"
+          transform="translate(7.602 7.595)"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit="10"
+          strokeWidth="1.5"
+        />
+        <path
+          id="Stroke_2"
+          data-name="Stroke 2"
+          d="M4.8,4.8,0,0"
+          transform="translate(7.6 7.593)"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit="10"
+          strokeWidth="1.5"
+        />
+        <path
+          id="Stroke_3"
+          data-name="Stroke 3"
+          d="M0,9.25c0,6.937,2.313,9.25,9.25,9.25s9.25-2.313,9.25-9.25S16.187,0,9.25,0,0,2.313,0,9.25Z"
+          transform="translate(0.75 0.75)"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit="10"
+          strokeWidth="1.5"
+        />
+      </g>
+    </svg>
+  );
+}
+
+function PlusIcon({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      height={size || height}
+      width={size || width}
+      {...props}
+    >
+      <g id="Plus" transform="translate(2.3 2.3)">
+        <path
+          id="Stroke_1"
+          data-name="Stroke 1"
+          d="M.526,0V7.148"
+          transform="translate(9.211 6.163)"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit="10"
+          strokeWidth="1.5"
+        />
+        <path
+          id="Stroke_2"
+          data-name="Stroke 2"
+          d="M7.156.526H0"
+          transform="translate(6.159 9.211)"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit="10"
+          strokeWidth="1.5"
+        />
+        <path
+          id="Stroke_3"
+          data-name="Stroke 3"
+          d="M0,9.737C0,2.435,2.435,0,9.737,0s9.737,2.435,9.737,9.737-2.435,9.737-9.737,9.737S0,17.039,0,9.737Z"
+          transform="translate(0 0)"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit="10"
+          strokeWidth="1.5"
+        />
+      </g>
+    </svg>
+  );
+}
+
+// svg source: https://react-iconly.jrgarciadev.com/
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
   scale: <ScaleIcon fill="var(--nextui-colors-warning)" size={30} />,
@@ -243,6 +348,8 @@ const icons = {
   heart: <HeartIcon fill="var(--nextui-colors-secondary)" size={24} />,
   chat: <ChatIcon fill="var(--nextui-colors-secondary)" size={20} />,
   arrowUp: <ArrowUpIcon fill="var(--nextui-colors-secondary)" size={20} />,
+  close: <CloseIcon fill="var(--nextui-colors-error)" size={20} />,
+  plus: <PlusIcon fill="var(--nextui-colors-success)" size={20} />,
 };
 export default icons;
 /* eslint-enable react/jsx-props-no-spreading */

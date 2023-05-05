@@ -34,6 +34,8 @@ import ImagineResponse, {
   Reference,
   ImageResponseContext,
 } from '../components/ImagineResponse';
+import FormSuggestion from '../components/FormSuggestion';
+import { promptInit, promptAll } from './prompt';
 import GetStarted from '../components/GetStarted';
 
 let socket;
@@ -55,6 +57,8 @@ function Index() {
   const [historyResponse, setHistoryResponse] = useState<
     WebhookSuccessResponse[]
   >([]);
+  const [advancedPrompt, setAdvancedPrompt] = useState([]);
+  const [suggestions, setSuggestions] = useState([...promptInit]);
 
   const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
@@ -124,7 +128,7 @@ function Index() {
     }
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
       await midjourneyClient.imagine(
-        `${seedFileName} ${finalPrompt}`,
+        `${seedFileName} ${advancedPrompt.join(' ')} ${finalPrompt}`,
         socketId,
         ''
       );
@@ -185,6 +189,34 @@ function Index() {
     [loading, setLoading]
   );
 
+  function handleValue(tags: string[]) {
+    setAdvancedPrompt(tags);
+  }
+
+  function handleAdd(tag: string) {
+    setSuggestions(() => {
+      const find = promptAll.find(
+        (d: { name: string; next: [] }) => d.name === tag
+      );
+      if ('next' in find) {
+        return find.next;
+      }
+      return [];
+    });
+  }
+
+  function handleRemove(tag: string) {
+    setSuggestions(() => {
+      const find = promptAll.find(
+        (d: { name: string; prev: [] }) => d.name === tag
+      );
+      if ('prev' in find) {
+        return find.prev;
+      }
+      return [];
+    });
+  }
+
   const fieldRef = React.useRef<HTMLInputElement>(null);
 
   function onClick() {
@@ -221,7 +253,9 @@ function Index() {
             <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
               <Header1 content="Playground" />
               <Header2 content="Write your first GenAI prompt" />
+              <Spacer x={1} />
               <Textarea
+                style={{ padding: '2rem' }}
                 width="100%"
                 cacheMeasurements={false}
                 label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
@@ -230,6 +264,14 @@ function Index() {
                 onBlur={(e) => handleBlurPrompt(e.target.value)}
                 onFocus={() => setFinalPrompt('typing...')}
               />
+              <Spacer x={1} />
+              <FormSuggestion
+                suggestions={suggestions}
+                onValue={(data: string[]) => handleValue(data)}
+                onRemove={(data: string) => handleRemove(data)}
+                onAdd={(data: string) => handleAdd(data)}
+              />
+              <Spacer x={1} />
               <FileUpload
                 seedImage={seedFileName}
                 onUploadFinished={(fileName: string) =>
