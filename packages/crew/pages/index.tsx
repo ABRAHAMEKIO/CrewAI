@@ -129,16 +129,17 @@ function Index() {
         socketId,
         ''
       );
-    if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
-      setError(true);
-      setErrorMessage(
-        `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
-      );
-      errorBeep();
-      setLoading(false);
-    } else {
-      setLoading(true);
-    }
+    setLoading(true);
+    // if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
+    //   setError(true);
+    //   setErrorMessage(
+    //     `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
+    //   );
+    //   errorBeep();
+    //   setLoading(false);
+    // } else {
+    //   setLoading(true);
+    // }
   }
 
   function handleChangePrompt(value: string) {
@@ -228,6 +229,9 @@ function Index() {
             />
             <SmartTextArea
               setPrompt={(e: string) => setPrompt(e)}
+              onContentChange={(value: string) => handleChangePrompt(value)}
+              onContentBlur={(value: string) => handleBlurPrompt(value)}
+              onContentFocus={() => setFinalPrompt('typing...')}
               openAIClient={openAIClient}
             />
             <FileUpload

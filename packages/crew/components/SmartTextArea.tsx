@@ -6,22 +6,31 @@ import useRefCallback from '../hooks/UseRefCallback';
 
 function SmartTextArea(props: {
   setPrompt: React.Dispatch<React.SetStateAction<string>>;
+  onContentChange: (value: string) => void;
+  onContentBlur: (value: string) => void;
+  onContentFocus: () => void;
   openAIClient: OpenAIClient;
 }) {
   const placeholder = 'A raccoon that can speak and wield a sword';
   const placeholderTag = `<span class="placeholder" style="color: #757575;user-select: none;" contenteditable="false">${placeholder}</span>`;
   const contentRef = React.useRef(null);
-  const { setPrompt, openAIClient } = props;
+  const {
+    setPrompt,
+    onContentChange,
+    onContentBlur,
+    onContentFocus,
+    openAIClient,
+  } = props;
   const [input, setInput] = React.useState('');
   const [suggestion, setSuggestion] = React.useState('');
   const [content, setContent] = React.useState(placeholderTag);
 
   let debounceTimerOnContentChanged;
-  const onContentChanged = useRefCallback((e) => {
+  const onChanged = useRefCallback((e) => {
     clearTimeout(debounceTimerOnContentChanged);
     if (e.currentTarget !== placeholderTag) {
       setContent(e.currentTarget.innerHTML);
-      setPrompt(e.currentTarget.innerHTML);
+      onContentChange(e.currentTarget.innerHTML);
 
       debounceTimerOnContentChanged = setTimeout(async () => {
         const userInput = e.currentTarget.innerHTML
@@ -59,6 +68,10 @@ function SmartTextArea(props: {
 
   const onBlur = useRefCallback(
     (e) => {
+      const userInput = content
+        .replace(/<span[^>]*>(.*?)<\/span>/gi, '')
+        .replace('&nbsp;', ' ');
+      onContentBlur(userInput);
       if (content === '') {
         setContent(placeholderTag);
       }
@@ -68,6 +81,7 @@ function SmartTextArea(props: {
 
   const onFocus = useRefCallback(
     (e) => {
+      onContentFocus();
       if (content.includes(placeholderTag)) {
         setContent('');
       } else if (content === '') {
@@ -82,7 +96,7 @@ function SmartTextArea(props: {
       ref={contentRef}
       className={styles.smart_text_area}
       html={content}
-      onChange={onContentChanged}
+      onChange={onChanged}
       onKeyDown={onKeyDown}
       onBlur={onBlur}
       onFocus={onFocus}
