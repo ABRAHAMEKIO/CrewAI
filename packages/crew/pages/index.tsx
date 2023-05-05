@@ -35,7 +35,7 @@ import ImagineResponse, {
   ImageResponseContext,
 } from '../components/ImagineResponse';
 import FormSuggestion from '../components/FormSuggestion';
-import { promptInit, promptAll } from './prompt';
+import { promptInit, promptAll } from '../helpers/prompt';
 import GetStarted from '../components/GetStarted';
 
 let socket;
