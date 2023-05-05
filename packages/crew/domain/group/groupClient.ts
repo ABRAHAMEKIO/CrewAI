@@ -3,8 +3,6 @@ import axios from 'axios';
 import { Json } from 'sequelize/types/utils';
 import process from 'process';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4200';
-
 export interface ErrorResponse {
   error: string;
 }
@@ -28,7 +26,7 @@ export default class GroupClient {
 
     const config = {
       method: reqMethod,
-      url: `${BASE_URL}/${path}`,
+      url: `/${path}`,
       headers,
       data,
       validateStatus(status) {
