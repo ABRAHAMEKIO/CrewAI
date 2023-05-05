@@ -1013,5 +1013,3 @@ function singleNested() {
 export const promptAll = singleNested();
 
 export const promptInit = Prompt.map((obj: { name: string }) => obj.name);
-
-export default Prompt;
