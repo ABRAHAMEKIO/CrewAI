@@ -1,7 +1,7 @@
 import { Magic } from 'magic-sdk';
 import axios from 'axios';
 import { Button, Grid, Input, Spacer, Text } from '@nextui-org/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header1 } from './Heading';
 import { magicLinkPk } from '../config';
 
@@ -22,33 +22,48 @@ function Login() {
     setInputs((values) => ({ ...values, [name]: value }));
   };
 
+  function setWithExpiry(key, value, ttl) {
+    const now = new Date();
+
+    // `item` is an object which contains the original value
+    // as well as the time when it's supposed to expire
+    const item = {
+      value,
+      expiry: now.getTime() + ttl,
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+  }
+
   const authUser = async (formData) => {
     const { email } = formData;
-    await magic.auth.loginWithMagicLink({ email }).then(async (token) => {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-      await axios
-        .post(
-          '/api/auth/validate',
-          {
-            email,
-          },
-          config
-        )
-        .then((res) => {
-          /* eslint-disable no-console */
-          console.log(res);
-        })
-        .catch((e) => {
-          /* eslint-disable no-console */
-          console.log(e);
-          setError('Unable to log in');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    });
+    await magic.auth
+      .loginWithMagicLink({ email })
+      .then(async (token) => {
+        const config = {
+          headers: { Authorization: `Bearer ${token}` },
+        };
+        await axios
+          .post(
+            '/api/auth/validate',
+            {
+              email,
+            },
+            config
+          )
+          .then((res) => {
+            localStorage.setItem('user_data', JSON.stringify(res.data.user));
+            setWithExpiry('is_logged_on', 'on', 28800000);
+          })
+          .catch((e) => {
+            setError('Unable to log in');
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      })
+      .catch((e) => {
+        setError('Unable to log in');
+      });
   };
 
   const handleSubmit = async (event) => {
@@ -57,6 +72,33 @@ function Login() {
     setErrorEmail(null);
     await authUser(inputs);
   };
+
+  function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key);
+
+    // if the item doesn't exist, return null
+    if (!itemStr) {
+      return null;
+    }
+
+    const item = JSON.parse(itemStr);
+    const now = new Date();
+
+    // compare the expiry time of the item with the current time
+    if (now.getTime() > item.expiry) {
+      // If the item is expired, delete the item from storage
+      // and return null
+      localStorage.removeItem(key);
+      return null;
+    }
+    return item.value;
+  }
+
+  useEffect(() => {
+    if (getWithExpiry('is_logged_on') !== null) {
+      window.location.href = '/';
+    }
+  });
 
   return (
     <Grid.Container justify="center">
