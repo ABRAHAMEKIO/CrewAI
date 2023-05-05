@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Container, Grid, Spacer, Text } from '@nextui-org/react';
+import { Container, Grid, Spacer, Text } from '@nextui-org/react';
 import Image from 'next/image';
 import Layout from '../../components/Layout';
 import NavigationBar from '../../components/NavigationBar';
@@ -15,6 +15,26 @@ function Index() {
       name: 'huda',
       image: 'https://github.com/hudakurniawan.png',
       description: `huda is the product manager at crew, he's long time business developer and iot engineer.`,
+    },
+    {
+      name: 'yuliefas',
+      image: 'https://github.com/yuliefas.png',
+      description: 'Tech Lead',
+    },
+    {
+      name: 'rahmap',
+      image: 'https://github.com/rahmap.png',
+      description: 'Software Engineer',
+    },
+    {
+      name: 'ahloct',
+      image: 'https://github.com/AhlOct.png',
+      description: 'Software Engineer',
+    },
+    {
+      name: 'garyjdn',
+      image: 'https://github.com/garyjdn.png',
+      description: 'Software Engineer (Mobile)',
     },
   ];
   return (
