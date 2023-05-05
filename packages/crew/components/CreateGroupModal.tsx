@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { TwitterShareButton, TwitterIcon } from 'react-share';
 import icons from './Icons';
 import GroupClient, {
-  CreateSuccessResponse,
+  SuccessResponse,
   ErrorResponse,
 } from '../domain/group/groupClient';
 
@@ -55,16 +55,16 @@ function CreateGroupModal(props: {
     event.preventDefault();
     setLoading(true);
 
-    const imagineResponse: CreateSuccessResponse | ErrorResponse =
-      await groupClient.imagine(values);
+    const createResponse: SuccessResponse | ErrorResponse =
+      await groupClient.create(values);
 
-    if ('error' in imagineResponse) {
-      setErrorMessage(imagineResponse.error);
+    if ('error' in createResponse) {
+      setErrorMessage(createResponse.error);
       setLoading(false);
     } else {
-      setResponseData(imagineResponse);
+      setResponseData(createResponse);
       setLoading(false);
-      setGroupUrl(`${window.location.href}group/${imagineResponse?.id}`);
+      setGroupUrl(`${window.location.href}group/${createResponse?.id}`);
     }
   }
 

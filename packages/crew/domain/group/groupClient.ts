@@ -9,7 +9,7 @@ export interface ErrorResponse {
   error: string;
 }
 
-export interface CreateSuccessResponse {
+export interface SuccessResponse {
   id: string;
   name: string;
   prompt: Text;
@@ -20,16 +20,14 @@ export interface CreateSuccessResponse {
   updatedAt: Date;
 }
 
-export default class CreateGroupClient {
-  getConfig(data: object) {
+export default class GroupClient {
+  getConfig(data: object | string, path: string, reqMethod: string) {
     const headers = {
       'Content-Type': 'application/json',
     };
 
-    const path = 'api/group/create';
-
     const config = {
-      method: 'POST',
+      method: reqMethod,
       url: `${BASE_URL}/${path}`,
       headers,
       data,
@@ -40,9 +38,17 @@ export default class CreateGroupClient {
     return config;
   }
 
-  async imagine(data: object): Promise<CreateSuccessResponse | ErrorResponse> {
-    const config = this.getConfig(data);
-    const response = await axios.request<CreateSuccessResponse | ErrorResponse>(
+  async create(data: object): Promise<SuccessResponse | ErrorResponse> {
+    const config = this.getConfig(data, 'api/group/create', 'POST');
+    const response = await axios.request<SuccessResponse | ErrorResponse>(
+      config
+    );
+    return response.data;
+  }
+
+  async get(id: string): Promise<SuccessResponse | ErrorResponse> {
+    const config = this.getConfig(id, `api/group/${id}`, 'GET');
+    const response = await axios.request<SuccessResponse | ErrorResponse>(
       config
     );
     return response.data;
