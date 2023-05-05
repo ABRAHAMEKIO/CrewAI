@@ -36,6 +36,7 @@ import ImagineResponse, {
 } from '../components/ImagineResponse';
 import FormSuggestion from '../components/FormSuggestion';
 import { promptInit, promptAll } from './prompt';
+import GetStarted from '../components/GetStarted';
 
 let socket;
 
@@ -216,117 +217,145 @@ function Index() {
     });
   }
 
+  const fieldRef = React.useRef<HTMLInputElement>(null);
+
+  function onClick() {
+    fieldRef.current.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <Layout>
       <NavigationBar />
-      <Container>
-        {errorValidationModal && (
-          <ErrorValidationModal
-            modalOpen={errorValidationModal}
-            modalClose={ToggleModal}
-            message="parameters format cannot contain spaces."
-          />
-        )}
-        <Grid.Container justify="center" gap={6}>
-          <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
-            <Header1 content="Playground" />
-            <Header2 content="Write your first GenAI prompt" />
-            <Spacer x={1} />
-            <Textarea
-              style={{ padding: '2rem' }}
-              width="100%"
-              cacheMeasurements={false}
-              label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
-              placeholder="A raccoon that can speak and wield a sword"
-              onChange={(e) => handleChangePrompt(e.target.value)}
-              onBlur={(e) => handleBlurPrompt(e.target.value)}
-              onFocus={() => setFinalPrompt('typing...')}
+      <GetStarted onClick={() => onClick()} />
+      <div
+        className="field"
+        ref={fieldRef}
+        style={{
+          paddingTop: '6rem',
+        }}
+      >
+        <Container
+          md
+          style={{
+            minHeight: '100vh',
+          }}
+        >
+          {errorValidationModal && (
+            <ErrorValidationModal
+              modalOpen={errorValidationModal}
+              modalClose={ToggleModal}
+              message="parameters format cannot contain spaces."
             />
-            <Spacer x={1} />
-            <FormSuggestion
-              suggestions={suggestions}
-              onValue={(data: string[]) => handleValue(data)}
-              onRemove={(data: string) => handleRemove(data)}
-              onAdd={(data: string) => handleAdd(data)}
-            />
-            <Spacer x={1} />
-            <FileUpload
-              seedImage={seedFileName}
-              onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
-            />
-            {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
-            {finalPrompt && (
-              <p>
-                <em>
-                  When you click <strong>try sample</strong>, you will execute
-                  this prompt &quot;
-                  {finalPrompt}&quot;
-                </em>
-              </p>
-            )}
-            {params && (
-              <ParametersFromPrompt
-                prompt={prompt}
-                params={params}
-                paramsData={paramsData}
-                finalPrompt={ParametersValue}
-              />
-            )}
-            {!loading && error && (
-              <Text color="error">
-                Error while generating image: {errorMessage}
-              </Text>
-            )}
-            <Link href="#promptPresets" css={{ float: 'right' }}>
-              Open Prompt Presets
-            </Link>
-            <Spacer y={1.5} />
-            <Button
-              color="gradient"
-              onPress={(e) => handleSubmit(e)}
-              disabled={loading}
-              css={{ float: 'right', maxWidth: '2rem' }}
-            >
-              {loading ? 'Loading' : 'Try sample'}
-            </Button>
-          </Grid>
-          {!error && response && historyResponse && (
-            <Grid xs={12} sm={6}>
-              <Grid.Container justify="center" gap={2}>
-                <Collapse.Group borderWeight="bold">
-                  <ImageResponseContext.Provider
-                    value={imageResponseContextValue}
-                  >
-                    {historyResponse.map((resp, index) => (
-                      <Collapse
-                        index={index}
-                        title={decodeReference(resp).button}
-                        expanded={index + 1 === historyResponse.length}
-                      >
-                        <ImagineResponse response={resp} />
-                        {isUpscale(decodeReference(resp)) && (
-                          <div>
-                            <Spacer x={4} />
-                            <Button
-                              type="button"
-                              bordered
-                              color="gradient"
-                              auto
-                              onPress={() => setSeedFileName(resp.imageUrl)}
-                            >
-                              Use Image As Prompt
-                            </Button>
-                          </div>
-                        )}
-                      </Collapse>
-                    ))}
-                  </ImageResponseContext.Provider>
-                </Collapse.Group>
-              </Grid.Container>
-            </Grid>
           )}
-        </Grid.Container>
-      </Container>
+          <Grid.Container justify="center" gap={6}>
+            <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
+              <Header1 content="Playground" />
+              <Header2 content="Write your first GenAI prompt" />
+              <Spacer x={1} />
+              <Textarea
+                style={{ padding: '2rem' }}
+                width="100%"
+                cacheMeasurements={false}
+                label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
+                placeholder="A raccoon that can speak and wield a sword"
+                onChange={(e) => handleChangePrompt(e.target.value)}
+                onBlur={(e) => handleBlurPrompt(e.target.value)}
+                onFocus={() => setFinalPrompt('typing...')}
+              />
+              <Spacer x={1} />
+              <FormSuggestion
+                suggestions={suggestions}
+                onValue={(data: string[]) => handleValue(data)}
+                onRemove={(data: string) => handleRemove(data)}
+                onAdd={(data: string) => handleAdd(data)}
+              />
+              <Spacer x={1} />
+              <FileUpload
+                seedImage={seedFileName}
+                onUploadFinished={(fileName: string) =>
+                  setSeedFileName(fileName)
+                }
+              />
+              {socketId ? (
+                <p>Status: Connected</p>
+              ) : (
+                <p>Status: Disconnected</p>
+              )}
+              {finalPrompt && (
+                <p>
+                  <em>
+                    When you click <strong>try sample</strong>, you will execute
+                    this prompt &quot;
+                    {finalPrompt}&quot;
+                  </em>
+                </p>
+              )}
+              {params && (
+                <ParametersFromPrompt
+                  prompt={prompt}
+                  params={params}
+                  paramsData={paramsData}
+                  finalPrompt={ParametersValue}
+                />
+              )}
+              {!loading && error && (
+                <Text color="error">
+                  Error while generating image: {errorMessage}
+                </Text>
+              )}
+              <Link href="#promptPresets" css={{ float: 'right' }}>
+                Open Prompt Presets
+              </Link>
+              <Spacer y={1.5} />
+              <Button
+                color="gradient"
+                onPress={(e) => handleSubmit(e)}
+                disabled={loading}
+                css={{ zIndex: '0', float: 'right', maxWidth: '2rem' }}
+              >
+                {loading ? 'Loading' : 'Try sample'}
+              </Button>
+            </Grid>
+            {!error && response && historyResponse && (
+              <Grid xs={12} sm={6}>
+                <Grid.Container justify="center" gap={2}>
+                  <Collapse.Group borderWeight="bold">
+                    <ImageResponseContext.Provider
+                      value={imageResponseContextValue}
+                    >
+                      {historyResponse.map((resp, index) => (
+                        <Collapse
+                          index={index}
+                          title={decodeReference(resp).button}
+                          expanded={index + 1 === historyResponse.length}
+                        >
+                          <ImagineResponse response={resp} />
+                          {isUpscale(decodeReference(resp)) && (
+                            <div>
+                              <Spacer x={4} />
+                              <Button
+                                type="button"
+                                bordered
+                                color="gradient"
+                                auto
+                                onPress={() => setSeedFileName(resp.imageUrl)}
+                              >
+                                Use Image As Prompt
+                              </Button>
+                            </div>
+                          )}
+                        </Collapse>
+                      ))}
+                    </ImageResponseContext.Provider>
+                  </Collapse.Group>
+                </Grid.Container>
+              </Grid>
+            )}
+          </Grid.Container>
+        </Container>
+      </div>
     </Layout>
   );
 }
