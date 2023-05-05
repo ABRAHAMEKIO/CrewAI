@@ -12,9 +12,16 @@ import {
   Image,
 } from '@nextui-org/react';
 
+const images = [
+  'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260909646_Fu-Kc2RaUAEKERb.jpeg',
+  'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260931065_FvMHr0bakAUD1HL.jpeg',
+  'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260974037_FvER45aacAAN7qL.jpeg',
+];
+
 function GetStarted({ onClick }: { onClick: () => void }) {
   return (
     <Container
+      sm
       style={{
         minHeight: '100vh',
       }}
@@ -63,28 +70,20 @@ function GetStarted({ onClick }: { onClick: () => void }) {
         </Button>
       </div>
 
-      <Grid.Container gap={2} justify="center">
-        <Grid xs={12} sm={4}>
-          <Image
-            src="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true"
-            objectFit="cover"
-            alt="Default Image"
-          />
-        </Grid>
-        <Grid xs={12} sm={4}>
-          <Image
-            src="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true"
-            objectFit="cover"
-            alt="Default Image"
-          />
-        </Grid>
-        <Grid xs={12} sm={4}>
-          <Image
-            src="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true"
-            objectFit="cover"
-            alt="Default Image"
-          />
-        </Grid>
+      <Grid.Container
+        gap={2}
+        justify="center"
+        css={{
+          marginTop: '1rem',
+        }}
+      >
+        {images.map((image) => {
+          return (
+            <Grid xs={12} sm={4}>
+              <Image src={image} objectFit="cover" alt="Default Image" />
+            </Grid>
+          );
+        })}
       </Grid.Container>
     </Container>
   );

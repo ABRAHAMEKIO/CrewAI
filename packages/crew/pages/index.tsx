@@ -205,6 +205,7 @@ function Index() {
         }}
       >
         <Container
+          md
           style={{
             minHeight: '100vh',
           }}
