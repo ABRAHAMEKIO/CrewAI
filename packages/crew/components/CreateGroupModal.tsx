@@ -14,6 +14,10 @@ import {
 import React, { useState } from 'react';
 import { TwitterShareButton, TwitterIcon } from 'react-share';
 import icons from './Icons';
+import GroupClient, {
+  CreateSuccessResponse,
+  ErrorResponse,
+} from '../domain/group/groupClient';
 
 function CreateGroupModal(props: {
   modalOpen: boolean;
@@ -29,6 +33,7 @@ function CreateGroupModal(props: {
     creatorParams,
     creatorImageUrl,
   } = props;
+  const groupClient = new GroupClient();
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState(null);
@@ -37,7 +42,7 @@ function CreateGroupModal(props: {
   const [values, setValues] = useState({
     name: '',
     prompt: creatorPrompt,
-    parametersFromPrompt: JSON.stringify(creatorParams),
+    parametersFromPrompt: creatorParams,
     imageUrl: creatorImageUrl,
     userId: 1,
   });
@@ -50,23 +55,16 @@ function CreateGroupModal(props: {
     event.preventDefault();
     setLoading(true);
 
-    const response = await fetch('/api/group/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
+    const imagineResponse: CreateSuccessResponse | ErrorResponse =
+      await groupClient.imagine(values);
 
-    const data = await response.json();
-
-    if (response.ok) {
-      setResponseData(data);
+    if ('error' in imagineResponse) {
+      setErrorMessage(imagineResponse.error);
       setLoading(false);
-      setGroupUrl(`${window.location.href}group/${data?.id}`);
     } else {
-      setErrorMessage(data.error);
+      setResponseData(imagineResponse);
       setLoading(false);
+      setGroupUrl(`${window.location.href}group/${imagineResponse?.id}`);
     }
   }
 
