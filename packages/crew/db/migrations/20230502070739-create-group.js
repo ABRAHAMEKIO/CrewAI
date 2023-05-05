@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       parametersFromPrompt: {
-        type: Sequelize.TEXT,
+        type: Sequelize.JSON,
       },
       imageUrl: {
         type: Sequelize.STRING,

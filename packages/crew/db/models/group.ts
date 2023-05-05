@@ -1,4 +1,5 @@
 import { DataTypes, Model, Optional, UUIDV4 } from 'sequelize';
+import { Json } from 'sequelize/types/utils';
 import sequelizeConnection from '../config/connection';
 
 interface GroupAttributes {
@@ -6,7 +7,7 @@ interface GroupAttributes {
   name?: string;
   prompt?: Text;
   masterKey?: string;
-  parametersFromPrompt?: Text;
+  parametersFromPrompt?: Json;
   imageUrl?: string;
 
   createdAt?: Date;
@@ -28,7 +29,7 @@ class Group
 
   public masterKey!: string;
 
-  public parametersFromPrompt!: Text;
+  public parametersFromPrompt!: Json;
 
   public imageUrl!: string;
 
@@ -59,7 +60,7 @@ Group.init(
     },
     parametersFromPrompt: {
       allowNull: true,
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
     },
     imageUrl: {
       allowNull: false,
