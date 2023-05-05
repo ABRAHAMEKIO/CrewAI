@@ -28,6 +28,7 @@ import { successBeep, errorBeep } from '../domain/sounds/beep';
 import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
+import CreateGroupModal from '../components/CreateGroupModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
 import ImagineResponse, {
   decodeReference,
@@ -53,14 +54,19 @@ function Index() {
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [createGroupModal, setCreateGroupModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
+  const [cretorImageUrl, setCreatorImageurl] = useState(null);
   const [historyResponse, setHistoryResponse] = useState<
     WebhookSuccessResponse[]
   >([]);
+
+  const ErrorValidationToggleModal = () =>
+    setErrorValidationModal(!errorValidationModal);
+  const CreateGroupToggleModal = () => setCreateGroupModal(!createGroupModal);
+
   const [advancedPrompt, setAdvancedPrompt] = useState([]);
   const [suggestions, setSuggestions] = useState([...promptInit]);
-
-  const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
   };
@@ -245,8 +251,17 @@ function Index() {
           {errorValidationModal && (
             <ErrorValidationModal
               modalOpen={errorValidationModal}
-              modalClose={ToggleModal}
+              modalClose={ErrorValidationToggleModal}
               message="parameters format cannot contain spaces."
+            />
+          )}
+          {createGroupModal && (
+            <CreateGroupModal
+              modalOpen={createGroupModal}
+              modalClose={CreateGroupToggleModal}
+              creatorPrompt={prompt}
+              creatorParams={paramsData}
+              creatorImageUrl={cretorImageUrl}
             />
           )}
           <Grid.Container justify="center" gap={6}>
@@ -332,20 +347,44 @@ function Index() {
                           expanded={index + 1 === historyResponse.length}
                         >
                           <ImagineResponse response={resp} />
-                          {isUpscale(decodeReference(resp)) && (
-                            <div>
-                              <Spacer x={4} />
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'Center',
+                              marginTop: '1rem',
+                            }}
+                          >
+                            {isUpscale(decodeReference(resp)) && (
                               <Button
                                 type="button"
                                 bordered
                                 color="gradient"
                                 auto
                                 onPress={() => setSeedFileName(resp.imageUrl)}
+                                css={{
+                                  width: 'fit-content',
+                                  margin: '0 .5rem',
+                                }}
                               >
                                 Use Image As Prompt
                               </Button>
-                            </div>
-                          )}
+                            )}
+                            <Button
+                              color="gradient"
+                              onPress={() => {
+                                setCreateGroupModal(true);
+                                setCreatorImageurl(resp.imageUrl);
+                              }}
+                              css={{
+                                width: 'fit-content',
+                                margin: '0 .5rem',
+                              }}
+                              disabled={loading}
+                            >
+                              Create Group
+                            </Button>
+                          </div>
                         </Collapse>
                       ))}
                     </ImageResponseContext.Provider>
