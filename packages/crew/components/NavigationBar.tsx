@@ -117,6 +117,9 @@ function NavigationBar() {
         </Text>
       </Navbar.Brand>
       <Navbar.Content hideIn="xs">
+        <Navbar.Link isActive={asPath === '/'} key="home" href="/">
+          Home
+        </Navbar.Link>
         <Dropdown isBordered>
           <Navbar.Item>
             <Dropdown.Button
