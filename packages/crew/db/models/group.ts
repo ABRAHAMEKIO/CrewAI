@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional, UUIDV4 } from 'sequelize';
 import { Json } from 'sequelize/types/utils';
 import sequelizeConnection from '../config/connection';
 
-interface GroupAttributes {
+export interface GroupAttributes {
   id?: string;
   name?: string;
   prompt?: Text;
