@@ -41,6 +41,11 @@ import GetStarted from '../components/GetStarted';
 
 let socket;
 
+interface PromptHistory {
+  webhookSuccessResponse: WebhookSuccessResponse;
+  prompt: string;
+}
+
 function Index() {
   const mixpanel = useMixpanel();
   const [socketId, setSocketId] = useState(null);
@@ -57,9 +62,8 @@ function Index() {
   const [createGroupModal, setCreateGroupModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
   const [cretorImageUrl, setCreatorImageurl] = useState(null);
-  const [historyResponse, setHistoryResponse] = useState<
-    WebhookSuccessResponse[]
-  >([]);
+  // TODO: need to make the history of prompt more reliable, this is only temporary hacks
+  const [historyResponse, setHistoryResponse] = useState<PromptHistory[]>([]);
 
   const ErrorValidationToggleModal = () =>
     setErrorValidationModal(!errorValidationModal);
@@ -99,7 +103,10 @@ function Index() {
               setError(false);
               setErrorMessage('');
               setResponse(val);
-              historyResponse.push(val);
+              historyResponse.push({
+                webhookSuccessResponse: val,
+                prompt: val.content,
+              });
               setHistoryResponse(historyResponse);
               successBeep();
             } else {
@@ -132,12 +139,11 @@ function Index() {
         finalPrompt,
       });
     }
+    const completePrompt = `${seedFileName} ${advancedPrompt.join(
+      ' '
+    )} ${finalPrompt}`;
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
-      await midjourneyClient.imagine(
-        `${seedFileName} ${advancedPrompt.join(' ')} ${finalPrompt}`,
-        socketId,
-        ''
-      );
+      await midjourneyClient.imagine(completePrompt, socketId, '');
     if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
       setError(true);
       setErrorMessage(
@@ -340,13 +346,21 @@ function Index() {
                     <ImageResponseContext.Provider
                       value={imageResponseContextValue}
                     >
-                      {historyResponse.map((resp, index) => (
+                      {historyResponse.map((val, index) => (
                         <Collapse
                           index={index}
-                          title={decodeReference(resp).button}
+                          /* TODO: please make the title collapse logic better, this is only solve issue with prompt history */
+                          title={
+                            !decodeReference(val.webhookSuccessResponse).button
+                              ? `${val.prompt.slice(0, 50)}..`
+                              : decodeReference(val.webhookSuccessResponse)
+                                  .button
+                          }
                           expanded={index + 1 === historyResponse.length}
                         >
-                          <ImagineResponse response={resp} />
+                          <ImagineResponse
+                            response={val.webhookSuccessResponse}
+                          />
                           <div
                             style={{
                               display: 'flex',
@@ -355,13 +369,19 @@ function Index() {
                               marginTop: '1rem',
                             }}
                           >
-                            {isUpscale(decodeReference(resp)) && (
+                            {isUpscale(
+                              decodeReference(val.webhookSuccessResponse)
+                            ) && (
                               <Button
                                 type="button"
                                 bordered
                                 color="gradient"
                                 auto
-                                onPress={() => setSeedFileName(resp.imageUrl)}
+                                onPress={() =>
+                                  setSeedFileName(
+                                    val.webhookSuccessResponse.imageUrl
+                                  )
+                                }
                                 css={{
                                   width: 'fit-content',
                                   margin: '0 .5rem',
@@ -374,7 +394,9 @@ function Index() {
                               color="gradient"
                               onPress={() => {
                                 setCreateGroupModal(true);
-                                setCreatorImageurl(resp.imageUrl);
+                                setCreatorImageurl(
+                                  val.webhookSuccessResponse.imageUrl
+                                );
                               }}
                               css={{
                                 width: 'fit-content',
