@@ -31,3 +31,4 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           NEXT_PUBLIC_MIXPANEL_ID: ${{ secrets.NEXT_PUBLIC_MIXPANEL_ID }}
+          NX_DATABASE_URL: ${{ secrets.NX_DATABASE_URL }}
