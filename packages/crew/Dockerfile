@@ -11,8 +11,6 @@ RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
 # RUN npm ci
 
 ENV NEXT_TELEMETRY_DISABLED 1
-# Build time database url, not being used when running the app
-ENV DATABASE_URL postgres://postgres:postgres@localhost:5432/crew
 
 # Add `ARG` instructions below if you need `NEXT_PUBLIC_` variables
 # then put the value on your fly.toml
