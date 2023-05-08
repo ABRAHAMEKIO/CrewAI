@@ -16,7 +16,7 @@ import { server } from '../../config';
 /* eslint-disable react/prop-types */
 function Login({ User }) {
   const [loading, setLoading] = useState(false);
-  const [inputs, setInputs] = useState({});
+  const [inputs, setInputs] = useState({ username: null });
   const [error, setError] = useState(null);
   const [errorUsername, setErrorUsername] = useState(null);
   const [UserState, setUserState] = useState(User);
