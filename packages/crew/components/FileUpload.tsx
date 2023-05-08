@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
-import { Input, Image, Progress, Spacer } from '@nextui-org/react';
+import {
+  Input,
+  Image,
+  Progress,
+  Spacer,
+  Button,
+  Grid,
+} from '@nextui-org/react';
 import http from 'axios';
+import icons from './Icons';
 // UploadService.js
 const UploadService = {
   upload: (file: File, onUploadProgress) => {
@@ -62,34 +70,84 @@ function FileUpload({
     upload(selectedFiles?.[0]);
   };
 
+  const inputFileRef = React.useRef<HTMLInputElement>(null);
+
+  function removePhoto() {
+    setProgress(0);
+    inputFileRef.current.value = null;
+    setCurrentFile(undefined);
+    setFileLocation('');
+    onUploadFinished('');
+  }
+
   return (
-    <>
-      <Input label="File" type="file" onChange={selectFile} />
-      <Spacer y={1} />
-      {(fileLocation || seedImage) && (
-        <Image
-          width={300}
-          height={300}
-          src={fileLocation || seedImage}
-          alt="Prompt Image"
-          objectFit="cover"
+    <Grid.Container
+      justify="space-between"
+      css={{
+        marginBottom: '1rem',
+      }}
+    >
+      <Grid xs={4} direction="column">
+        <Input
+          label="File"
+          type="file"
+          onChange={selectFile}
+          ref={inputFileRef}
+          css={{
+            display: 'none',
+          }}
         />
-      )}
+        <Button
+          iconRight={icons.image}
+          color="gradient"
+          css={{
+            width: 'fit-content',
+          }}
+          onPress={() => inputFileRef.current.click()}
+        >
+          Chose photo
+        </Button>
+        <Spacer y={1} />
+        {(fileLocation || seedImage) && (
+          <Button
+            icon={icons.trash}
+            color="error"
+            flat
+            css={{
+              width: 'fit-content',
+            }}
+            onPress={() => removePhoto()}
+          >
+            Remove photo
+          </Button>
+        )}
+      </Grid>
+      <Grid xs={8} direction="column">
+        {(fileLocation || seedImage) && (
+          <Image
+            width="100%"
+            src={fileLocation || seedImage}
+            alt="Prompt Image"
+            objectFit="cover"
+          />
+        )}
 
-      {currentFile && (
-        <>
-          <Spacer y={1} />
-          <Progress color="primary" value={progress} />
-          <Spacer y={1} />
-        </>
-      )}
+        {currentFile && (
+          <Progress
+            css={{ marginTop: '.5rem' }}
+            color="primary"
+            size="xs"
+            value={progress}
+          />
+        )}
 
-      {message && (
-        <div className="alert alert-secondary mt-3" role="alert">
-          {message}
-        </div>
-      )}
-    </>
+        {message && (
+          <div className="alert alert-secondary mt-3" role="alert">
+            {message}
+          </div>
+        )}
+      </Grid>
+    </Grid.Container>
   );
 }
 

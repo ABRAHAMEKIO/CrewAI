@@ -1,16 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import {
-  Button,
-  Container,
-  PressEvent,
-  Textarea,
-  Text,
-  Grid,
-  Spacer,
-  Collapse,
-  Link,
-  Image,
-} from '@nextui-org/react';
+import React from 'react';
+import { Button, Container, Text, Grid, Image } from '@nextui-org/react';
 
 const images = [
   'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260909646_Fu-Kc2RaUAEKERb.jpeg',
