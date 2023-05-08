@@ -9,6 +9,7 @@ import {
   Collapse,
   Link,
   Avatar,
+  Textarea,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
@@ -17,7 +18,7 @@ import { storagePromptHistory, PromptHistory } from '../helpers/storage';
 import { Header1, Header2 } from '../components/Heading';
 import NavigationBar from '../components/NavigationBar';
 
-import { server, wsServer } from '../config';
+import { isAutocompleteEnabled, server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import MidjourneyClient, {
   IsNaughtySuccessResponse,
@@ -288,12 +289,25 @@ function Index() {
               <Header1 content="Playground" />
               <Header2 content="Write your first GenAI prompt" />
               <Spacer x={1} />
-              <SmartTextArea
-                onContentChange={(value: string) => handleChangePrompt(value)}
-                onContentBlur={(value: string) => handleBlurPrompt(value)}
-                onContentFocus={() => setFinalPrompt('typing...')}
-                openAIClient={openAIClient}
-              />
+              {!isAutocompleteEnabled ? (
+                <Textarea
+                  style={{ padding: '2rem' }}
+                  width="100%"
+                  cacheMeasurements={false}
+                  label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
+                  placeholder="A raccoon that can speak and wield a sword"
+                  onChange={(e) => handleChangePrompt(e.target.value)}
+                  onBlur={(e) => handleBlurPrompt(e.target.value)}
+                  onFocus={() => setFinalPrompt('typing...')}
+                />
+              ) : (
+                <SmartTextArea
+                  onContentChange={(value: string) => handleChangePrompt(value)}
+                  onContentBlur={(value: string) => handleBlurPrompt(value)}
+                  onContentFocus={() => setFinalPrompt('typing...')}
+                  openAIClient={openAIClient}
+                />
+              )}
               <Spacer x={1} />
               <FormSuggestion
                 suggestions={suggestions}
