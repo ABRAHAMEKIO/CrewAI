@@ -13,7 +13,15 @@ const nextConfig = {
     svgr: false,
   },
   images: {
-    domains: ['github.com'],
+    domains: ['github.com', 'discordapp.com', 'cdn.discordapp.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+        port: '',
+        pathname: '/attachments/**/**/**',
+      },
+    ],
   },
 };
 

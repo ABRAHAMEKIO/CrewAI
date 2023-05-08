@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Button,
   Container,
@@ -28,14 +28,24 @@ import { successBeep, errorBeep } from '../domain/sounds/beep';
 import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
+import CreateGroupModal from '../components/CreateGroupModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
 import SmartTextArea from '../components/SmartTextArea';
 import ImagineResponse, {
   decodeReference,
   Reference,
+  ImageResponseContext,
 } from '../components/ImagineResponse';
+import FormSuggestion from '../components/FormSuggestion';
+import { promptInit, promptAll } from '../helpers/prompt';
+import GetStarted from '../components/GetStarted';
 
 let socket;
+
+interface PromptHistory {
+  webhookSuccessResponse: WebhookSuccessResponse;
+  prompt: string;
+}
 
 function Index() {
   const mixpanel = useMixpanel();
@@ -51,12 +61,18 @@ function Index() {
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [createGroupModal, setCreateGroupModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
-  const [historyResponse, setHistoryResponse] = useState<
-    WebhookSuccessResponse[]
-  >([]);
+  const [cretorImageUrl, setCreatorImageurl] = useState(null);
+  // TODO: need to make the history of prompt more reliable, this is only temporary hacks
+  const [historyResponse, setHistoryResponse] = useState<PromptHistory[]>([]);
 
-  const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
+  const ErrorValidationToggleModal = () =>
+    setErrorValidationModal(!errorValidationModal);
+  const CreateGroupToggleModal = () => setCreateGroupModal(!createGroupModal);
+
+  const [advancedPrompt, setAdvancedPrompt] = useState([]);
+  const [suggestions, setSuggestions] = useState([...promptInit]);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
   };
@@ -89,7 +105,10 @@ function Index() {
               setError(false);
               setErrorMessage('');
               setResponse(val);
-              historyResponse.push(val);
+              historyResponse.push({
+                webhookSuccessResponse: val,
+                prompt: val.content,
+              });
               setHistoryResponse(historyResponse);
               successBeep();
             } else {
@@ -122,23 +141,21 @@ function Index() {
         finalPrompt,
       });
     }
+    const completePrompt = `${seedFileName} ${advancedPrompt.join(
+      ' '
+    )} ${finalPrompt}`;
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
-      await midjourneyClient.imagine(
-        `${seedFileName} ${finalPrompt}`,
-        socketId,
-        ''
+      await midjourneyClient.imagine(completePrompt, socketId, '');
+    if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
+      setError(true);
+      setErrorMessage(
+        `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
       );
-    setLoading(true);
-    // if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
-    //   setError(true);
-    //   setErrorMessage(
-    //     `there (are) prohibited phrase(s) ${imagineResponse.phrase}`
-    //   );
-    //   errorBeep();
-    //   setLoading(false);
-    // } else {
-    //   setLoading(true);
-    // }
+      errorBeep();
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
   }
 
   function handleChangePrompt(value: string) {
@@ -181,97 +198,223 @@ function Index() {
     return first === 'U' && ['1', '2', '3', '4'].includes(second);
   }
 
+  const imageResponseContextValue = useMemo(
+    () => [loading, setLoading],
+    [loading, setLoading]
+  );
+
+  function handleValue(tags: string[]) {
+    setAdvancedPrompt(tags);
+  }
+
+  function handleAdd(tag: string) {
+    setSuggestions(() => {
+      const find = promptAll.find(
+        (d: { name: string; next: [] }) => d.name === tag
+      );
+      if ('next' in find) {
+        return find.next;
+      }
+      return [];
+    });
+  }
+
+  function handleRemove(tag: string) {
+    setSuggestions(() => {
+      const find = promptAll.find(
+        (d: { name: string; prev: [] }) => d.name === tag
+      );
+      if ('prev' in find) {
+        return find.prev;
+      }
+      return [];
+    });
+  }
+
+  const fieldRef = React.useRef<HTMLInputElement>(null);
+
+  function onClick() {
+    fieldRef.current.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
+
   return (
     <Layout>
       <NavigationBar />
-      <Container>
-        {errorValidationModal && (
-          <ErrorValidationModal
-            modalOpen={errorValidationModal}
-            modalClose={ToggleModal}
-            message="parameters format cannot contain spaces."
-          />
-        )}
-        <Grid.Container justify="center" gap={6}>
-          <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
-            <Header1 content="Playground" />
-            <Header2 content="Write your first GenAI prompt" />
-            <SmartTextArea
-              onContentChange={(value: string) => handleChangePrompt(value)}
-              onContentBlur={(value: string) => handleBlurPrompt(value)}
-              onContentFocus={() => setFinalPrompt('typing...')}
-              openAIClient={openAIClient}
+      <GetStarted onClick={() => onClick()} />
+      <div
+        className="field"
+        ref={fieldRef}
+        style={{
+          paddingTop: '6rem',
+        }}
+      >
+        <Container
+          md
+          style={{
+            minHeight: '100vh',
+          }}
+        >
+          {errorValidationModal && (
+            <ErrorValidationModal
+              modalOpen={errorValidationModal}
+              modalClose={ErrorValidationToggleModal}
+              message="parameters format cannot contain spaces."
             />
-            <FileUpload
-              seedImage={seedFileName}
-              onUploadFinished={(fileName: string) => setSeedFileName(fileName)}
-            />
-            {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
-            {finalPrompt && (
-              <p>
-                <em>
-                  When you click <strong>try sample</strong>, you will execute
-                  this prompt &quot;
-                  {finalPrompt}&quot;
-                </em>
-              </p>
-            )}
-            {params && (
-              <ParametersFromPrompt
-                prompt={prompt}
-                params={params}
-                paramsData={paramsData}
-                finalPrompt={ParametersValue}
-              />
-            )}
-            {!loading && error && (
-              <Text color="error">
-                Error while generating image: {errorMessage}
-              </Text>
-            )}
-            <Link href="#promptPresets" css={{ float: 'right' }}>
-              Open Prompt Presets
-            </Link>
-            <Spacer y={1.5} />
-            <Button
-              color="gradient"
-              onPress={(e) => handleSubmit(e)}
-              disabled={loading}
-              css={{ float: 'right', maxWidth: '2rem' }}
-            >
-              {loading ? 'Loading' : 'Try sample'}
-            </Button>
-          </Grid>
-          {!error && response && historyResponse && (
-            <Grid xs={12} sm={6}>
-              <Grid.Container justify="center" gap={2}>
-                <Collapse.Group>
-                  {historyResponse.map((resp, index) => (
-                    // expanded={index + 1 === historyResponse.length}
-                    <Collapse title={decodeReference(resp).button}>
-                      <ImagineResponse response={resp} />
-                      {isUpscale(decodeReference(resp)) && (
-                        <div>
-                          <Spacer x={4} />
-                          <Button
-                            type="button"
-                            bordered
-                            color="gradient"
-                            auto
-                            onPress={() => setSeedFileName(resp.imageUrl)}
-                          >
-                            Use Image As Prompt
-                          </Button>
-                        </div>
-                      )}
-                    </Collapse>
-                  ))}
-                </Collapse.Group>
-              </Grid.Container>
-            </Grid>
           )}
-        </Grid.Container>
-      </Container>
+          {createGroupModal && (
+            <CreateGroupModal
+              modalOpen={createGroupModal}
+              modalClose={CreateGroupToggleModal}
+              creatorPrompt={prompt}
+              creatorParams={paramsData}
+              creatorImageUrl={cretorImageUrl}
+            />
+          )}
+          <Grid.Container justify="center" gap={6}>
+            <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
+              <Header1 content="Playground" />
+              <Header2 content="Write your first GenAI prompt" />
+              <Spacer x={1} />
+              <SmartTextArea
+                onContentChange={(value: string) => handleChangePrompt(value)}
+                onContentBlur={(value: string) => handleBlurPrompt(value)}
+                onContentFocus={() => setFinalPrompt('typing...')}
+                openAIClient={openAIClient}
+              />
+              <Spacer x={1} />
+              <FormSuggestion
+                suggestions={suggestions}
+                onValue={(data: string[]) => handleValue(data)}
+                onRemove={(data: string) => handleRemove(data)}
+                onAdd={(data: string) => handleAdd(data)}
+              />
+              <Spacer x={1} />
+              <FileUpload
+                seedImage={seedFileName}
+                onUploadFinished={(fileName: string) =>
+                  setSeedFileName(fileName)
+                }
+              />
+              {socketId ? (
+                <p>Status: Connected</p>
+              ) : (
+                <p>Status: Disconnected</p>
+              )}
+              {finalPrompt && (
+                <p>
+                  <em>
+                    When you click <strong>try sample</strong>, you will execute
+                    this prompt &quot;
+                    {finalPrompt}&quot;
+                  </em>
+                </p>
+              )}
+              {params && (
+                <ParametersFromPrompt
+                  prompt={prompt}
+                  params={params}
+                  paramsData={paramsData}
+                  finalPrompt={ParametersValue}
+                />
+              )}
+              {!loading && error && (
+                <Text color="error">
+                  Error while generating image: {errorMessage}
+                </Text>
+              )}
+              <Link href="#promptPresets" css={{ float: 'right' }}>
+                Open Prompt Presets
+              </Link>
+              <Spacer y={1.5} />
+              <Button
+                color="gradient"
+                onPress={(e) => handleSubmit(e)}
+                disabled={loading}
+                css={{ zIndex: '0', float: 'right', maxWidth: '2rem' }}
+              >
+                {loading ? 'Loading' : 'Try sample'}
+              </Button>
+            </Grid>
+            {!error && response && historyResponse && (
+              <Grid xs={12} sm={6}>
+                <Grid.Container justify="center" gap={2}>
+                  <Collapse.Group borderWeight="bold">
+                    <ImageResponseContext.Provider
+                      value={imageResponseContextValue}
+                    >
+                      {historyResponse.map((val, index) => (
+                        <Collapse
+                          index={index}
+                          /* TODO: please make the title collapse logic better, this is only solve issue with prompt history */
+                          title={
+                            !decodeReference(val.webhookSuccessResponse).button
+                              ? `${val.prompt.slice(0, 50)}..`
+                              : decodeReference(val.webhookSuccessResponse)
+                                  .button
+                          }
+                          expanded={index + 1 === historyResponse.length}
+                        >
+                          <ImagineResponse
+                            response={val.webhookSuccessResponse}
+                          />
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'Center',
+                              marginTop: '1rem',
+                            }}
+                          >
+                            {isUpscale(
+                              decodeReference(val.webhookSuccessResponse)
+                            ) && (
+                              <Button
+                                type="button"
+                                bordered
+                                color="gradient"
+                                auto
+                                onPress={() =>
+                                  setSeedFileName(
+                                    val.webhookSuccessResponse.imageUrl
+                                  )
+                                }
+                                css={{
+                                  width: 'fit-content',
+                                  margin: '0 .5rem',
+                                }}
+                              >
+                                Use Image As Prompt
+                              </Button>
+                            )}
+                            <Button
+                              color="gradient"
+                              onPress={() => {
+                                setCreateGroupModal(true);
+                                setCreatorImageurl(
+                                  val.webhookSuccessResponse.imageUrl
+                                );
+                              }}
+                              css={{
+                                width: 'fit-content',
+                                margin: '0 .5rem',
+                              }}
+                              disabled={loading}
+                            >
+                              Create Group
+                            </Button>
+                          </div>
+                        </Collapse>
+                      ))}
+                    </ImageResponseContext.Provider>
+                  </Collapse.Group>
+                </Grid.Container>
+              </Grid>
+            )}
+          </Grid.Container>
+        </Container>
+      </div>
     </Layout>
   );
 }

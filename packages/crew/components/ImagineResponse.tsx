@@ -1,5 +1,5 @@
-import { Button, Image, Spacer, Text } from '@nextui-org/react';
-import React, { useState } from 'react';
+import { Button, Image, Text } from '@nextui-org/react';
+import React, { createContext, useContext, useState } from 'react';
 import MidjourneyClient, {
   IsNaughtySuccessResponse,
   SuccessResponse,
@@ -7,6 +7,8 @@ import MidjourneyClient, {
 } from '../domain/midjourney/midjourneyClient';
 import { errorBeep } from '../domain/sounds/beep';
 import { server } from '../config';
+
+export const ImageResponseContext = createContext(undefined);
 
 export interface Reference {
   socketId: string;
@@ -28,7 +30,7 @@ export function decodeReference(response: WebhookSuccessResponse): Reference {
 // props :response
 function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
   const midjourneyClient = new MidjourneyClient('', `${server}/api/thenextleg`);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useContext(ImageResponseContext);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const reference = decodeReference(response);
@@ -54,31 +56,64 @@ function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
     // }
   }
 
+  function filterButton(
+    buttons,
+    allowed = ['U1', 'U2', 'U3', 'U4', 'V1', 'V2', 'V3', 'V4']
+  ) {
+    return buttons.filter((button) => allowed.includes(button));
+  }
+
   return (
     <div>
-      <Spacer x={4} />
       <div>
-        <div style={{ marginTop: '4vh' }}>
-          <Image
-            css={{ maxWidth: 550 }}
-            src={response?.imageUrl}
-            alt="Your amazing generative art"
-          />
-        </div>
-        <Spacer y={1} />
-        <Button.Group color="gradient" ghost>
-          {response.buttons.map((button) => (
-            <Button type="button" onPress={() => handleButton(button)}>
-              {button}
-            </Button>
-          ))}
-        </Button.Group>
-        {!loading && error && (
-          <Text color="error">
-            Error while generating image: {errorMessage}
-          </Text>
+        <Image
+          css={{ maxWidth: 550 }}
+          src={response?.imageUrl}
+          alt="Your amazing generative art"
+        />
+        {filterButton(response.buttons).length >= 1 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column',
+            }}
+          >
+            <div
+              style={{
+                marginTop: '2vh',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <Button.Group color="gradient" ghost>
+                {filterButton(response.buttons).map((button) => (
+                  <Button
+                    disabled={loading}
+                    type="button"
+                    onPress={() => handleButton(button)}
+                  >
+                    {button}
+                  </Button>
+                ))}
+              </Button.Group>
+            </div>
+            {loading && (
+              <Text
+                color="warning"
+                style={{
+                  marginTop: '1vh',
+                }}
+              >
+                Loading...
+              </Text>
+            )}
+          </div>
         )}
       </div>
+      {!loading && error && (
+        <Text color="error">Error while generating image: {errorMessage}</Text>
+      )}
     </div>
   );
 }
