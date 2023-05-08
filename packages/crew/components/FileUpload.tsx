@@ -131,7 +131,14 @@ function FileUpload({
           />
         )}
 
-        {currentFile && <Progress color="primary" size="xs" value={progress} />}
+        {currentFile && (
+          <Progress
+            css={{ marginTop: '.5rem' }}
+            color="primary"
+            size="xs"
+            value={progress}
+          />
+        )}
 
         {message && (
           <div className="alert alert-secondary mt-3" role="alert">
