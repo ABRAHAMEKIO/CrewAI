@@ -396,6 +396,52 @@ function TrashIcon({ fill, size, width = 24, height = 24, ...props }) {
   );
 }
 
+export function LogoIcon({ size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      height={size || height}
+      width={size || width}
+      {...props}
+    >
+      <rect width="40" height="40" rx="8" fill="url(#paint0_linear_77_58)" />
+      <rect
+        x="16.3335"
+        y="16.3333"
+        width="7.33333"
+        height="7.33333"
+        fill="white"
+      />
+      <rect
+        x="23.6665"
+        y="23.6667"
+        width="7.33333"
+        height="7.33333"
+        fill="white"
+      />
+      <rect x="23.6665" y="9" width="7.33333" height="7.33333" fill="white" />
+      <rect x="9" y="23.6667" width="7.33333" height="7.33333" fill="white" />
+      <rect x="9" y="9" width="7.33333" height="7.33333" fill="white" />
+      <defs>
+        <linearGradient
+          id="paint0_linear_77_58"
+          x1="40"
+          y1="-1.37255"
+          x2="-4.09051e-08"
+          y2="40"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#211093" />
+          <stop offset="0.479167" stopColor="#A323A3" />
+          <stop offset="1" stopColor="#FFA01B" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
 // svg source: https://react-iconly.jrgarciadev.com/
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
@@ -413,6 +459,7 @@ const icons = {
   plus: <PlusIcon fill="var(--nextui-colors-success)" size={20} />,
   image: <ImageIcon fill="currentColor" size={20} />,
   trash: <TrashIcon fill="currentColor" size={20} />,
+  logo: <LogoIcon size={20} />,
 };
 
 export default icons;
