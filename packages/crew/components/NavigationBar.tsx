@@ -75,6 +75,7 @@ async function logout() {
 
 function NavigationBar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(`${server}/api/auth/check`, {
@@ -87,6 +88,7 @@ function NavigationBar() {
       } else {
         setIsLoggedIn(false);
       }
+      setIsLoading(true);
     };
     fetchData().catch(console.error);
   }, []);
@@ -171,24 +173,25 @@ function NavigationBar() {
         ))}
       </Navbar.Collapse>
       <Navbar.Content>
-        {!isLoggedIn ? (
-          <Navbar.Item>
-            <Button auto flat as={Link} href="/login">
-              Login
-            </Button>
-          </Navbar.Item>
-        ) : (
-          <>
-            <Navbar.Link color="inherit" onPress={() => logout()}>
-              Logout
-            </Navbar.Link>
+        {isLoading &&
+          (!isLoggedIn ? (
             <Navbar.Item>
-              <Button auto flat as={Link} href="/profile">
-                Profile
+              <Button auto flat as={Link} href="/login">
+                Login
               </Button>
             </Navbar.Item>
-          </>
-        )}
+          ) : (
+            <>
+              <Navbar.Link color="inherit" onPress={() => logout()}>
+                Logout
+              </Navbar.Link>
+              <Navbar.Item>
+                <Button auto flat as={Link} href="/profile">
+                  Profile
+                </Button>
+              </Navbar.Item>
+            </>
+          ))}
       </Navbar.Content>
     </Navbar>
   );
