@@ -359,8 +359,9 @@ function Index() {
                   }}
                 >
                   <Button
-                    iconRight={icons.trash}
-                    color="warning"
+                    icon={icons.trash}
+                    color="error"
+                    flat
                     css={{
                       width: 'fit-content',
                       zIndex: 0,
