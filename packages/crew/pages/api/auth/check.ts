@@ -7,6 +7,11 @@ const magic = new Magic(process.env.MAGIC_LINK_SECRET_KEY);
 const check = async (req, res) => {
   if (req.method === 'POST') {
     try {
+      if (!req.headers.cookie) {
+        return res.status(200).json({
+          is_login: false,
+        });
+      }
       const cookie = parse(req.headers.cookie);
       if (!cookie.is_logged_on) {
         return res.status(200).json({
@@ -24,7 +29,10 @@ const check = async (req, res) => {
           is_login: true,
         });
       }
-
+      res.setHeader(
+        'set-cookie',
+        `is_logged_on=; path=/; samesite=lax; httponly; Max-Age=-1`
+      );
       return res.status(200).json({
         is_login: false,
       });
