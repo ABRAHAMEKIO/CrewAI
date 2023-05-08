@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  // "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
+  "configurations": [
+    {
+      "name": "crew (debug)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "nx",
+      "runtimeArgs": [
+        "serve",
+        "crew"
+        // "-r",
+        // "ts-node/register",
+        // "-r",
+        // "tsconfig-paths/register"
+      ],
+      // "outputCapture": "std",
+      // "internalConsoleOptions": "openOnSessionStart",
+      "console": "internalConsole",
+      "env": {
+        "TS_NODE_IGNORE": "false",
+        "TS_NODE_PROJECT": "${workspaceFolder}/packages/crew/tsconfig.json"
+      },
+      "cwd": "${workspaceFolder}/packages/crew/"
+    }
+  ]
+}

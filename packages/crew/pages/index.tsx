@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   PressEvent,
-  Textarea,
   Text,
   Grid,
   Spacer,
@@ -25,6 +24,7 @@ import MidjourneyClient, {
   SuccessResponse,
   WebhookSuccessResponse,
 } from '../domain/midjourney/midjourneyClient';
+import OpenAIClient from '../domain/openai/openAIClient';
 import Layout from '../components/Layout';
 import { successBeep, errorBeep } from '../domain/sounds/beep';
 import FileUpload from '../components/FileUpload';
@@ -32,6 +32,7 @@ import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
 import CreateGroupModal from '../components/CreateGroupModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
+import SmartTextArea from '../components/SmartTextArea';
 import ImagineResponse, {
   decodeReference,
   Reference,
@@ -52,6 +53,7 @@ function Index() {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [prompt, setPrompt] = useState('');
+  const openAIClient = new OpenAIClient('', `${server}/api/openapi`);
   const midjourneyClient = new MidjourneyClient('', `${server}/api/thenextleg`);
   const [params, setParams] = useState([]);
   const [paramsData] = useState({});
@@ -286,15 +288,11 @@ function Index() {
               <Header1 content="Playground" />
               <Header2 content="Write your first GenAI prompt" />
               <Spacer x={1} />
-              <Textarea
-                style={{ padding: '2rem' }}
-                width="100%"
-                cacheMeasurements={false}
-                label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
-                placeholder="A raccoon that can speak and wield a sword"
-                onChange={(e) => handleChangePrompt(e.target.value)}
-                onBlur={(e) => handleBlurPrompt(e.target.value)}
-                onFocus={() => setFinalPrompt('typing...')}
+              <SmartTextArea
+                onContentChange={(value: string) => handleChangePrompt(value)}
+                onContentBlur={(value: string) => handleBlurPrompt(value)}
+                onContentFocus={() => setFinalPrompt('typing...')}
+                openAIClient={openAIClient}
               />
               <Spacer x={1} />
               <FormSuggestion
