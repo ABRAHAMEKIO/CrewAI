@@ -1,14 +1,8 @@
 import { Button, Dropdown, Link, Navbar, Text } from '@nextui-org/react';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Magic } from 'magic-sdk';
 import icons from './Icons';
-import { magicLinkPk } from '../config';
-
-let magic;
-if (typeof window !== 'undefined') {
-  magic = new Magic(magicLinkPk);
-}
+import { server } from '../config';
 
 const navItems = [
   {
@@ -73,37 +67,28 @@ function PlaceholderLogo() {
 }
 
 async function logout() {
-  await magic.user.logout();
-  localStorage.removeItem('user_data');
-  localStorage.removeItem('is_logged_on');
+  await fetch(`${server}/api/auth/logout`, {
+    method: 'POST',
+  });
   window.location.href = '/login';
-}
-
-function getWithExpiry(key) {
-  const itemStr = localStorage.getItem(key);
-
-  // if the item doesn't exist, return null
-  if (!itemStr) {
-    return null;
-  }
-
-  const item = JSON.parse(itemStr);
-  const now = new Date();
-
-  // compare the expiry time of the item with the current time
-  if (now.getTime() > item.expiry) {
-    // If the item is expired, delete the item from storage
-    // and return null
-    localStorage.removeItem(key);
-    return null;
-  }
-  return item.value;
 }
 
 function NavigationBar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
-    setIsLoggedIn(getWithExpiry('is_logged_on') === 'on');
+    const fetchData = async () => {
+      const response = await fetch(`${server}/api/auth/check`, {
+        method: 'POST',
+      });
+      const check = await response.json();
+
+      if (check.is_login) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+    fetchData().catch(console.error);
   }, []);
 
   const { asPath } = useRouter();

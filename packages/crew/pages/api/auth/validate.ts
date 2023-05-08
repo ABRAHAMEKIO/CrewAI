@@ -13,6 +13,11 @@ const validate = async (req, res) => {
         where: { issuer: metaData.issuer },
       });
 
+      res.setHeader(
+        'set-cookie',
+        `is_logged_on=${didToken}; path=/; samesite=lax; httponly; Max-Age=28800`
+      );
+
       if (user) {
         return res.status(200).json({
           user,
@@ -25,7 +30,7 @@ const validate = async (req, res) => {
         email: req.body.email,
         username: username
           ? username[1]
-          : `dummy_${(Math.random() + 1).toString(36).substring(7)}`,
+          : `crewai_${(Math.random() + 1).toString(36).substring(7)}`,
       });
       return res.status(200).json({
         user: newUser,
