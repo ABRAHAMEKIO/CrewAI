@@ -99,10 +99,10 @@ function FileUpload({
         />
         <Button
           iconRight={icons.image}
-          color="gradient"
           css={{
             width: 'fit-content',
           }}
+          color="primary"
           onPress={() => inputFileRef.current.click()}
         >
           Chose photo

@@ -411,7 +411,7 @@ const icons = {
   copy: <CopyIcon fill="white" size={20} />,
   close: <CloseIcon fill="var(--nextui-colors-error)" size={20} />,
   plus: <PlusIcon fill="var(--nextui-colors-success)" size={20} />,
-  image: <ImageIcon fill="var(--nextui-colors-warning)" size={20} />,
+  image: <ImageIcon fill="currentColor" size={20} />,
   trash: <TrashIcon fill="currentColor" size={20} />,
 };
 

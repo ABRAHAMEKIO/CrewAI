@@ -11,16 +11,16 @@ const theme = createTheme({
   theme: {
     colors: {
       // brand colors
-      primaryLight: '$green200',
-      primaryLightHover: '$green300',
-      primaryLightActive: '$green400',
-      primaryLightContrast: '$green600',
-      primary: '#4ADE7B',
-      primaryBorder: '$green500',
-      primaryBorderHover: '$green600',
-      primarySolidHover: '$green700',
-      primarySolidContrast: '$white',
-      primaryShadow: '$green500',
+      primaryLight: '$blue200',
+      primaryLightHover: '$blue300', // commonly used on hover state
+      primaryLightActive: '$blue400', // commonly used on pressed state
+      primaryLightContrast: '$blue600', // commonly used for text inside the component
+      primary: '$blue600',
+      primaryBorder: '$blue500',
+      primaryBorderHover: '$blue600',
+      primarySolidHover: '$blue700',
+      primarySolidContrast: '$white', // commonly used for text inside the component
+      primaryShadow: '$blue500',
 
       gradient:
         'linear-gradient(112deg, $blue100 -25%, $pink500 -10%, $purple500 80%)',
