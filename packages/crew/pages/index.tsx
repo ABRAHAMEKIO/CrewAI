@@ -9,10 +9,12 @@ import {
   Spacer,
   Collapse,
   Link,
+  Avatar,
 } from '@nextui-org/react';
 import io from 'socket.io-client';
 import { useMixpanel } from 'react-mixpanel-browser';
 import Handlebars from 'handlebars/dist/cjs/handlebars';
+import { storagePromptHistory, PromptHistory } from '../helpers/storage';
 import { Header1, Header2 } from '../components/Heading';
 import NavigationBar from '../components/NavigationBar';
 
@@ -38,13 +40,9 @@ import ImagineResponse, {
 import FormSuggestion from '../components/FormSuggestion';
 import { promptInit, promptAll } from '../helpers/prompt';
 import GetStarted from '../components/GetStarted';
+import icons from '../components/Icons';
 
 let socket;
-
-interface PromptHistory {
-  webhookSuccessResponse: WebhookSuccessResponse;
-  prompt: string;
-}
 
 function Index() {
   const mixpanel = useMixpanel();
@@ -108,6 +106,7 @@ function Index() {
                 prompt: val.content,
               });
               setHistoryResponse(historyResponse);
+              storagePromptHistory.save(historyResponse);
               successBeep();
             } else {
               setError(true);
@@ -131,6 +130,18 @@ function Index() {
         console.error(e);
       });
   }, [historyResponse, mixpanel]);
+
+  useEffect(() => {
+    const histories = storagePromptHistory.all();
+    if (histories) {
+      setHistoryResponse(histories);
+    }
+  }, []);
+
+  function clearHistories() {
+    storagePromptHistory.destroy();
+    setHistoryResponse([]);
+  }
 
   async function handleSubmit(event: PressEvent): Promise<void> {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -339,9 +350,26 @@ function Index() {
                 {loading ? 'Loading' : 'Try sample'}
               </Button>
             </Grid>
-            {!error && response && historyResponse && (
+            {!error && historyResponse.length >= 1 && (
               <Grid xs={12} sm={6}>
-                <Grid.Container justify="center" gap={2}>
+                <Grid.Container
+                  justify="flex-end"
+                  css={{
+                    alignContent: 'flex-start',
+                  }}
+                >
+                  <Button
+                    icon={icons.trash}
+                    color="error"
+                    flat
+                    css={{
+                      width: 'fit-content',
+                      zIndex: 0,
+                    }}
+                    onPress={() => clearHistories()}
+                  >
+                    Clear history
+                  </Button>
                   <Collapse.Group borderWeight="bold">
                     <ImageResponseContext.Provider
                       value={imageResponseContextValue}
@@ -357,6 +385,14 @@ function Index() {
                                   .button
                           }
                           expanded={index + 1 === historyResponse.length}
+                          contentLeft={
+                            <Avatar
+                              size="lg"
+                              src={val.webhookSuccessResponse.imageUrl}
+                              color="secondary"
+                              squared
+                            />
+                          }
                         >
                           <ImagineResponse
                             response={val.webhookSuccessResponse}
