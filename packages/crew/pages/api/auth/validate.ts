@@ -20,8 +20,6 @@ const validate = async (req, res) => {
 
       if (user) {
         return res.status(200).json({
-          user,
-          metadata: metaData,
           newUser: false,
         });
       }
@@ -33,12 +31,10 @@ const validate = async (req, res) => {
           : `crewai_${(Math.random() + 1).toString(36).substring(7)}`,
       });
       return res.status(200).json({
-        user: newUser,
-        metadata: metaData,
         newUser: true,
       });
     } catch (e) {
-      return res.status(405).json({ error: e });
+      return res.status(405).json({ error: e.message });
     }
   } else {
     return res
