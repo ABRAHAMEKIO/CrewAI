@@ -9,25 +9,34 @@ function classNames(...classes) {
 }
 
 function Index() {
-  const images = [
-    'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260974037_FvER45aacAAN7qL.jpeg',
-    'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260974037_FvER45aacAAN7qL.jpeg',
-    'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260974037_FvER45aacAAN7qL.jpeg',
-  ];
+  const items = [];
+  let i = 0;
+  do {
+    items.push({
+      prompt:
+        'inside a girl room, cyberpunk vibe, neon glowing lights, sharp focus, photorealistic, unreal engine 5, girl in the',
+      imageUrl:
+        'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260974037_FvER45aacAAN7qL.jpeg',
+    });
+    i += 1;
+  } while (i < 5);
+
   return (
     <Wrap>
       <Nav />
       <Section>
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 mt-[1.5rem] sm:mt-10 relative h-[calc(100vh-72px-24px)] sm:h-[calc(100vh-112px-40px)]">
-          <div className="grid sm:col-span-8 space-y-10 overflow-y-scroll h-[calc(50vh-72px-24px)] sm:h-[calc(100vh-112px-40px)]">
-            {images.map((image) => {
+          <div className="grid sm:col-span-8 space-y-10 overflow-y-scroll h-[calc(50vh-72px-24px)] sm:h-[calc(100vh-112px-40px)] snap-mandatory snap-y scroll-smooth">
+            {items.map((item) => {
               return (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  className="object-cover rounded-2xl h-[calc(100vw-32px-32px)] w-[calc(100vw-32px-32px)] sm:h-auto sm:w-auto"
-                  src={image}
-                  alt={image}
-                />
+                <div className="snap-start">
+                  <img
+                    className="object-cover rounded-2xl h-[calc(100vw-32px-32px)] w-[calc(100vw-32px-32px)] sm:h-auto sm:w-auto"
+                    src={item.imageUrl}
+                    alt={item.imageUrl}
+                  />
+                </div>
               );
             })}
           </div>
