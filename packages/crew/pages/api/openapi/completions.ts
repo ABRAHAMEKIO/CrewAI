@@ -3,8 +3,7 @@ import OpenAIClient, {
   CompletionSuccessResponse,
 } from '../../../domain/openai/openAIClient';
 
-// eslint-disable-next-line prefer-destructuring
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_KEY: string = process.env.OPENAI_API_KEY;
 export default async function handler(
   req,
   res
@@ -23,22 +22,7 @@ export default async function handler(
     },
   } = req;
 
-  // console.log('server log:');
-  // console.log(req.body);
-  // console.log({
-  //   prompt,
-  //   model,
-  //   maxTokens,
-  //   temperature,
-  //   topP,
-  //   n,
-  //   stream,
-  //   logprob,
-  //   stop,
-  // });
-  // console.log(prompt);
-
-  const openAiClient = new OpenAIClient(OPENAI_API_KEY);
+  const openAiClient = new OpenAIClient(OPENAI_KEY);
   const response = await openAiClient.completions(
     prompt,
     model,

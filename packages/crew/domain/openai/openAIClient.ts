@@ -1,5 +1,4 @@
 import axios, { AxiosResponse } from 'axios';
-import _ from 'lodash';
 
 export interface Choice {
   text: string;
@@ -13,10 +12,6 @@ export interface CompletionSuccessResponse {
   created: number;
   model: string;
   choices: Array<Choice>;
-}
-
-interface ServerCompletionSuccessResponse {
-  data: CompletionSuccessResponse;
 }
 
 export interface Request {
@@ -73,8 +68,6 @@ export default class OpenAIClient {
         logprobs,
         stop: stop ?? '\n',
       };
-      console.log('client req:');
-      console.log(data);
     } else {
       data = {
         model: model ?? 'text-davinci-003',
@@ -87,8 +80,6 @@ export default class OpenAIClient {
         logprobs,
         stop: stop ?? '\n',
       };
-      console.log('server req:');
-      console.log(data);
     }
 
     const config = {
@@ -96,23 +87,10 @@ export default class OpenAIClient {
       url: `${this.proxyUrl || this.BASE_URL}/completions`,
       headers,
       data,
-      // transformResponse: (r: ServerCompletionSuccessResponse) => r.data,
     };
-
-    console.log('config:');
-    console.log(config);
 
     const response: AxiosResponse<CompletionSuccessResponse> =
       await axios.request(config);
-    console.log('proxyUrl:');
-    console.log(this.proxyUrl);
-    if (this.proxyUrl) {
-      console.log('response: (from next server)');
-      console.log(response);
-    } else {
-      console.log('response: (from openapi server)');
-      console.log(response);
-    }
 
     return response.data;
   };

@@ -5,7 +5,6 @@ import OpenAIClient from '../domain/openai/openAIClient';
 import useRefCallback from '../hooks/UseRefCallback';
 
 function SmartTextArea(props: {
-  setPrompt: React.Dispatch<React.SetStateAction<string>>;
   onContentChange: (value: string) => void;
   onContentBlur: (value: string) => void;
   onContentFocus: () => void;
@@ -14,13 +13,8 @@ function SmartTextArea(props: {
   const placeholder = 'A raccoon that can speak and wield a sword';
   const placeholderTag = `<span class="placeholder" style="color: #757575;user-select: none;" contenteditable="false">${placeholder}</span>`;
   const contentRef = React.useRef(null);
-  const {
-    setPrompt,
-    onContentChange,
-    onContentBlur,
-    onContentFocus,
-    openAIClient,
-  } = props;
+  const { onContentChange, onContentBlur, onContentFocus, openAIClient } =
+    props;
   const [input, setInput] = React.useState('');
   const [suggestion, setSuggestion] = React.useState('');
   const [content, setContent] = React.useState(placeholderTag);
@@ -38,16 +32,14 @@ function SmartTextArea(props: {
           .replaceAll('&nbsp;', ' ');
         if (userInput && userInput !== input) {
           setInput(userInput);
-          await openAIClient.completions(userInput).then((response) => {
-            if (response?.choices.length > 0) {
-              const suggestionResponse = response?.choices[0].text;
-              // if (suggestionResponse && suggestionResponse !== suggestion) {
-              setSuggestion(suggestionResponse);
-              const suggestionTag = `<span class="sug" style="color: #757575;
-              user-select: none;" contenteditable="false">${suggestionResponse}</span>`;
-              setContent(userInput + suggestionTag);
-            }
-          });
+          const response = await openAIClient.completions(userInput);
+          if (response?.choices.length > 0) {
+            const suggestionResponse = response?.choices[0].text;
+            setSuggestion(suggestionResponse);
+            const suggestionTag = `<span class="sug" style="color: #757575;
+            user-select: none;" contenteditable="false">${suggestionResponse}</span>`;
+            setContent(userInput + suggestionTag);
+          }
         }
       }, 500);
     }
@@ -59,7 +51,6 @@ function SmartTextArea(props: {
         e.preventDefault();
         e.stopPropagation();
         const newContent = input + suggestion;
-        // content.current = input + suggestion;
         setContent(newContent);
       }
     },
@@ -92,15 +83,17 @@ function SmartTextArea(props: {
   );
 
   return (
-    <ContentEditable
-      ref={contentRef}
-      className={styles.smart_text_area}
-      html={content}
-      onChange={onChanged}
-      onKeyDown={onKeyDown}
-      onBlur={onBlur}
-      onFocus={onFocus}
-    />
+    <div className={styles.textarea_container}>
+      <ContentEditable
+        ref={contentRef}
+        className={styles.smart_text_area}
+        html={content}
+        onChange={onChanged}
+        onKeyDown={onKeyDown}
+        onBlur={onBlur}
+        onFocus={onFocus}
+      />
+    </div>
   );
 }
 

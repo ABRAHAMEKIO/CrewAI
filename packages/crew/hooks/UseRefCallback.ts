@@ -6,7 +6,7 @@ const useRefCallback = <T extends any[]>(
 ): ((...args: T) => void) => {
   const ref = React.useRef(value);
 
-  React.useEffect(() => {
+  useEffect(() => {
     ref.current = value;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps ?? [value]);

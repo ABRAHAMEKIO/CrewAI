@@ -1,3 +1,15 @@
+
+.textarea_container {
+  box-sizing: border-box;
+  background: #16181A;
+  border-radius: 0.75rem;
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  align-items: center;
+  user-select: none;
+}
+
 .smart_text_area {
   box-shadow: none;
   display: block;
@@ -6,12 +18,14 @@
   border: none;
   outline: none;
   padding: 0px;
-  font-size: var(--nextui--inputFontSize);
   background: transparent;
-  color: var(--nextui--inputTextColor);
   border-radius: 0px;
   min-width: 0px;
   appearance: none;
   font-family: inherit;
   line-height: inherit;
+  margin: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #ECEDEE;
+  min-height: 63px;
 }

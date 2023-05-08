@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   PressEvent,
-  Textarea,
   Text,
   Grid,
   Spacer,
@@ -186,27 +185,6 @@ function Index() {
     <Layout>
       <NavigationBar />
       <Container>
-        {/* <Header1 content="Playground" />
-        <Header2 content="Write your first GenAI prompt" /> */}
-        {/* <Textarea
-          width="100%"
-          cacheMeasurements={false}
-          label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
-          placeholder="A raccoon that can speak and wield a sword"
-          onChange={(e) => setPrompt(e.target.value)}
-        /> */}
-        {/* <AutoCompleteTextarea
-          setPrompt={(e: string) => setPrompt(e)}
-          openAIClient={openAIClient}
-        />
-        {socketId ? <p>Status: Connected</p> : <p>Status: Disconnected</p>}
-        {!error && response && (
-          <Image
-            width={1200}
-            src={response?.imageUrl}
-            alt="Your amazing generative art"
-          />
-        )} */}
         {errorValidationModal && (
           <ErrorValidationModal
             modalOpen={errorValidationModal}
@@ -218,17 +196,7 @@ function Index() {
           <Grid xs={12} sm={6} direction="column" css={{ p: 0 }}>
             <Header1 content="Playground" />
             <Header2 content="Write your first GenAI prompt" />
-            <Textarea
-              width="100%"
-              cacheMeasurements={false}
-              label="Generate your first beautiful image within seconds. Write your awesome AI prose below to start"
-              placeholder="A raccoon that can speak and wield a sword"
-              onChange={(e) => handleChangePrompt(e.target.value)}
-              onBlur={(e) => handleBlurPrompt(e.target.value)}
-              onFocus={() => setFinalPrompt('typing...')}
-            />
             <SmartTextArea
-              setPrompt={(e: string) => setPrompt(e)}
               onContentChange={(value: string) => handleChangePrompt(value)}
               onContentBlur={(value: string) => handleBlurPrompt(value)}
               onContentFocus={() => setFinalPrompt('typing...')}
