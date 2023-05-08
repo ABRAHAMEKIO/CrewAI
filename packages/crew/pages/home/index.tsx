@@ -24,9 +24,9 @@ function Index() {
   return (
     <Wrap>
       <Nav />
-      <Section>
+      <Section className="container mx-auto sm:max-w-[64rem]">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 mt-[1.5rem] sm:mt-10 relative h-[calc(100vh-72px-24px)] sm:h-[calc(100vh-112px-40px)]">
-          <div className="grid sm:col-span-8 space-y-10 overflow-y-scroll h-[calc(50vh-72px-24px)] sm:h-[calc(100vh-112px-40px)] snap-mandatory snap-y scroll-smooth">
+          <div className="mx-auto grid sm:col-span-8 space-y-10 overflow-y-scroll h-[calc(50vh-72px-24px)] sm:h-[calc(100vh-112px-40px)] snap-mandatory snap-y scroll-smooth">
             {items.map((item) => {
               return (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -40,22 +40,24 @@ function Index() {
               );
             })}
           </div>
-          <div className="absolute bottom-0 sm:relative grid sm:col-span-4 place-content-start rounded-t-2xl sm:rounded-2xl bg-white p-6 place-self-end sm:place-self-start">
-            <div className="space-y-2">
+          <div className="absolute bottom-0 sm:relative grid sm:col-span-4 place-content-start rounded-t-2xl sm:rounded-2xl bg-white place-self-end sm:place-self-start">
+            <div className="space-y-2 p-6">
               <h1 className="font-bold text-xl">Fire Ligh John</h1>
-              <div className="flex space-x-2 pb-6">
+              <div className="flex space-x-2">
                 <div className="rounded-full bg-gradient h-5 w-5" />
                 <p className="font-normal text-sm">vello</p>
               </div>
             </div>
-            <span className="border-b" />
-            <h1 className="font-bold text-base pt-4 pb-3">Prompt</h1>
-            <div className="space-y-6">
-              <div className="bg-[#F7F7FA] px-6 py-4 rounded-lg">
-                <p className="text-base font-normal">
-                  inside a girl room, cyberpunk vibe, neon glowing lights, sharp
-                  focus, photorealistic, unreal engine 5, girl in the
-                </p>
+            <span className="border-b mx-6" />
+            <div className="space-y-6 p-6 pt-0">
+              <div>
+                <h1 className="font-bold text-base pt-4 pb-3">Prompt</h1>
+                <div className="bg-[#F7F7FA] px-6 py-4 rounded-lg">
+                  <p className="text-base font-normal">
+                    inside a girl room, cyberpunk vibe, neon glowing lights,
+                    sharp focus, photorealistic, unreal engine 5, girl in the
+                  </p>
+                </div>
               </div>
               {[
                 {
