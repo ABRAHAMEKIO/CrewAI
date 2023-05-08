@@ -18,13 +18,23 @@ function SmartTextArea(props: {
   const [input, setInput] = React.useState('');
   const [suggestion, setSuggestion] = React.useState('');
   const [content, setContent] = React.useState(placeholderTag);
+  const [plainContent, setPlainContent] = React.useState('');
+
+  const changeContent = (plain, rich) => {
+    setContent(rich);
+    setPlainContent(plain);
+  };
+  const fullContent = () => plainContent + suggestion;
 
   let debounceTimerOnContentChanged;
   const onChanged = useRefCallback((e) => {
     clearTimeout(debounceTimerOnContentChanged);
     if (e.currentTarget !== placeholderTag) {
-      setContent(e.currentTarget.innerHTML);
-      onContentChange(e.currentTarget.innerHTML);
+      const newPlainContent = e.target.value
+        ? e.target.value.replace('&nbsp;', ' ')
+        : '';
+      changeContent(newPlainContent, e.currentTarget.innerHTML);
+      onContentChange(newPlainContent);
 
       debounceTimerOnContentChanged = setTimeout(async () => {
         const userInput = e.currentTarget.innerHTML
@@ -38,10 +48,13 @@ function SmartTextArea(props: {
             setSuggestion(suggestionResponse);
             const suggestionTag = `<span class="sug" style="color: #757575;
             user-select: none;" contenteditable="false">${suggestionResponse}</span>`;
-            setContent(userInput + suggestionTag);
+            changeContent(
+              plainContent + suggestionResponse,
+              userInput + suggestionTag
+            );
           }
         }
-      }, 500);
+      }, 2000);
     }
   }, []);
 
@@ -51,7 +64,8 @@ function SmartTextArea(props: {
         e.preventDefault();
         e.stopPropagation();
         const newContent = input + suggestion;
-        setContent(newContent);
+        changeContent(plainContent + suggestion, newContent);
+        onContentChange(plainContent + suggestion);
       }
     },
     [content]
@@ -62,9 +76,10 @@ function SmartTextArea(props: {
       const userInput = content
         .replace(/<span[^>]*>(.*?)<\/span>/gi, '')
         .replace('&nbsp;', ' ');
-      onContentBlur(userInput);
+      setInput(content);
+      onContentBlur(content);
       if (content === '') {
-        setContent(placeholderTag);
+        changeContent('', placeholderTag);
       }
     },
     [content]
@@ -74,9 +89,9 @@ function SmartTextArea(props: {
     (e) => {
       onContentFocus();
       if (content.includes(placeholderTag)) {
-        setContent('');
+        changeContent('', '');
       } else if (content === '') {
-        setContent(placeholderTag);
+        changeContent('', '');
       }
     },
     [content]

@@ -44,16 +44,16 @@ function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
     const buttonResponse: SuccessResponse | IsNaughtySuccessResponse =
       await midjourneyClient.button(button, response.buttonMessageId, ref, '');
     setLoading(true);
-    // if ('isNaughty' in buttonResponse && buttonResponse.isNaughty) {
-    //   setError(true);
-    //   setErrorMessage(
-    //     `there (are) prohibited phrase(s) ${buttonResponse.phrase}`
-    //   );
-    //   errorBeep();
-    //   setLoading(false);
-    // } else {
-    //   setLoading(true);
-    // }
+    if ('isNaughty' in buttonResponse && buttonResponse.isNaughty) {
+      setError(true);
+      setErrorMessage(
+        `there (are) prohibited phrase(s) ${buttonResponse.phrase}`
+      );
+      errorBeep();
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
   }
 
   function filterButton(
