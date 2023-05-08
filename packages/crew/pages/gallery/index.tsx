@@ -5,10 +5,22 @@ import DetailImageModal from '../../components/DetailImageModal';
 import Layout from '../../components/Layout';
 import NavigationBar from '../../components/NavigationBar';
 import GalleryItemCard from '../../components/GalleryItemCard';
+import Group, { GroupAttributes } from '../../db/models/group';
 
-function Index() {
+export const getServerSideProps: () => Promise<{
+  props: { data: GroupAttributes[] };
+}> = async () => {
+  const result = (
+    await Group.findAll({ attributes: ['id', 'name', 'imageUrl'] })
+  ).map((group) => group.dataValues);
+  return { props: { data: result } };
+};
+
+// TODO: please fix this because this is only a temporary solution to the gallary rendering
+function Index(props: { data: GroupAttributes[] }) {
   const [detailImageModal, setDetailImageModal] = useState(false);
   const ToggleModal = () => setDetailImageModal(!detailImageModal);
+  const { data } = props;
 
   return (
     <Layout>
@@ -54,19 +66,17 @@ function Index() {
           })()}
         </Grid.Container>
         <Grid.Container gap={2}>
-          {(() => {
-            const arr = [];
-            for (let i = 0; i < 10; i += 1) {
-              arr.push(
-                <Grid md={3} direction="column" key={i}>
-                  <div onClick={ToggleModal} aria-hidden="true">
-                    <GalleryItemCard imgSrc="https://github.com/nextui-org/nextui/blob/next/apps/docs/public/nextui-banner.jpeg?raw=true" />
-                  </div>
-                </Grid>
-              );
-            }
-            return arr;
-          })()}
+          {data.map((item) => (
+            <Grid md={3} direction="column" key={item.id}>
+              <div onClick={ToggleModal} aria-hidden="true">
+                <GalleryItemCard
+                  imgSrc={item.imageUrl}
+                  id={item.id}
+                  title={item.name}
+                />
+              </div>
+            </Grid>
+          ))}
         </Grid.Container>
       </Container>
     </Layout>

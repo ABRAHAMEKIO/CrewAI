@@ -22,7 +22,7 @@ function FileUpload({
   seedImage,
 }: {
   onUploadFinished: (fileLocation: string) => void;
-  seedImage: string;
+  seedImage?: string;
 }) {
   const [currentFile, setCurrentFile] = useState<File>();
   const [progress, setProgress] = useState<number>(0);
@@ -92,5 +92,9 @@ function FileUpload({
     </>
   );
 }
+
+FileUpload.defaultProps = {
+  seedImage: '',
+};
 
 export default FileUpload;

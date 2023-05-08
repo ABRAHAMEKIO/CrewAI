@@ -3,12 +3,12 @@ import React from 'react';
 import ReactStars from 'react-rating-stars-component';
 import icons from './Icons';
 
-function GalleryItemCard(props: { imgSrc: string }) {
-  const { imgSrc } = props;
+function GalleryItemCard(props: { imgSrc: string; id: string; title: string }) {
+  const { imgSrc, title, id } = props;
   return (
-    <Card css={{ mw: '330px' }}>
+    <Card css={{ mw: '330px' }} key={id}>
       <Card.Header>
-        <Text b>Title</Text>
+        <Text b>{title}</Text>
       </Card.Header>
       <Card.Body>
         <Image css={{ mw: 320 }} src={imgSrc} alt="Default Image" />

@@ -28,6 +28,7 @@ import { successBeep, errorBeep } from '../domain/sounds/beep';
 import FileUpload from '../components/FileUpload';
 import bracketsRecognize from '../helpers/bracketsRecognize';
 import ErrorValidationModal from '../components/ErrorValidationModal';
+import CreateGroupModal from '../components/CreateGroupModal';
 import ParametersFromPrompt from '../components/ParametersFromPrompt';
 import ImagineResponse, {
   decodeReference,
@@ -39,6 +40,11 @@ import { promptInit, promptAll } from '../helpers/prompt';
 import GetStarted from '../components/GetStarted';
 
 let socket;
+
+interface PromptHistory {
+  webhookSuccessResponse: WebhookSuccessResponse;
+  prompt: string;
+}
 
 function Index() {
   const mixpanel = useMixpanel();
@@ -53,14 +59,18 @@ function Index() {
   const [paramsData] = useState({});
   const [finalPrompt, setFinalPrompt] = useState('');
   const [errorValidationModal, setErrorValidationModal] = useState(false);
+  const [createGroupModal, setCreateGroupModal] = useState(false);
   const [seedFileName, setSeedFileName] = useState('');
-  const [historyResponse, setHistoryResponse] = useState<
-    WebhookSuccessResponse[]
-  >([]);
+  const [cretorImageUrl, setCreatorImageurl] = useState(null);
+  // TODO: need to make the history of prompt more reliable, this is only temporary hacks
+  const [historyResponse, setHistoryResponse] = useState<PromptHistory[]>([]);
+
+  const ErrorValidationToggleModal = () =>
+    setErrorValidationModal(!errorValidationModal);
+  const CreateGroupToggleModal = () => setCreateGroupModal(!createGroupModal);
+
   const [advancedPrompt, setAdvancedPrompt] = useState([]);
   const [suggestions, setSuggestions] = useState([...promptInit]);
-
-  const ToggleModal = () => setErrorValidationModal(!errorValidationModal);
   const ParametersValue = (value: string) => {
     setFinalPrompt(value);
   };
@@ -93,7 +103,10 @@ function Index() {
               setError(false);
               setErrorMessage('');
               setResponse(val);
-              historyResponse.push(val);
+              historyResponse.push({
+                webhookSuccessResponse: val,
+                prompt: val.content,
+              });
               setHistoryResponse(historyResponse);
               successBeep();
             } else {
@@ -126,12 +139,11 @@ function Index() {
         finalPrompt,
       });
     }
+    const completePrompt = `${seedFileName} ${advancedPrompt.join(
+      ' '
+    )} ${finalPrompt}`;
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
-      await midjourneyClient.imagine(
-        `${seedFileName} ${advancedPrompt.join(' ')} ${finalPrompt}`,
-        socketId,
-        ''
-      );
+      await midjourneyClient.imagine(completePrompt, socketId, '');
     if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
       setError(true);
       setErrorMessage(
@@ -245,8 +257,17 @@ function Index() {
           {errorValidationModal && (
             <ErrorValidationModal
               modalOpen={errorValidationModal}
-              modalClose={ToggleModal}
+              modalClose={ErrorValidationToggleModal}
               message="parameters format cannot contain spaces."
+            />
+          )}
+          {createGroupModal && (
+            <CreateGroupModal
+              modalOpen={createGroupModal}
+              modalClose={CreateGroupToggleModal}
+              creatorPrompt={prompt}
+              creatorParams={paramsData}
+              creatorImageUrl={cretorImageUrl}
             />
           )}
           <Grid.Container justify="center" gap={6}>
@@ -325,27 +346,67 @@ function Index() {
                     <ImageResponseContext.Provider
                       value={imageResponseContextValue}
                     >
-                      {historyResponse.map((resp, index) => (
+                      {historyResponse.map((val, index) => (
                         <Collapse
                           index={index}
-                          title={decodeReference(resp).button}
+                          /* TODO: please make the title collapse logic better, this is only solve issue with prompt history */
+                          title={
+                            !decodeReference(val.webhookSuccessResponse).button
+                              ? `${val.prompt.slice(0, 50)}..`
+                              : decodeReference(val.webhookSuccessResponse)
+                                  .button
+                          }
                           expanded={index + 1 === historyResponse.length}
                         >
-                          <ImagineResponse response={resp} />
-                          {isUpscale(decodeReference(resp)) && (
-                            <div>
-                              <Spacer x={4} />
+                          <ImagineResponse
+                            response={val.webhookSuccessResponse}
+                          />
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'Center',
+                              marginTop: '1rem',
+                            }}
+                          >
+                            {isUpscale(
+                              decodeReference(val.webhookSuccessResponse)
+                            ) && (
                               <Button
                                 type="button"
                                 bordered
                                 color="gradient"
                                 auto
-                                onPress={() => setSeedFileName(resp.imageUrl)}
+                                onPress={() =>
+                                  setSeedFileName(
+                                    val.webhookSuccessResponse.imageUrl
+                                  )
+                                }
+                                css={{
+                                  width: 'fit-content',
+                                  margin: '0 .5rem',
+                                }}
                               >
                                 Use Image As Prompt
                               </Button>
-                            </div>
-                          )}
+                            )}
+                            <Button
+                              color="gradient"
+                              onPress={() => {
+                                setCreateGroupModal(true);
+                                setCreatorImageurl(
+                                  val.webhookSuccessResponse.imageUrl
+                                );
+                              }}
+                              css={{
+                                width: 'fit-content',
+                                margin: '0 .5rem',
+                              }}
+                              disabled={loading}
+                            >
+                              Create Group
+                            </Button>
+                          </div>
                         </Collapse>
                       ))}
                     </ImageResponseContext.Provider>

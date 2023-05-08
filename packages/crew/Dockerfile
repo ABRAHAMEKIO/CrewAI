@@ -18,7 +18,10 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # ARG NEXT_PUBLIC_EXAMPLE="value here"
 
 RUN --mount=type=secret,id=NEXT_PUBLIC_MIXPANEL_ID \
-    NEXT_PUBLIC_MIXPANEL_ID="$(cat /run/secrets/NEXT_PUBLIC_MIXPANEL_ID)" npx nx build crew
+    --mount=type=secret,id=NX_DATABASE_URL \
+    NEXT_PUBLIC_MIXPANEL_ID="$(cat /run/secrets/NEXT_PUBLIC_MIXPANEL_ID)" \
+    NX_DATABASE_URL="$(cat /run/secrets/NX_DATABASE_URL)" \
+    npx nx build crew
 
 # If using npm comment out above and use below instead
 # RUN npm run build
