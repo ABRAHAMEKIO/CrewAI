@@ -1,7 +1,8 @@
 import { Button, Dropdown, Link, Navbar, Text } from '@nextui-org/react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import icons from './Icons';
+import { server } from '../config';
 
 const navItems = [
   {
@@ -65,7 +66,31 @@ function PlaceholderLogo() {
   return <span>&nbsp;&nbsp;&nbsp;</span>;
 }
 
+async function logout() {
+  await fetch(`${server}/api/auth/logout`, {
+    method: 'POST',
+  });
+  window.location.href = '/login';
+}
+
 function NavigationBar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(`${server}/api/auth/check`, {
+        method: 'POST',
+      });
+      const check = await response.json();
+
+      if (check.is_login) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+    fetchData().catch(console.error);
+  }, []);
+
   const { asPath } = useRouter();
   return (
     <Navbar isBordered variant="floating">
@@ -146,14 +171,24 @@ function NavigationBar() {
         ))}
       </Navbar.Collapse>
       <Navbar.Content>
-        <Navbar.Link color="inherit" href="#">
-          Login
-        </Navbar.Link>
-        <Navbar.Item>
-          <Button auto flat as={Link} href="#">
-            Sign Up
-          </Button>
-        </Navbar.Item>
+        {!isLoggedIn ? (
+          <Navbar.Item>
+            <Button auto flat as={Link} href="/login">
+              Login
+            </Button>
+          </Navbar.Item>
+        ) : (
+          <>
+            <Navbar.Link color="inherit" onPress={() => logout()}>
+              Logout
+            </Navbar.Link>
+            <Navbar.Item>
+              <Button auto flat as={Link} href="/profile">
+                Profile
+              </Button>
+            </Navbar.Item>
+          </>
+        )}
       </Navbar.Content>
     </Navbar>
   );
