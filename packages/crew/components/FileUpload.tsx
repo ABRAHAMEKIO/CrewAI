@@ -110,8 +110,9 @@ function FileUpload({
         <Spacer y={1} />
         {(fileLocation || seedImage) && (
           <Button
-            iconRight={icons.trash}
-            color="warning"
+            icon={icons.trash}
+            color="error"
+            flat
             css={{
               width: 'fit-content',
             }}
