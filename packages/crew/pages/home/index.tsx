@@ -114,16 +114,16 @@ function Index() {
   return (
     <Wrap className="mx-auto relative">
       <div
-        className="absolute inset-0 bg-center bg-cover blur-[35px] -z-10 transition-all"
+        className="absolute inset-0 bg-center bg-cover blur-[35px] scale-100 -z-10 transition-all"
         style={{
           backgroundImage: `url(${current.imageUrl})`,
         }}
       />
-      <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 sm:relative bg-none" />
+      <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
       <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] lg:px-0">
-        <div className="sm:grid sm:grid-cols-12 gap-10 sm:pt-10 relative h-[calc(100vh)] sm:h-[calc(100vh)]">
+        <div className="h-[calc(100vh)] sm:h-[calc(100vh)]">
           <div
-            className="mx-auto grid sm:col-span-8 space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] sm:h-[calc(100vh-112px-40px)]
+            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)]
             snap-mandatory snap-y scroll-smooth
             gap-y-[112px]
             "
@@ -132,26 +132,23 @@ function Index() {
             {dataset.map((item, index) => {
               return (
                 <div
-                  className="snap-start h-[calc(100vh)] sm:h-auto
-                  pt-[112px]
-                  "
+                  className="snap-start pt-[112px] sm:pt-[136px]"
                   key={item.id}
                   data-id={item.id}
                   data-index={index}
                 >
-                  <div className="h-[calc(100vh-112px)] flex flex-col space-y-[32px]">
-                    <div className="flex items-center justify-center sm:block h-[calc(100vh-112px-226px)] ">
+                  <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
+                    <div className="flex items-center justify-center h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-136px-40px)] sm:col-span-8">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         className="object-contain rounded-2xl
                         max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)]
-                        sm:max-h-full sm:max-w-full
-                        sm:h-auto sm:w-auto"
+                        sm:max-h-full sm:max-w-full mx-auto"
                         src={item.imageUrl}
                         alt={item.imageUrl}
                       />
                     </div>
-                    <div className="max-h-[calc(226px)] w-full sm:relative sm:grid sm:col-span-4 place-content-start sm:rounded-2xl text-white place-self-end sm:place-self-start">
+                    <div className="max-h-[calc(226px)] w-full text-white sm:col-span-4 sm:max-h-full sm:h-fit sm:place-self-center">
                       <div className="space-y-4">
                         <div className="space-y-[4px]">
                           <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
@@ -191,7 +188,7 @@ function Index() {
                             </button>
                           );
                         })}
-                        <div className="border-b-4 rounded w-20 mx-auto opacity-50" />
+                        <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden" />
                       </div>
                     </div>
                   </div>
