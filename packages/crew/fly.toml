@@ -1,6 +1,6 @@
-# fly.toml file generated for crew-ai on 2023-04-14T01:01:17+02:00
+# fly.toml file generated for hologram-ai on 2023-05-08T23:04:22Z
 
-app = "crew-ai"
+app = "hologram-ai"
 kill_signal = "SIGINT"
 kill_timeout = 5
 primary_region = "sin"
