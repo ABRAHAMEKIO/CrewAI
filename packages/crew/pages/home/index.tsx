@@ -15,22 +15,23 @@ function classNames(...classes) {
 
 function Index() {
   const scrollRef = React.useRef<HTMLDivElement>(null);
-
-  const [dataset, setDataset] = useState<PromptAttributes[]>([]);
+  const [dataPrompt, setDataPrompt] = useState({
+    rows: [],
+    page: 0,
+  });
   const [current, setCurrent] = useState<PromptAttributes>({});
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const promptClient = useMemo(() => new PromptClient(), []);
-
   useEffect(() => {
+    const promptClient1 = new PromptClient();
     // fetch data
     const dataFetch = async () => {
       const promptPaginationResponse:
         | PaginationSuccessResponse
-        | ErrorResponse = await promptClient.pagination({ page: 0 });
+        | ErrorResponse = await promptClient1.pagination({ page: 0 });
 
       if (
         'error' in promptPaginationResponse &&
@@ -46,43 +47,51 @@ function Index() {
         'prompt' in promptPaginationResponse &&
         promptPaginationResponse.prompt
       ) {
-        setDataset(promptPaginationResponse.prompt.rows);
+        setDataPrompt(() => ({
+          rows: promptPaginationResponse.prompt.rows,
+          page: 0,
+        }));
         setCurrent(promptPaginationResponse.prompt.rows[0]);
       }
     };
 
     dataFetch().then((r) => r);
-  }, [promptClient]);
+  }, []);
 
   useEffect(() => {
-    const dataFetch = async (index: string) => {
-      const limit = 20;
-      if (dataset.length - parseInt(index, 10) === 5) {
-        const promptPaginationResponse:
-          | PaginationSuccessResponse
-          | ErrorResponse = await promptClient.pagination({
-          page: dataset.length / limit,
-        });
+    const promptClient2 = new PromptClient();
+    const limit = 20;
+    const dataFetch = async (page: number) => {
+      const promptPaginationResponse:
+        | PaginationSuccessResponse
+        | ErrorResponse = await promptClient2.pagination({
+        page,
+      });
 
-        if (
-          'error' in promptPaginationResponse &&
-          promptPaginationResponse.error
-        ) {
-          setError(true);
-          setErrorMessage(promptPaginationResponse.error);
-          setLoading(false);
-        } else {
-          setLoading(true);
-        }
-        if (
-          'prompt' in promptPaginationResponse &&
-          promptPaginationResponse.prompt
-        ) {
-          setDataset((prevDataset) => [
-            ...prevDataset,
-            ...promptPaginationResponse.prompt.rows,
-          ]);
-        }
+      if (
+        'error' in promptPaginationResponse &&
+        promptPaginationResponse.error
+      ) {
+        setError(true);
+        setErrorMessage(promptPaginationResponse.error);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+      if (
+        'prompt' in promptPaginationResponse &&
+        promptPaginationResponse.prompt
+      ) {
+        setDataPrompt((prev) => ({
+          rows: [
+            ...new Map(
+              [...prev.rows, ...promptPaginationResponse.prompt.rows].map(
+                (item) => [item.id, item]
+              )
+            ).values(),
+          ],
+          page: promptPaginationResponse.page,
+        }));
       }
     };
     const observer = new IntersectionObserver(
@@ -92,11 +101,16 @@ function Index() {
             const id = entry.target.getAttribute('data-id');
             const dataIndex = entry.target.getAttribute('data-index');
 
-            dataFetch(dataIndex).then(() => true);
-
-            const item = dataset.find((i) => i.id.toString() === id);
+            const item = dataPrompt.rows.find((i) => i.id.toString() === id);
             if (item) {
               setCurrent(item);
+            }
+            const len = dataPrompt.rows.length;
+            if (len - parseInt(dataIndex, 10) === 5) {
+              const page = Math.ceil(len / limit);
+              if (page > dataPrompt.page) {
+                dataFetch(page).then(() => true);
+              }
             }
           }
         });
@@ -109,7 +123,7 @@ function Index() {
     scrollRef.current.querySelectorAll('.snap-start').forEach((snap) => {
       observer.observe(snap);
     });
-  }, [dataset, promptClient]);
+  }, [dataPrompt.page, dataPrompt.rows]);
 
   return (
     <Wrap className="mx-auto relative">
@@ -123,13 +137,10 @@ function Index() {
       <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] lg:px-0">
         <div className="h-[calc(100vh)] sm:h-[calc(100vh)]">
           <div
-            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)]
-            snap-mandatory snap-y scroll-smooth
-            gap-y-[112px]
-            "
+            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px]"
             ref={scrollRef}
           >
-            {dataset.map((item, index) => {
+            {dataPrompt.rows.map((item, index) => {
               return (
                 <div
                   className="snap-start pt-[112px] sm:pt-[136px]"
@@ -141,21 +152,19 @@ function Index() {
                     <div className="flex items-center justify-center h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-136px-40px)] sm:col-span-8">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        className="object-contain rounded-2xl
-                        max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)]
-                        sm:max-h-full sm:max-w-full mx-auto"
+                        className="object-contain rounded-2xl max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)] sm:max-h-full sm:max-w-full mx-auto"
                         src={item.imageUrl}
                         alt={item.imageUrl}
                       />
                     </div>
-                    <div className="max-h-[calc(226px)] w-full text-white sm:col-span-4 sm:max-h-full sm:h-fit sm:place-self-center">
-                      <div className="space-y-4">
-                        <div className="space-y-[4px]">
+                    <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
+                      <div className="space-y-4 sm:space-y-6">
+                        <div className="space-y-1 sm:space-y-2">
                           <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
                             {item.objectName}
                           </h1>
-                          <div className="flex space-x-2 ">
-                            <div className="rounded-full bg-gradient h-[14px] w-[14px]" />
+                          <div className="flex space-x-2">
+                            <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
                             <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
                               {item.creatorAddress}
                             </p>
@@ -181,7 +190,7 @@ function Index() {
                                 it.bgDark
                                   ? '!bg-black'
                                   : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
-                                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-12 min-w-[117px] text-white'
+                                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white'
                               )}
                             >
                               {it.name}

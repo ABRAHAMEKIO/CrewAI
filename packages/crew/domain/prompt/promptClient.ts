@@ -9,9 +9,10 @@ export interface ErrorResponse {
 export interface PaginationSuccessResponse {
   prompt: {
     count: number;
-    limit: number;
     rows: PromptAttributes[];
   };
+  page: number;
+  limit: number;
 }
 
 export default class PromptClient {

@@ -28,6 +28,9 @@ apiRoute.get(async (req, res) => {
   const limit = 20;
   const offset = parseInt(page, 10) * limit;
   const prompt = await Prompt.findAndCountAll({
+    where: {
+      imageUrlIsUnique: true,
+    },
     offset,
     limit,
   });
