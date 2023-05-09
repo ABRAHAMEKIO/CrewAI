@@ -16,7 +16,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-function Example({ className }: { className?: string }) {
+function Nav({ className }: { className?: string }) {
   return (
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
       {({ open }) => (
@@ -104,8 +104,8 @@ function Example({ className }: { className?: string }) {
   );
 }
 
-Example.defaultProps = {
+Nav.defaultProps = {
   className: null,
 };
 
-export default Example;
+export default Nav;
