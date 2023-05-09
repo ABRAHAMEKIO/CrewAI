@@ -1,17 +1,17 @@
 import { DataTypes, FloatDataType, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config/connection';
 
-interface PromptAttributes {
+export interface PromptAttributes {
   id?: number;
-  prompt?: Text | null;
-  imageUrl?: Text | null;
-  creatorAddress?: Text | null;
+  prompt?: string | null;
+  imageUrl?: string | null;
+  creatorAddress?: string | null;
   objectName?: string | null;
   objectNameIsUnique?: boolean | null;
   showPromptFee?: FloatDataType | null;
   maximumMint?: number | null;
   mintFee?: FloatDataType | null;
-  ipfsUrl?: Text | null;
+  ipfsUrl?: string | null;
   imageUrlIsUnique?: boolean | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -26,11 +26,11 @@ class Prompt
 {
   public id!: number;
 
-  public prompt!: Text;
+  public prompt!: string;
 
-  public imageUrl!: Text;
+  public imageUrl!: string;
 
-  public creatorAddress!: Text;
+  public creatorAddress!: string;
 
   public objectName!: string;
 
@@ -42,7 +42,7 @@ class Prompt
 
   public mintFee!: FloatDataType;
 
-  public ipfsUrl!: Text;
+  public ipfsUrl!: string;
 
   public imageUrlIsUnique!: boolean;
 
