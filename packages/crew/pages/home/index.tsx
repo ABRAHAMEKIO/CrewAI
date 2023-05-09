@@ -79,10 +79,10 @@ function Index() {
         }}
       />
       <Nav className="bg-white border-b z-10" />
-      <Section className="container mx-auto sm:max-w-[64rem]">
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 pt-[1.5rem] sm:pt-10 relative h-[calc(100vh-72px)] sm:h-[calc(100vh-112px)]">
+      <Section className="container mx-auto sm:max-w-[64rem]  sm:px-[2rem] lg:px-0">
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 pt-[1.5rem] sm:pt-10 relative h-[calc(100vh-72px)] sm:h-[calc(100vh-112px-40px)]">
           <div
-            className="mx-auto grid sm:col-span-8 space-y-10 overflow-y-scroll scrollbar-hide h-[calc(50vh-72px)] sm:h-[calc(100vh-112px)] snap-mandatory snap-y scroll-smooth"
+            className="mx-auto grid sm:col-span-8 space-y-10 overflow-y-scroll scrollbar-hide h-[calc(50vh-72px)] sm:h-[calc(100vh-112px-40px)] snap-mandatory snap-y scroll-smooth"
             ref={scrollRef}
           >
             {dataset.map((item) => {
