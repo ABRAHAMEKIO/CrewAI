@@ -159,19 +159,17 @@ function Index() {
                           </h1>
                           <div className="flex space-x-2 ">
                             <div className="rounded-full bg-gradient h-[14px] w-[14px]" />
-                            <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                            <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
                               {item.creatorAddress}
                             </p>
                           </div>
                         </div>
-                        <div className="text-sm sm:text-base font-normal relative">
-                          <p>
-                            {item.prompt.length > 80
-                              ? `${item.prompt.slice(0, 80)}...`
-                              : item.prompt}
-                            <span className="font-bold"> Edit Prompt</span>
-                          </p>
-                        </div>
+                        <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal ">
+                          {item.prompt.length > 80
+                            ? `${item.prompt.slice(0, 80)}...`
+                            : item.prompt}
+                          <span className="font-bold"> Edit Prompt</span>
+                        </p>
                         {[
                           {
                             name: `Generate ($${item.showPromptFee} xDai)`,
