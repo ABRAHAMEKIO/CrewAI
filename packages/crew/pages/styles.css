@@ -13,3 +13,14 @@ html {
 .bg-gradient {
     background: linear-gradient(224.03deg, #211093 -1.74%, #A323A3 47.01%, #FFA01B 100%);
 }
+
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
