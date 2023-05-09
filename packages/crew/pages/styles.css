@@ -6,7 +6,7 @@
 
 
 html {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', sans-serif !important;
     background: #F5F5F5;
 }
 

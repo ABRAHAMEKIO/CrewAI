@@ -112,90 +112,94 @@ function Index() {
   }, [dataset, promptClient]);
 
   return (
-    <Wrap>
+    <Wrap className="mx-auto relative">
       <div
         className="absolute inset-0 bg-center bg-cover blur-[35px] -z-10 transition-all"
         style={{
           backgroundImage: `url(${current.imageUrl})`,
         }}
       />
-      <Nav className="z-10" />
-      <Section className="container mx-auto sm:max-w-[64rem]  sm:px-[2rem] lg:px-0">
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 pt-[1.5rem] sm:pt-10 relative h-[calc(100vh-72px)] sm:h-[calc(100vh-112px-40px)]">
+      <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 sm:relative bg-none" />
+      <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] lg:px-0">
+        <div className="sm:grid sm:grid-cols-12 gap-10 sm:pt-10 relative h-[calc(100vh)] sm:h-[calc(100vh)]">
           <div
-            className="mx-auto grid sm:col-span-8 space-y-10 overflow-y-scroll scrollbar-hide h-[calc(100vh-72px-228px)] sm:h-[calc(100vh-112px-40px)] snap-mandatory snap-y scroll-smooth"
+            className="mx-auto grid sm:col-span-8 space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] sm:h-[calc(100vh-112px-40px)]
+            snap-mandatory snap-y scroll-smooth
+            gap-y-[112px]
+            "
             ref={scrollRef}
           >
             {dataset.map((item, index) => {
               return (
                 <div
-                  className="snap-start h-[calc(100vh-72px-228px)] sm:h-auto
-                  flex items-center justify-center
-                  sm:block
+                  className="snap-start h-[calc(100vh)] sm:h-auto
+                  pt-[112px]
                   "
                   key={item.id}
                   data-id={item.id}
                   data-index={index}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="object-contain rounded-2xl
-                    max-h-[calc(100vw-32px-32px)] max-w-[calc(100vw-32px-32px)]
-                    sm:max-h-full sm:max-w-full
-                    sm:h-auto sm:w-auto"
-                    src={item.imageUrl}
-                    alt={item.imageUrl}
-                  />
+                  <div className="h-[calc(100vh-112px)] flex flex-col space-y-[32px]">
+                    <div className="flex items-center justify-center sm:block h-[calc(100vh-112px-226px)] ">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        className="object-contain rounded-2xl
+                        max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)]
+                        sm:max-h-full sm:max-w-full
+                        sm:h-auto sm:w-auto"
+                        src={item.imageUrl}
+                        alt={item.imageUrl}
+                      />
+                    </div>
+                    <div className="max-h-[calc(226px)] w-full sm:relative sm:grid sm:col-span-4 place-content-start sm:rounded-2xl text-white place-self-end sm:place-self-start">
+                      <div className="space-y-4">
+                        <div className="space-y-[4px]">
+                          <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                            {item.objectName}
+                          </h1>
+                          <div className="flex space-x-2 ">
+                            <div className="rounded-full bg-gradient h-[14px] w-[14px]" />
+                            <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                              {item.creatorAddress}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-sm sm:text-base font-normal relative">
+                          <p>
+                            {item.prompt.length > 80
+                              ? `${item.prompt.slice(0, 80)}...`
+                              : item.prompt}
+                            <span className="font-bold"> Edit Prompt</span>
+                          </p>
+                        </div>
+                        {[
+                          {
+                            name: `Generate ($${item.showPromptFee} xDai)`,
+                            bgDark: false,
+                          },
+                        ].map((it) => {
+                          return (
+                            <button
+                              type="button"
+                              key={it.name}
+                              className={classNames(
+                                it.bgDark
+                                  ? '!bg-black'
+                                  : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
+                                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-12 min-w-[117px] text-white'
+                              )}
+                            >
+                              {it.name}
+                            </button>
+                          );
+                        })}
+                        <div className="border-b-4 rounded w-20 mx-auto opacity-50" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })}
-          </div>
-          <div className="absolute bottom-0 sm:relative grid sm:col-span-4 place-content-start rounded-t-2xl sm:rounded-2xl bg-white place-self-end sm:place-self-start">
-            <div className="space-y-2 p-6">
-              <h1 className="font-bold text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-                {current.objectName}
-              </h1>
-              <div className="flex space-x-2 ">
-                <div className="rounded-full bg-gradient h-5 w-5" />
-                <p className="font-normal text-sm text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-                  {current.creatorAddress}
-                </p>
-              </div>
-            </div>
-            <span className="border-b mx-6" />
-            <div className="space-y-6 p-6 pt-0">
-              <div>
-                <h1 className="font-bold text-base pt-4 pb-3">Prompt</h1>
-                <div className="bg-[#F7F7FA] px-6 py-4 rounded-lg">
-                  <p className="text-base font-normal">{current.prompt}</p>
-                </div>
-              </div>
-              {[
-                {
-                  name: `Generate (${current.showPromptFee})`,
-                  bgDark: true,
-                },
-                {
-                  name: `Mint (${current.mintFee})`,
-                  bgDark: false,
-                },
-              ].map((item) => {
-                return (
-                  <button
-                    type="button"
-                    key={item.name}
-                    className={classNames(
-                      item.bgDark
-                        ? '!bg-black'
-                        : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
-                      'border rounded-lg w-full text-base font-bold min-h-[3rem] sm:h-12 min-w-[117px] text-white'
-                    )}
-                  >
-                    {item.name}
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
       </Section>
