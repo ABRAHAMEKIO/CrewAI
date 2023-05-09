@@ -56,11 +56,12 @@ function Index() {
 
   useEffect(() => {
     const dataFetch = async (index: string) => {
+      const limit = 20;
       if (dataset.length - parseInt(index, 10) === 5) {
         const promptPaginationResponse:
           | PaginationSuccessResponse
           | ErrorResponse = await promptClient.pagination({
-          page: dataset.length / 10,
+          page: dataset.length / limit,
         });
 
         if (
@@ -118,7 +119,7 @@ function Index() {
           backgroundImage: `url(${current.imageUrl})`,
         }}
       />
-      <Nav className="bg-white border-b z-10" />
+      <Nav className="z-10" />
       <Section className="container mx-auto sm:max-w-[64rem]  sm:px-[2rem] lg:px-0">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 pt-[1.5rem] sm:pt-10 relative h-[calc(100vh-72px)] sm:h-[calc(100vh-112px-40px)]">
           <div

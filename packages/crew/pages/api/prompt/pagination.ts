@@ -25,7 +25,7 @@ const apiRoute = nextConnect<ExtendedRequest, NextApiResponse>({
 // 'file' is params name
 apiRoute.get(async (req, res) => {
   const { page } = req.query;
-  const limit = 10;
+  const limit = 20;
   const offset = parseInt(page, 10) * limit;
   const prompt = await Prompt.findAndCountAll({
     offset,

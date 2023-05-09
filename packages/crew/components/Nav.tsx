@@ -21,8 +21,8 @@ function Nav({ className }: { className?: string }) {
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
       {({ open }) => (
         <>
-          <Section>
-            <div className="relative flex h-[4.5rem] sm:h-[7rem] items-center justify-between ">
+          <Section className="container max-w-[64rem] mx-auto px-[2rem] pt-4 sm:pt-8 lg:px-0">
+            <div className="relative flex h-[4rem] sm:h-[4rem] items-center justify-between bg-white rounded-2xl py-3 px-4">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button */}
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -31,10 +31,7 @@ function Nav({ className }: { className?: string }) {
               </div>
               <div className="flex flex-1 items-center justify-between sm:items-stretch">
                 <div className="flex flex-shrink-0 items-center space-x-4">
-                  <div className="max-w-[32px] sm:max-w-[40px]">
-                    <LogoIcon fill="currentColor" size="auto" />
-                  </div>
-                  <h1 className="font-bold text-2xl not-italic hidden sm:block">
+                  <h1 className="font-bold text-base sm:text-2xl not-italic">
                     Hologram
                   </h1>
                 </div>
@@ -54,7 +51,7 @@ function Nav({ className }: { className?: string }) {
                 </div>
               </div>
 
-              <div className="absolute right-0 flex items-center sm:static sm:inset-auto w-fit">
+              <div className="lex items-center sm:static sm:inset-auto w-fit">
                 <div className="flex space-x-4">
                   {nivigationRight.map((item) => {
                     return (
