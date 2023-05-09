@@ -7,34 +7,16 @@ const magic = new Magic(process.env.MAGIC_LINK_SECRET_KEY);
 const check = async (req, res) => {
   if (req.method === 'POST') {
     try {
-      if (!req.headers.cookie) {
-        return res.status(200).json({
-          is_login: false,
-        });
-      }
       const cookie = parse(req.headers.cookie);
-      if (!cookie.is_logged_on) {
-        return res.status(200).json({
-          is_login: false,
-        });
-      }
-      const token = cookie.is_logged_on;
-      const metaData = await magic.users.getMetadataByToken(token);
+      const metaData = await magic.users.getMetadataByToken(
+        cookie.is_logged_on
+      );
       const user = await User.findOne({
         where: { issuer: metaData.issuer },
       });
 
-      if (user) {
-        return res.status(200).json({
-          is_login: true,
-        });
-      }
-      res.setHeader(
-        'set-cookie',
-        `is_logged_on=; path=/; samesite=lax; httponly; Max-Age=-1`
-      );
       return res.status(200).json({
-        is_login: false,
+        user,
       });
     } catch (e) {
       return res.status(405).json({ error: e.message });
