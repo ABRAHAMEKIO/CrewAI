@@ -65,16 +65,14 @@ function HorizontalSlider(props: {
   setOpenModalPrompt: (bool: boolean) => void;
 }) {
   const { item, setOpenBottomSlideOver, setOpenModalPrompt } = props;
-  const [imageSize, setImageSize] = useState([0, 0]);
-  const [span4Size, setSpan4Size] = useState([0, 0]);
-  const [wrap, setWrap] = useState([0, 0]);
-  const [windowSize, setWindowSize] = useState([0, 0]);
-  const [width] = imageSize;
+  const [ref1Size, setRef1Size] = useState([0, 0]);
+  const [ref3ImageSize, setRef3ImageSize] = useState([0, 0]);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isLandscapeRef1, setIsLandscapeRef1] = useState(false);
 
-  const imageRef = React.useRef<HTMLImageElement>(null);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
-  const span4Ref = React.useRef<HTMLDivElement>(null);
-  const wrapRef = React.useRef<HTMLDivElement>(null);
+  const ref1 = React.useRef<HTMLDivElement>(null);
+  const ref2 = React.useRef<HTMLDivElement>(null); // ref2
+  const ref3Image = React.useRef<HTMLImageElement>(null);
 
   const [allItem, setAllItem] = useState([]);
   const [current, setCurrent] = useState(item);
@@ -85,75 +83,46 @@ function HorizontalSlider(props: {
 
   // handle horizontal slider
   useEffect(() => {
-    setImageSize([imageRef.current.clientWidth, imageRef.current.clientHeight]);
+    setRef1Size([ref1.current.clientWidth, ref1.current.clientHeight]);
 
     const inter = setInterval(() => {
-      setImageSize((prev) => {
+      setRef1Size((prev) => {
         if (prev[0]) {
           clearInterval(inter);
         }
-        return [imageRef.current.clientWidth, imageRef.current.clientHeight];
-      });
-    }, 1000);
-  }, [imageRef]);
-
-  useEffect(() => {
-    setSpan4Size([span4Ref.current.clientWidth, span4Ref.current.clientHeight]);
-
-    const inter = setInterval(() => {
-      setSpan4Size((prev) => {
-        if (prev[0]) {
-          clearInterval(inter);
-        }
-        return [span4Ref.current.clientWidth, span4Ref.current.clientHeight];
+        return [ref1.current.clientWidth, ref1.current.clientHeight];
       });
     }, 1000);
 
-    setWrap([wrapRef.current.clientWidth, wrapRef.current.clientHeight]);
+    setRef3ImageSize([
+      ref3Image.current.clientWidth,
+      ref3Image.current.clientHeight,
+    ]);
 
     const inter2 = setInterval(() => {
-      setWrap((prev) => {
+      setRef3ImageSize((prev) => {
         if (prev[0]) {
           clearInterval(inter2);
         }
-        return [wrapRef.current.clientWidth, wrapRef.current.clientHeight];
+        return [ref3Image.current.clientWidth, ref3Image.current.clientHeight];
       });
     }, 1000);
-  }, [span4Ref, wrapRef]);
+
+    setIsLandscapeRef1(ref1.current.clientWidth >= ref1.current.clientHeight);
+  }, [ref1, ref3Image]);
 
   useEffect(() => {
-    setSpan4Size([
-      scrollRef.current.clientWidth,
-      scrollRef.current.clientHeight,
-    ]);
+    const getMeta = (url, cb) => {
+      const img = new Image();
+      img.onload = () => cb(null, img);
+      img.onerror = (err) => cb(err);
+      img.src = url;
+    };
 
-    const inter = setInterval(() => {
-      setSpan4Size((prev) => {
-        if (prev[0]) {
-          clearInterval(inter);
-        }
-        return [scrollRef.current.clientWidth, scrollRef.current.clientHeight];
-      });
-    }, 1000);
-  }, [scrollRef]);
-
-  // get window size
-  useEffect(
-    function mount() {
-      function onResize() {
-        setWindowSize([window.innerWidth, window.innerHeight]);
-      }
-
-      onResize();
-
-      window.addEventListener('resize', onResize);
-
-      return function unMount() {
-        window.removeEventListener('resize', onResize);
-      };
-    },
-    [setWindowSize]
-  );
+    getMeta(item.imageUrl, (err, img) => {
+      setIsLandscape(img.naturalWidth >= img.naturalHeight);
+    });
+  }, [item]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -174,45 +143,67 @@ function HorizontalSlider(props: {
       }
     );
 
-    scrollRef.current.querySelectorAll('.snap-start').forEach((snap) => {
+    ref2.current.querySelectorAll('.snap-start').forEach((snap) => {
       observer.observe(snap);
     });
   }, [allItem]);
 
   return (
-    <div
-      className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative"
-      ref={wrapRef}
-    >
+    <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
-        {/* <div className="sm:col-span-8"> */}
-        <div
-          className="snap-x snap-mandatory flex overflow-x-scroll scrollbar-hide gap-x-6 rounded-2xl mx-auto transition-all sm:col-span-8"
-          ref={scrollRef}
-          style={
-            // eslint-disable-next-line no-nested-ternary
-            width
-              ? {
-                  width: imageSize[0],
-                }
-              : {}
-          }
-        >
-          <Item
-            item={item}
-            refId={imageRef}
-            maxImageSize={wrap[0] - span4Size[0]}
-          />
-          {item.SubPrompts.map((sub) => (
-            <Item item={sub} maxImageSize={wrap[0] - span4Size[0]} />
-          ))}
+        <div className="sm:col-span-8" ref={ref1}>
+          {/* ini perlu di ganti pake ukuran gambar */}
+          <div
+            className="snap-x snap-mandatory overflow-x-scroll scrollbar-hide gap-x-6 rounded-2xl mx-auto transition-all
+            h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-156px)]
+            flex
+            "
+            ref={ref2}
+            style={{
+              width: ref3ImageSize[0],
+            }}
+          >
+            {allItem.map((myItem, index) => (
+              <div
+                className="snap-start flex items-center"
+                key={myItem.id}
+                data-id={myItem.id}
+              >
+                <div
+                  className="flex items-center rounded-2xl justify-center"
+                  style={{
+                    width: ref3ImageSize[0],
+                    height: ref3ImageSize[1],
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="object-contain rounded-2xl mx-auto max-h-[calc(100vh)] max-w-[calc(100vw)] "
+                    src={myItem.imageUrl}
+                    alt={myItem.imageUrl}
+                    ref={index === 0 ? ref3Image : undefined}
+                    style={
+                      // eslint-disable-next-line no-nested-ternary
+                      isLandscape
+                        ? isLandscapeRef1
+                          ? {
+                              height: ref1Size[1],
+                            }
+                          : {
+                              width: ref1Size[0],
+                            }
+                        : {
+                            height: ref1Size[1],
+                          }
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        {/* </div> */}
 
-        <div
-          className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center"
-          ref={span4Ref}
-        >
+        <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
           <div className="space-y-1 sm:space-y-2">
             <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
               {current.objectName}
