@@ -95,8 +95,8 @@ function HorizontalSlider(props: {
     }, 1000);
 
     setRef3ImageSize([
-      ref3Image.current.clientWidth,
-      ref3Image.current.clientHeight,
+      ref3Image?.current?.clientWidth || 0,
+      ref3Image?.current?.clientHeight || 0,
     ]);
 
     const inter2 = setInterval(() => {
@@ -181,7 +181,7 @@ function HorizontalSlider(props: {
                     className="object-contain rounded-2xl mx-auto max-h-[calc(100vh)] max-w-[calc(100vw)] "
                     src={myItem.imageUrl}
                     alt={myItem.imageUrl}
-                    ref={index === 0 ? ref3Image : undefined}
+                    ref={ref3Image}
                     style={
                       // eslint-disable-next-line no-nested-ternary
                       isLandscape
