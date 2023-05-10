@@ -442,6 +442,32 @@ export function LogoIcon({ size, width = 24, height = 24, ...props }) {
   );
 }
 
+export function CrossIcon({ fill, size, width = 24, height = 24, ...props }) {
+  return (
+    <svg
+      viewBox="0 0 14 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      height={size || height}
+      width={size || width}
+      {...props}
+    >
+      <path
+        d="M13 1L1 13"
+        stroke={fill}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M1 1L13 13"
+        stroke={fill}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 // svg source: https://react-iconly.jrgarciadev.com/
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
@@ -460,6 +486,7 @@ const icons = {
   image: <ImageIcon fill="currentColor" size={20} />,
   trash: <TrashIcon fill="currentColor" size={20} />,
   logo: <LogoIcon size={20} />,
+  cross: <CrossIcon fill="currentColor" size={24} />,
 };
 
 export default icons;

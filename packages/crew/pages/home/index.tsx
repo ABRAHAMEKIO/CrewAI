@@ -2,147 +2,250 @@ import React, { useEffect, useState } from 'react';
 import Wrap from '../../components/Wrap';
 import Nav from '../../components/Nav';
 import Section from '../../components/Section';
+import { PromptAttributes } from '../../db/models/prompt';
+
+import PromptClient, {
+  PaginationSuccessResponse,
+  ErrorResponse,
+} from '../../domain/prompt/promptClient';
+import BottomSlideOver from '../../components/BottomSlideOver';
+import ModalPrompt from '../../components/ModalPrompt';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 function Index() {
-  const items = [
-    {
-      id: 1,
-      title: 'Fire Light John Crew Ai 1',
-      owner: 'Crew Ai 1',
-      generatePrice: '$0.01 xDai',
-      mintPrice: '$0.10 xDai',
-      prompt:
-        'Crew Ai 1 inside a girl room, cyberpunk vibe, neon glowing lights, sharp focus, photorealistic, unreal engine 5, girl in the',
-      imageUrl:
-        'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683599960407_tdraw-girl.webp',
-    },
-    {
-      id: 2,
-      title: 'Fire Light John Crew Ai 2',
-      owner: 'Crew Ai 2',
-      generatePrice: '$0.02 xDai',
-      mintPrice: '$0.20 xDai',
-      prompt:
-        'Crew Ai 2 inside a girl room, cyberpunk vibe, neon glowing lights, sharp focus, photorealistic, unreal engine 5, girl in the',
-      imageUrl:
-        'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683600162587_DavidmWilliasdms123_john_mayer_fire_light_1cfb2f37-edb5-427b-8338-bd881e3c9a16.png',
-    },
-    {
-      id: 3,
-      title: 'Fire Light John Crew Ai 3',
-      owner: 'Crew Ai 3',
-      generatePrice: '$0.03 xDai',
-      mintPrice: '$0.30 xDai',
-      prompt:
-        'Crew Ai 3 inside a girl room, cyberpunk vibe, neon glowing lights, sharp focus, photorealistic, unreal engine 5, girl in the',
-      imageUrl:
-        'https://crew-ai.s3.ap-southeast-1.amazonaws.com/1683260974037_FvER45aacAAN7qL.jpeg',
-    },
-  ];
-
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [dataPrompt, setDataPrompt] = useState({
+    rows: [],
+    page: 0,
+  });
+  const [current, setCurrent] = useState<PromptAttributes>({});
+  const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
+  const [openModalPrompt, setOpenModalPrompt] = useState(false);
 
-  const [dataset] = useState(items);
-  const [current, setCurrent] = useState(items[0]);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    const promptClient1 = new PromptClient();
+    // fetch data
+    const dataFetch = async () => {
+      const promptPaginationResponse:
+        | PaginationSuccessResponse
+        | ErrorResponse = await promptClient1.pagination({ page: 0 });
+
+      if (
+        'error' in promptPaginationResponse &&
+        promptPaginationResponse.error
+      ) {
+        // setError(true);
+        // setErrorMessage(promptPaginationResponse.error);
+        // setLoading(false);
+      } else {
+        // setLoading(true);
+      }
+      if (
+        'prompt' in promptPaginationResponse &&
+        promptPaginationResponse.prompt
+      ) {
+        setDataPrompt(() => ({
+          rows: promptPaginationResponse.prompt.rows,
+          page: 0,
+        }));
+        setCurrent(promptPaginationResponse.prompt.rows[0]);
+      }
+    };
+
+    dataFetch().then((r) => r);
+  }, []);
+
+  useEffect(() => {
+    const promptClient2 = new PromptClient();
+    const limit = 20;
+    const dataFetch = async (page: number) => {
+      const promptPaginationResponse:
+        | PaginationSuccessResponse
+        | ErrorResponse = await promptClient2.pagination({
+        page,
+      });
+
+      if (
+        'error' in promptPaginationResponse &&
+        promptPaginationResponse.error
+      ) {
+        // setError(true);
+        // setErrorMessage(promptPaginationResponse.error);
+        // setLoading(false);
+      } else {
+        // setLoading(true);
+      }
+      if (
+        'prompt' in promptPaginationResponse &&
+        promptPaginationResponse.prompt
+      ) {
+        setDataPrompt((prev) => ({
+          rows: [
+            ...new Map(
+              [...prev.rows, ...promptPaginationResponse.prompt.rows].map(
+                (item) => [item.id, item]
+              )
+            ).values(),
+          ],
+          page: promptPaginationResponse.page,
+        }));
+      }
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute('data-id');
-            const item = dataset.find((i) => i.id === parseInt(id, 10));
-            setCurrent(item);
+            const dataIndex = entry.target.getAttribute('data-index');
+
+            const item = dataPrompt.rows.find((i) => i.id.toString() === id);
+            if (item) {
+              setCurrent(item);
+            }
+            const len = dataPrompt.rows.length;
+            if (len - parseInt(dataIndex, 10) === 5) {
+              const page = Math.ceil(len / limit);
+              if (page > dataPrompt.page) {
+                dataFetch(page).then(() => true);
+              }
+            }
           }
         });
       },
       {
-        threshold: 0.5,
+        threshold: 0.3,
       }
     );
 
     scrollRef.current.querySelectorAll('.snap-start').forEach((snap) => {
       observer.observe(snap);
     });
-  }, [dataset]);
+  }, [dataPrompt.page, dataPrompt.rows]);
 
   return (
-    <Wrap>
+    <Wrap className="mx-auto relative">
       <div
-        className="absolute inset-0 bg-center bg-cover blur-[35px] -z-10 transition-all"
+        className="absolute inset-0 bg-center bg-cover blur-[35px] scale-100 -z-10 transition-all"
         style={{
           backgroundImage: `url(${current.imageUrl})`,
         }}
       />
-      <Nav className="bg-white border-b z-10" />
-      <Section className="container mx-auto sm:max-w-[64rem]  sm:px-[2rem] lg:px-0">
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-10 pt-[1.5rem] sm:pt-10 relative h-[calc(100vh-72px)] sm:h-[calc(100vh-112px-40px)]">
+      <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
+      <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
+        <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
           <div
-            className="mx-auto grid sm:col-span-8 space-y-10 overflow-y-scroll scrollbar-hide h-[calc(50vh-72px)] sm:h-[calc(100vh-112px-40px)] snap-mandatory snap-y scroll-smooth"
+            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px]"
             ref={scrollRef}
           >
-            {dataset.map((item) => {
+            {dataPrompt.rows.map((item, index) => {
               return (
-                <div className="snap-start" key={item.id} data-id={item.id}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="object-cover rounded-2xl h-[calc(100vw-32px-32px)] w-[calc(100vw-32px-32px)] sm:h-auto sm:w-auto"
-                    src={item.imageUrl}
-                    alt={item.imageUrl}
-                  />
+                <div
+                  className="snap-start pt-[112px] sm:pt-[136px]"
+                  key={item.id}
+                  data-id={item.id}
+                  data-index={index}
+                >
+                  <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
+                    <div className="flex items-center justify-center h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-136px-40px)] sm:col-span-8">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        className="object-contain rounded-2xl max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)] sm:max-h-full sm:max-w-full mx-auto"
+                        src={item.imageUrl}
+                        alt={item.imageUrl}
+                      />
+                    </div>
+                    <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
+                      <div className="space-y-1 sm:space-y-2">
+                        <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                          {item.objectName}
+                        </h1>
+                        <div className="flex space-x-2">
+                          <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
+                          <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                            {item.creatorAddress}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <button
+                          onClick={() => setOpenBottomSlideOver(true)}
+                          type="button"
+                          className="block sm:hidden"
+                        >
+                          <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                            {item.prompt.length > 70
+                              ? `${item.prompt.slice(0, 70)}...`
+                              : item.prompt}{' '}
+                            <span className="font-bold">Edit Prompt</span>
+                          </p>
+                        </button>
+                        <button
+                          onClick={() => setOpenModalPrompt(true)}
+                          type="button"
+                          className="hidden sm:block sm:mt-4"
+                        >
+                          <p className="text-base font-normal text-left">
+                            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                            {item.prompt.length > 70
+                              ? `${item.prompt.slice(0, 70)}...`
+                              : item.prompt}{' '}
+                            <span className="font-bold">Edit Prompt</span>
+                          </p>
+                        </button>
+                      </div>
+                      <div className="mt-4 sm:mt-6">
+                        {[
+                          {
+                            name: 'Generate Now',
+                            bgDark: false,
+                          },
+                        ].map((it) => {
+                          return (
+                            <button
+                              type="button"
+                              key={it.name}
+                              className={classNames(
+                                it.bgDark
+                                  ? '!bg-black'
+                                  : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
+                                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white'
+                              )}
+                            >
+                              {it.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden mt-4" />
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
-          <div className="absolute bottom-0 sm:relative grid sm:col-span-4 place-content-start rounded-t-2xl sm:rounded-2xl bg-white place-self-end sm:place-self-start">
-            <div className="space-y-2 p-6">
-              <h1 className="font-bold text-xl">{current.title}</h1>
-              <div className="flex space-x-2">
-                <div className="rounded-full bg-gradient h-5 w-5" />
-                <p className="font-normal text-sm">{current.owner}</p>
-              </div>
-            </div>
-            <span className="border-b mx-6" />
-            <div className="space-y-6 p-6 pt-0">
-              <div>
-                <h1 className="font-bold text-base pt-4 pb-3">Prompt</h1>
-                <div className="bg-[#F7F7FA] px-6 py-4 rounded-lg">
-                  <p className="text-base font-normal">{current.prompt}</p>
-                </div>
-              </div>
-              {[
-                {
-                  name: `Generate (${current.generatePrice})`,
-                  bgDark: true,
-                },
-                {
-                  name: `Mint (${current.mintPrice})`,
-                  bgDark: false,
-                },
-              ].map((item) => {
-                return (
-                  <button
-                    type="button"
-                    key={item.name}
-                    className={classNames(
-                      item.bgDark
-                        ? '!bg-black'
-                        : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
-                      'border rounded-lg w-full text-base font-bold min-h-[3rem] sm:h-12 min-w-[117px] text-white'
-                    )}
-                  >
-                    {item.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </Section>
+
+      <BottomSlideOver
+        prompt={current.prompt}
+        modalOpen={openBottomSlideOver}
+        modalClose={() => setOpenBottomSlideOver(false)}
+      />
+      <div />
+
+      <ModalPrompt
+        prompt={current.prompt}
+        modalOpen={openModalPrompt}
+        modalClose={() => setOpenModalPrompt(false)}
+      />
       <div />
     </Wrap>
   );
