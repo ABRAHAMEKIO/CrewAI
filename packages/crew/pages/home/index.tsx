@@ -131,12 +131,15 @@ function Index() {
 
   return (
     <Wrap className="mx-auto relative">
-      <div
-        className="absolute inset-0 bg-center bg-cover blur-[35px] scale-100 -z-10 transition-all"
-        style={{
-          backgroundImage: `url(${current.imageUrl})`,
-        }}
-      />
+      <>
+        <div
+          className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity -bottom-1"
+          style={{
+            backgroundImage: `url(${current.imageUrl})`,
+          }}
+        />
+        <div className="absolute inset-0 -z-10 backdrop-blur-[35px]" />
+      </>
       <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
       <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
         <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">

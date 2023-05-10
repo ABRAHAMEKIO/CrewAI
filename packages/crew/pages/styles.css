@@ -7,7 +7,8 @@
 
 html {
     font-family: 'DM Sans', sans-serif !important;
-    background: #F5F5F5;
+    padding: 0;
+    margin: 0;
 }
 
 .bg-gradient {
@@ -21,6 +22,10 @@ html {
 
 /* For IE, Edge and Firefox */
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.h-15 {
+    height: 3.75rem; /* 60px */
 }
