@@ -9,6 +9,7 @@ import PromptClient, {
   ErrorResponse,
 } from '../../domain/prompt/promptClient';
 import BottomSlideOver from '../../components/BottomSlideOver';
+import ModalPrompt from '../../components/ModalPrompt';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -22,6 +23,7 @@ function Index() {
   });
   const [current, setCurrent] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
+  const [openModalPrompt, setOpenModalPrompt] = useState(false);
 
   // const [loading, setLoading] = useState(false);
   // const [error, setError] = useState(false);
@@ -172,23 +174,37 @@ function Index() {
                             </p>
                           </div>
                         </div>
-                        <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal">
-                          {item.prompt.length > 70
-                            ? `${item.prompt.slice(0, 70)}...`
-                            : item.prompt}
-                          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                          <a
-                            href="#"
-                            className="font-bold"
-                            onClick={() => setOpenBottomSlideOver(true)}
-                          >
-                            {' '}
-                            Edit Prompt
-                          </a>
-                        </p>
+
+                        <button
+                          onClick={() => setOpenBottomSlideOver(true)}
+                          type="button"
+                          className="block sm:hidden"
+                        >
+                          <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                            {item.prompt.length > 70
+                              ? `${item.prompt.slice(0, 70)}...`
+                              : item.prompt}{' '}
+                            <span className="font-bold">Edit Prompt</span>
+                          </p>
+                        </button>
+                        <button
+                          onClick={() => setOpenModalPrompt(true)}
+                          type="button"
+                          className="hidden sm:block"
+                        >
+                          <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                            {item.prompt.length > 70
+                              ? `${item.prompt.slice(0, 70)}...`
+                              : item.prompt}{' '}
+                            <span className="font-bold">Edit Prompt</span>
+                          </p>
+                        </button>
+
                         {[
                           {
-                            name: `Generate ($${item.showPromptFee} xDai)`,
+                            name: `Generate`,
                             bgDark: false,
                           },
                         ].map((it) => {
@@ -222,6 +238,13 @@ function Index() {
         prompt={current.prompt}
         modalOpen={openBottomSlideOver}
         modalClose={() => setOpenBottomSlideOver(false)}
+      />
+      <div />
+
+      <ModalPrompt
+        prompt={current.prompt}
+        modalOpen={openModalPrompt}
+        modalClose={() => setOpenModalPrompt(false)}
       />
       <div />
     </Wrap>

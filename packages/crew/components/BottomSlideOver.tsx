@@ -35,7 +35,7 @@ function BottomSlideOver(props: {
                 leaveTo="translate-y-full"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen">
-                  <div className="flex h-full flex-col overflow-x-scroll bg-white py-6 shadow-xl rounded-t-3xl">
+                  <div className="flex h-full flex-col overflow-x-scroll bg-white py-6 shadow-xl rounded-t-3xl space-y-4">
                     <div className="px-6">
                       <div className="flex items-start justify-between">
                         <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
@@ -44,7 +44,7 @@ function BottomSlideOver(props: {
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
                             onClick={() => modalClose()}
                           >
                             <span className="sr-only">Close panel</span>
@@ -58,22 +58,24 @@ function BottomSlideOver(props: {
                         </div>
                       </div>
                     </div>
-                    <div className="relative mt-4 flex-1 px-4 sm:px-6 space-y-6 h-[104px]">
+                    <div className="relative flex-1 px-4 sm:px-6 space-y-4">
                       {/* Your content */}
-                      <textarea
-                        className="text-sm border border-[#EBEBEB] ring-[#EBEBEB] rounded-lg p-4 h-[104px] w-full"
-                        style={{
-                          resize: 'none',
-                        }}
-                        onChange={(e) => setText(e.target.value)}
-                        value={text}
-                      />
+                      <div className="border border-[#EBEBEB] ring-[#EBEBEB] rounded-lg h-[104px] p-4">
+                        <textarea
+                          className="text-sm h-full w-full focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                          style={{
+                            resize: 'none',
+                          }}
+                          onChange={(e) => setText(e.target.value)}
+                          value={text}
+                        />
+                      </div>
                       <button
                         type="button"
                         className="bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)] rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white"
                         onClick={(e) => handleSubmit(e)}
                       >
-                        Generate ($0.01 xDai)
+                        Generate
                       </button>
                     </div>
                   </div>
