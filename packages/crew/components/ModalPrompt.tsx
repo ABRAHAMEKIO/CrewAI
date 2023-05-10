@@ -44,7 +44,7 @@ function ModalPrompt(props: {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-[492px] mx-auto">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl transition-all w-full sm:max-w-[492px] mx-auto">
                 <div className="flex h-full flex-col overflow-x-scroll bg-white space-y-4">
                   <div className="">
                     <div className="flex items-start justify-between">
