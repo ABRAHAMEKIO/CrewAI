@@ -12,17 +12,19 @@ export const ImageResponseContext = createContext(undefined);
 
 export interface Reference {
   socketId: string;
+  parentId: string;
   button: string;
 }
 
 function encodeReference(ref: Reference): string {
-  return `${ref.socketId};${ref.button}`;
+  return `${ref.socketId};${ref.parentId};${ref.button}`;
 }
 
 export function decodeReference(response: WebhookSuccessResponse): Reference {
-  const [socketId = '', button = ''] = response.ref.split(';');
+  const [socketId = '', parentId = '', button = ''] = response.ref.split(';');
   return {
     socketId,
+    parentId,
     button,
   };
 }
@@ -38,6 +40,7 @@ function ImagineResponse({ response }: { response: WebhookSuccessResponse }) {
   async function handleButton(button: string): Promise<void> {
     const ref = encodeReference({
       socketId: reference.socketId,
+      parentId: reference.parentId,
       button,
     });
 

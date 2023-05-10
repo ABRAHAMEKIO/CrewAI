@@ -49,16 +49,21 @@ function Index() {
   // const [error, setError] = useState(false);
   // const [errorMessage, setErrorMessage] = useState('');
 
-  async function handleSubmit(event, valuePrompt): Promise<void> {
+  async function handleSubmit(event, valueButton): Promise<void> {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
+      const { command } = valueButton;
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('image_generation_requested', {
-        valuePrompt,
+        command,
       });
     }
 
     const imagineResponse: SuccessResponse | IsNaughtySuccessResponse =
-      await midjourneyClient.imagine(valuePrompt, socketId, '');
+      await midjourneyClient.imagine(
+        valueButton.command,
+        `${socketId};${valueButton.parentId}`,
+        ''
+      );
     if ('isNaughty' in imagineResponse && imagineResponse.isNaughty) {
       console.log(`there (are) prohibited phrase(s) ${imagineResponse.phrase}`);
       await errorBeep();
@@ -309,7 +314,12 @@ function Index() {
                             <button
                               type="button"
                               key={it.name}
-                              onClick={(e) => handleSubmit(e, item.prompt)}
+                              onClick={(e) =>
+                                handleSubmit(e, {
+                                  command: item.prompt,
+                                  parentId: item.id,
+                                })
+                              }
                               className={classNames(
                                 it.bgDark
                                   ? '!bg-black'
