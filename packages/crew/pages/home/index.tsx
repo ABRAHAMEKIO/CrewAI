@@ -143,7 +143,7 @@ function Index() {
       <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
         <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
           <div
-            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px]"
+            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px] overflow-x-hidden"
             ref={scrollRef}
           >
             {dataPrompt.rows.map((item, index) => {

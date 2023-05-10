@@ -12,45 +12,12 @@ interface ItemInterface {
   prompt: string;
 }
 
-function Item({
-  item,
-  refId,
-  maxImageSize,
-}: {
-  item: {
-    imageUrl: string;
-    id: number;
-  };
-  refId?: MutableRefObject<HTMLImageElement>;
-  maxImageSize: number;
-}) {
-  return (
-    // <div
-    //   className="flex items-center justify-center h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-136px-40px)] sm:col-span-8">
-    //   <img
-    //     className="object-contain rounded-2xl max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)] sm:max-h-full sm:max-w-full mx-auto"
-    //     src="https://cdn.discordapp.com/attachments/1102867395204370464/1105228754642534511/DavidmWilliams123_An_alien_planet_landscape_with_strange_plants_9435ba4a-162d-4d47-a2c0-e93edce46f2c.png"
-    // </div>
-    <div className="snap-start" key={item.id} data-id={item.id}>
-      <div className="flex items-center justify-center h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-136px-40px)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="object-contain rounded-2xl mx-auto max-h-[calc(100vh-112px-226px)] max-w-[calc(100vw-24px-24px)] "
-          // style={{
-          //   maxWidth: maxImageSize,
-          // }}
-          src={item.imageUrl}
-          alt={item.imageUrl}
-          ref={refId}
-        />
-      </div>
-    </div>
-  );
+// eslint-disable-next-line no-shadow
+enum ImageOrientation {
+  portrait,
+  landscape,
+  square,
 }
-
-Item.defaultProps = {
-  refId: null,
-};
 
 function HorizontalSlider(props: {
   item: {
@@ -67,8 +34,10 @@ function HorizontalSlider(props: {
   const { item, setOpenBottomSlideOver, setOpenModalPrompt } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref3ImageSize, setRef3ImageSize] = useState([0, 0]);
-  const [isLandscape, setIsLandscape] = useState(false);
   const [isLandscapeRef1, setIsLandscapeRef1] = useState(false);
+  const [imageOrientation, setImageOrientation] = useState(
+    ImageOrientation.portrait
+  );
 
   const ref1 = React.useRef<HTMLDivElement>(null);
   const ref2 = React.useRef<HTMLDivElement>(null); // ref2
@@ -120,7 +89,13 @@ function HorizontalSlider(props: {
     };
 
     getMeta(item.imageUrl, (err, img) => {
-      setIsLandscape(img.naturalWidth >= img.naturalHeight);
+      if (img.naturalWidth > img.naturalHeight) {
+        setImageOrientation(ImageOrientation.landscape);
+      } else if (img.naturalWidth === img.naturalHeight) {
+        setImageOrientation(ImageOrientation.square);
+      } else {
+        setImageOrientation(ImageOrientation.portrait);
+      }
     });
   }, [item]);
 
@@ -148,6 +123,37 @@ function HorizontalSlider(props: {
     });
   }, [allItem]);
 
+  const getStyle = () =>
+    // eslint-disable-next-line no-nested-ternary
+    imageOrientation === ImageOrientation.square
+      ? isLandscapeRef1
+        ? {
+            height: ref1Size[1],
+          }
+        : {
+            width: ref1Size[0],
+          }
+      : // eslint-disable-next-line no-nested-ternary
+      imageOrientation === ImageOrientation.landscape
+      ? ref3ImageSize[0] > ref1Size[0]
+        ? {
+            height: ref1Size[1],
+          }
+        : {
+            width: ref1Size[0],
+          }
+      : // kalo gambar nya portrait ref1 nya portrait set image width
+      // eslint-disable-next-line no-nested-ternary
+      imageOrientation === ImageOrientation.portrait
+      ? isLandscapeRef1
+        ? {
+            width: ref1Size[0],
+          }
+        : {
+            height: ref1Size[1],
+          }
+      : { height: ref1Size[1] };
+
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
@@ -163,7 +169,7 @@ function HorizontalSlider(props: {
               width: ref3ImageSize[0],
             }}
           >
-            {allItem.map((myItem, index) => (
+            {allItem.map((myItem) => (
               <div
                 className="snap-start flex items-center"
                 key={myItem.id}
@@ -171,31 +177,16 @@ function HorizontalSlider(props: {
               >
                 <div
                   className="flex items-center rounded-2xl justify-center"
-                  style={{
-                    width: ref3ImageSize[0],
-                    height: ref3ImageSize[1],
-                  }}
+                  style={getStyle()}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {/* mencoba biin objec contain untuk mulitple gambar varian version ratio */}
                   <img
                     className="object-contain rounded-2xl mx-auto max-h-[calc(100vh)] max-w-[calc(100vw)] "
                     src={myItem.imageUrl}
                     alt={myItem.imageUrl}
                     ref={ref3Image}
-                    style={
-                      // eslint-disable-next-line no-nested-ternary
-                      isLandscape
-                        ? isLandscapeRef1
-                          ? {
-                              height: ref1Size[1],
-                            }
-                          : {
-                              width: ref1Size[0],
-                            }
-                        : {
-                            height: ref1Size[1],
-                          }
-                    }
+                    style={getStyle()}
                   />
                 </div>
               </div>
@@ -274,24 +265,3 @@ function HorizontalSlider(props: {
 }
 
 export default HorizontalSlider;
-
-// <div className="sm:hidden flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
-//   <div className="sm:col-span-8 ">
-//     <div className="w-80 relative w-full flex gap-6 snap-x snap-mandatory overflow-x-auto pb-14">
-//       <div className="snap-start shrink-0">
-//         <img
-//           className="shrink-0 w-80 h-40 rounded-lg shadow-xl bg-white"
-//           src="https://images.unsplash.com/photo-1604999565976-8913ad2ddb7c?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=320&amp;h=160&amp;q=80"
-//           alt="hell"
-//         />
-//       </div>
-//       <div className="snap-start shrink-0">
-//         <img
-//           className="shrink-0 w-80 h-40 rounded-lg shadow-xl bg-white"
-//           src="https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=320&amp;h=160&amp;q=80"
-//           alt="hello"
-//         />
-//       </div>
-//     </div>
-//   </div>
-// </div>
