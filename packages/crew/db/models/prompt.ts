@@ -13,6 +13,7 @@ export interface PromptAttributes {
   mintFee?: FloatDataType | null;
   ipfsUrl?: string | null;
   imageUrlIsUnique?: boolean | null;
+  parentId?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -45,6 +46,8 @@ class Prompt
   public ipfsUrl!: string;
 
   public imageUrlIsUnique!: boolean;
+
+  public parentId!: number;
 
   public readonly createdAt!: Date;
 
@@ -98,6 +101,10 @@ Prompt.init(
     imageUrlIsUnique: {
       allowNull: true,
       type: DataTypes.BOOLEAN,
+    },
+    parentId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
     },
   },
   {
