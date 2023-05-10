@@ -23,7 +23,7 @@ function Nav({ className }: { className?: string }) {
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
       {({ open }) => (
         <>
-          <Section className="container max-w-[64rem] mx-auto px-[1.5rem] sm:pt-8 lg:px-0">
+          <Section className="container max-w-[64rem] mx-auto px-[1.5rem] sm:pt-8 xl:px-0">
             {/* <div className="relative flex h-[4rem] sm:h-[4rem] items-center justify-between rounded-2xl py-3 px-4 border"> */}
             <div className="relative flex h-[4rem] sm:h-[4rem] items-center justify-between bg-white rounded-2xl py-3 px-4">
               {showFeature && (

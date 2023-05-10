@@ -138,7 +138,7 @@ function Index() {
         }}
       />
       <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
-      <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] lg:px-0">
+      <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
         <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
           <div
             className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px]"
@@ -162,19 +162,18 @@ function Index() {
                       />
                     </div>
                     <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
-                      <div className="space-y-4 sm:space-y-6">
-                        <div className="space-y-1 sm:space-y-2">
-                          <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-                            {item.objectName}
-                          </h1>
-                          <div className="flex space-x-2">
-                            <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
-                            <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-                              {item.creatorAddress}
-                            </p>
-                          </div>
+                      <div className="space-y-1 sm:space-y-2">
+                        <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                          {item.objectName}
+                        </h1>
+                        <div className="flex space-x-2">
+                          <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
+                          <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                            {item.creatorAddress}
+                          </p>
                         </div>
-
+                      </div>
+                      <div className="mt-4">
                         <button
                           onClick={() => setOpenBottomSlideOver(true)}
                           type="button"
@@ -191,9 +190,9 @@ function Index() {
                         <button
                           onClick={() => setOpenModalPrompt(true)}
                           type="button"
-                          className="hidden sm:block"
+                          className="hidden sm:block sm:mt-4"
                         >
-                          <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                          <p className="text-base font-normal text-left">
                             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                             {item.prompt.length > 70
                               ? `${item.prompt.slice(0, 70)}...`
@@ -201,7 +200,8 @@ function Index() {
                             <span className="font-bold">Edit Prompt</span>
                           </p>
                         </button>
-
+                      </div>
+                      <div className="mt-4 sm:mt-6">
                         {[
                           {
                             name: 'Generate Now',
@@ -223,8 +223,8 @@ function Index() {
                             </button>
                           );
                         })}
-                        <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden" />
                       </div>
+                      <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden mt-4" />
                     </div>
                   </div>
                 </div>

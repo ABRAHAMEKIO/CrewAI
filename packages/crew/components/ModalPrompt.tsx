@@ -72,7 +72,7 @@ function ModalPrompt(props: {
                     {/* Your content */}
                     <div className="border border-[#EBEBEB] ring-[#EBEBEB] rounded-lg h-[136px] p-4 ">
                       <textarea
-                        className="text-sm h-full w-full focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                        className="text-base h-full w-full focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
                         style={{
                           resize: 'none',
                         }}
