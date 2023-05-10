@@ -85,7 +85,7 @@ function ModalPrompt(props: {
                       className="bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)] rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white"
                       onClick={(e) => handleSubmit(e)}
                     >
-                      Generate
+                      Generate Now
                     </button>
                   </div>
                 </div>

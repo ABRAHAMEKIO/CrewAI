@@ -204,7 +204,7 @@ function Index() {
 
                         {[
                           {
-                            name: `Generate`,
+                            name: 'Generate Now',
                             bgDark: false,
                           },
                         ].map((it) => {
