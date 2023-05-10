@@ -10,7 +10,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return (
     <MixpanelProvider token={mixPanelId || ''}>
       <Head>
-        <title>Welcome to crew!</title>
+        <title>Hologram</title>
       </Head>
       <main className="app">
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
