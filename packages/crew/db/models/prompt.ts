@@ -3,6 +3,7 @@ import sequelizeConnection from '../config/connection';
 
 export interface PromptAttributes {
   id?: number;
+  parentId?: number;
   prompt?: string | null;
   imageUrl?: string | null;
   creatorAddress?: string | null;
@@ -49,6 +50,8 @@ class Prompt
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
+
+  public parentId: number;
 }
 
 Prompt.init(
@@ -99,6 +102,10 @@ Prompt.init(
       allowNull: true,
       type: DataTypes.BOOLEAN,
     },
+    parentId: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
+    },
   },
   {
     timestamps: true,
@@ -106,5 +113,12 @@ Prompt.init(
     underscored: false,
   }
 );
+
+// include: [{ model: Prompt, as: 'SubPrompts' }],
+Prompt.hasMany(Prompt, {
+  sourceKey: 'id',
+  foreignKey: 'parentId',
+  as: 'SubPrompts',
+});
 
 export default Prompt;
