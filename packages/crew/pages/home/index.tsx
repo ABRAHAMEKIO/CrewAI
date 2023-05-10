@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Wrap from '../../components/Wrap';
 import Nav from '../../components/Nav';
 import Section from '../../components/Section';
@@ -8,6 +8,7 @@ import PromptClient, {
   PaginationSuccessResponse,
   ErrorResponse,
 } from '../../domain/prompt/promptClient';
+import BottomSlideOver from '../../components/BottomSlideOver';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -20,10 +21,11 @@ function Index() {
     page: 0,
   });
   const [current, setCurrent] = useState<PromptAttributes>({});
+  const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const promptClient1 = new PromptClient();
@@ -37,11 +39,11 @@ function Index() {
         'error' in promptPaginationResponse &&
         promptPaginationResponse.error
       ) {
-        setError(true);
-        setErrorMessage(promptPaginationResponse.error);
-        setLoading(false);
+        // setError(true);
+        // setErrorMessage(promptPaginationResponse.error);
+        // setLoading(false);
       } else {
-        setLoading(true);
+        // setLoading(true);
       }
       if (
         'prompt' in promptPaginationResponse &&
@@ -72,11 +74,11 @@ function Index() {
         'error' in promptPaginationResponse &&
         promptPaginationResponse.error
       ) {
-        setError(true);
-        setErrorMessage(promptPaginationResponse.error);
-        setLoading(false);
+        // setError(true);
+        // setErrorMessage(promptPaginationResponse.error);
+        // setLoading(false);
       } else {
-        setLoading(true);
+        // setLoading(true);
       }
       if (
         'prompt' in promptPaginationResponse &&
@@ -135,7 +137,7 @@ function Index() {
       />
       <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
       <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] lg:px-0">
-        <div className="h-[calc(100vh)] sm:h-[calc(100vh)]">
+        <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
           <div
             className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px]"
             ref={scrollRef}
@@ -170,11 +172,19 @@ function Index() {
                             </p>
                           </div>
                         </div>
-                        <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal ">
-                          {item.prompt.length > 80
-                            ? `${item.prompt.slice(0, 80)}...`
+                        <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal">
+                          {item.prompt.length > 70
+                            ? `${item.prompt.slice(0, 70)}...`
                             : item.prompt}
-                          <span className="font-bold"> Edit Prompt</span>
+                          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                          <a
+                            href="#"
+                            className="font-bold"
+                            onClick={() => setOpenBottomSlideOver(true)}
+                          >
+                            {' '}
+                            Edit Prompt
+                          </a>
                         </p>
                         {[
                           {
@@ -207,6 +217,12 @@ function Index() {
           </div>
         </div>
       </Section>
+
+      <BottomSlideOver
+        prompt={current.prompt}
+        modalOpen={openBottomSlideOver}
+        modalClose={() => setOpenBottomSlideOver(false)}
+      />
       <div />
     </Wrap>
   );
