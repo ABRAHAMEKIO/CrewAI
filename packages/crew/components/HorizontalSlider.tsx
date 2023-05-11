@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -33,6 +33,7 @@ function HorizontalSlider(props: {
 }) {
   const { item, setOpenBottomSlideOver, setOpenModalPrompt } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
+  const [ref2Size, setRef2Size] = useState([0, 0]);
   const [ref3ImageSize, setRef3ImageSize] = useState([0, 0]);
   const [isLandscapeRef1, setIsLandscapeRef1] = useState(false);
   const [imageOrientation, setImageOrientation] = useState(
@@ -63,22 +64,33 @@ function HorizontalSlider(props: {
       });
     }, 1000);
 
+    setRef2Size([ref1.current.clientWidth, ref1.current.clientHeight]);
+
+    const inter2 = setInterval(() => {
+      setRef2Size((prev) => {
+        if (prev[0]) {
+          clearInterval(inter2);
+        }
+        return [ref2.current.clientWidth, ref2.current.clientHeight];
+      });
+    }, 1000);
+
     setRef3ImageSize([
       ref3Image?.current?.clientWidth || 0,
       ref3Image?.current?.clientHeight || 0,
     ]);
 
-    const inter2 = setInterval(() => {
+    const inter3 = setInterval(() => {
       setRef3ImageSize((prev) => {
         if (prev[0]) {
-          clearInterval(inter2);
+          clearInterval(inter3);
         }
         return [ref3Image.current.clientWidth, ref3Image.current.clientHeight];
       });
     }, 1000);
 
     setIsLandscapeRef1(ref1.current.clientWidth >= ref1.current.clientHeight);
-  }, [ref1, ref3Image]);
+  }, [ref1, ref2, ref3Image]);
 
   useEffect(() => {
     const getMeta = (url, cb) => {
@@ -123,6 +135,9 @@ function HorizontalSlider(props: {
     });
   }, [allItem]);
 
+  const [windowSize, setWindowSize] = useState([null, null]);
+  const [isWindowLandscape, setIsWindowLandscape] = useState(false);
+
   const getStyle = () => {
     const heightSize = {
       height: ref1Size[1],
@@ -134,19 +149,49 @@ function HorizontalSlider(props: {
     const whichSize = (input) => (input ? heightSize : widthSize);
 
     if (imageOrientation === ImageOrientation.square) {
-      return whichSize(isLandscapeRef1);
+      const arr = [
+        ref1Size[0],
+        ref1Size[1],
+        ref2Size[0],
+        ref2Size[1],
+        ref3ImageSize[0],
+        ref3ImageSize[1],
+        windowSize[0],
+        windowSize[1],
+      ].filter(Boolean);
+      return {
+        width: Math.min(...arr),
+      };
     }
 
     if (imageOrientation === ImageOrientation.portrait) {
-      return whichSize(ref3ImageSize[0] < ref1Size[0]);
+      return whichSize(ref3ImageSize[0] < ref1Size[0] < windowSize[0]);
     }
 
     if (imageOrientation === ImageOrientation.landscape) {
-      return whichSize(ref3ImageSize[0] > ref1Size[0]);
+      return whichSize(ref3ImageSize[0] > ref1Size[0] < windowSize[0]);
     }
 
     return heightSize;
   };
+
+  useEffect(
+    function mount() {
+      function onResize() {
+        setWindowSize([window.innerWidth, window.innerHeight]);
+        setIsWindowLandscape(window.innerWidth > window.innerHeight);
+      }
+
+      onResize();
+
+      window.addEventListener('resize', onResize);
+
+      return function unMount() {
+        window.removeEventListener('resize', onResize);
+      };
+    },
+    [setWindowSize]
+  );
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
