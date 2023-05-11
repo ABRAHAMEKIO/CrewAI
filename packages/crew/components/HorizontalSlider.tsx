@@ -139,6 +139,17 @@ function HorizontalSlider(props: {
   const [isWindowLandscape, setIsWindowLandscape] = useState(false);
 
   const getStyle = () => {
+    const arr = [
+      ref1Size[0],
+      ref1Size[1],
+      ref2Size[0],
+      ref2Size[1],
+      ref3ImageSize[0],
+      ref3ImageSize[1],
+      windowSize[0],
+      windowSize[1],
+    ].filter(Boolean);
+    const minSize = Math.min(...arr);
     const heightSize = {
       height: ref1Size[1],
     };
@@ -149,27 +160,17 @@ function HorizontalSlider(props: {
     const whichSize = (input) => (input ? heightSize : widthSize);
 
     if (imageOrientation === ImageOrientation.square) {
-      const arr = [
-        ref1Size[0],
-        ref1Size[1],
-        ref2Size[0],
-        ref2Size[1],
-        ref3ImageSize[0],
-        ref3ImageSize[1],
-        windowSize[0],
-        windowSize[1],
-      ].filter(Boolean);
       return {
-        width: Math.min(...arr),
+        width: minSize,
       };
     }
 
     if (imageOrientation === ImageOrientation.portrait) {
-      return whichSize(ref3ImageSize[0] < ref1Size[0] < windowSize[0]);
+      return whichSize(ref3ImageSize[0] < ref1Size[0]);
     }
 
     if (imageOrientation === ImageOrientation.landscape) {
-      return whichSize(ref3ImageSize[0] > ref1Size[0] < windowSize[0]);
+      return whichSize(ref3ImageSize[0] > ref1Size[0]);
     }
 
     return heightSize;
