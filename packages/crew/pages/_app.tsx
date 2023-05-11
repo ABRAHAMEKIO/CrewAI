@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import './styles.css';
@@ -11,6 +11,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
     <MixpanelProvider token={mixPanelId || ''}>
       <Head>
         <title>Hologram</title>
+        <meta httpEquiv="ScreenOrientation" content="autoRotate:disabled" />
       </Head>
       <main className="app">
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
