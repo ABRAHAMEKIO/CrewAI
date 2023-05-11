@@ -132,7 +132,7 @@ function Index() {
     <Wrap className="mx-auto relative">
       <>
         <div
-          className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity -bottom-1"
+          className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity"
           style={{
             backgroundImage: `url(${current.imageUrl})`,
           }}

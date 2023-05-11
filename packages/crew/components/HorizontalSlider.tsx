@@ -123,36 +123,30 @@ function HorizontalSlider(props: {
     });
   }, [allItem]);
 
-  const getStyle = () =>
-    // eslint-disable-next-line no-nested-ternary
-    imageOrientation === ImageOrientation.square
-      ? isLandscapeRef1
-        ? {
-            height: ref1Size[1],
-          }
-        : {
-            width: ref1Size[0],
-          }
-      : // eslint-disable-next-line no-nested-ternary
-      imageOrientation === ImageOrientation.landscape
-      ? ref3ImageSize[0] > ref1Size[0]
-        ? {
-            height: ref1Size[1],
-          }
-        : {
-            width: ref1Size[0],
-          }
-      : // kalo gambar nya portrait ref1 nya portrait set image width
-      // eslint-disable-next-line no-nested-ternary
-      imageOrientation === ImageOrientation.portrait
-      ? isLandscapeRef1
-        ? {
-            width: ref1Size[0],
-          }
-        : {
-            height: ref1Size[1],
-          }
-      : { height: ref1Size[1] };
+  const getStyle = () => {
+    const heightSize = {
+      height: ref1Size[1],
+    };
+    const widthSize = {
+      width: ref1Size[0],
+    };
+
+    const whichSize = (input) => (input ? heightSize : widthSize);
+
+    if (imageOrientation === ImageOrientation.square) {
+      return whichSize(isLandscapeRef1);
+    }
+
+    if (imageOrientation === ImageOrientation.portrait) {
+      return whichSize(ref3ImageSize[0] < ref1Size[0]);
+    }
+
+    if (imageOrientation === ImageOrientation.landscape) {
+      return whichSize(ref3ImageSize[0] > ref1Size[0]);
+    }
+
+    return heightSize;
+  };
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
