@@ -132,7 +132,6 @@ Prompt.init(
     sequelize: sequelizeConnection,
     underscored: false,
   }
-  // @todo implement shadow attribute
 );
 
 // include: [{ model: Prompt, as: 'SubPrompts' }],

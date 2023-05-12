@@ -1,18 +1,27 @@
 import MidjourneyClient, {
   SuccessResponse,
 } from '../../../domain/midjourney/midjourneyClient';
+import Webhook, { WebhookStep } from '../../../db/models/webhook';
 
 const AUTH_SECRET = process.env.AUTH_SECRET_THENEXTLEG;
 const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
+
 export default async function handler(req, res): Promise<SuccessResponse> {
   const {
-    body: { msg, ref },
+    body: { msg, promptId, socketId },
   } = req;
+
+  const webhookTable = await Webhook.create({
+    msg,
+    socketId,
+    promptId,
+    step: WebhookStep.create,
+  });
 
   const midjourneyClient = new MidjourneyClient(AUTH_SECRET);
   const imageCommandResponse = await midjourneyClient.imagine(
     msg,
-    ref,
+    webhookTable.id.toString(),
     WEBHOOK_OVERRIDE || '',
     0.5 // lower the quality for free user
   );

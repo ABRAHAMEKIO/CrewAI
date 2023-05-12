@@ -150,7 +150,6 @@ function HorizontalSlider(props: {
   }, [allItem]);
 
   const [windowSize, setWindowSize] = useState([null, null]);
-  const [isWindowLandscape, setIsWindowLandscape] = useState(false);
 
   const getStyle = () => {
     const arr = [
@@ -194,7 +193,6 @@ function HorizontalSlider(props: {
     function mount() {
       function onResize() {
         setWindowSize([window.innerWidth, window.innerHeight]);
-        setIsWindowLandscape(window.innerWidth > window.innerHeight);
       }
 
       onResize();
