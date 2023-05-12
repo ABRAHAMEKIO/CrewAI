@@ -11,7 +11,6 @@ import PromptClient, {
 } from '../../domain/prompt/promptClient';
 import BottomSlideOver from '../../components/BottomSlideOver';
 import ModalPrompt from '../../components/ModalPrompt';
-
 import HorizontalSlider from '../../components/HorizontalSlider';
 
 function Index() {
