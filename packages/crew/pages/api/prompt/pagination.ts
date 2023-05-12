@@ -28,8 +28,11 @@ apiRoute.get(async (req, res) => {
   const limit = 20;
   const offset = parseInt(page, 10) * limit;
   const prompt = await Prompt.findAndCountAll({
+    distinct: true,
+    include: [{ model: Prompt, as: 'SubPrompts' }],
     where: {
       imageUrlIsUnique: true,
+      parentId: null,
     },
     offset,
     limit,
