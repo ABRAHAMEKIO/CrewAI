@@ -197,7 +197,7 @@ function HorizontalSlider(props: {
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
-        <div className="sm:col-span-8" ref={ref1}>
+        <div className="sm:col-span-8 relative" ref={ref1}>
           {/* ini perlu di ganti pake ukuran gambar */}
           <div
             className="snap-x snap-mandatory overflow-x-scroll scrollbar-hide gap-x-6 rounded-2xl mx-auto transition-all
@@ -209,6 +209,9 @@ function HorizontalSlider(props: {
               width: ref3ImageSize[0],
             }}
           >
+            <div style={getStyle()} className="absolute bg-gray-700 h-2 px-2">
+              <div className="h-1 w-[100px] bg-white" />
+            </div>
             {allItem.map((myItem) => (
               <div
                 className="snap-start flex items-center"
