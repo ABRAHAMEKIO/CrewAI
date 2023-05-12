@@ -1,5 +1,5 @@
 [[redirects]]
-  from = "/api
+  from = "/api"
   to = "https://hologram-ai.fly.dev/api"
   status = 200
   force = true
