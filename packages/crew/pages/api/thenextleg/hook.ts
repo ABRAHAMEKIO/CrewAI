@@ -1,8 +1,9 @@
 import MidjourneyCommand from '../../../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../../../domain/midjourney/midjourneyClient';
+import Prompt from '../../../db/models/prompt';
 
 const SECRET = process.env.WEBHOOK_THENEXTLEG_SECRET;
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const secret = req?.query?.hook;
   const { io } = res.socket.server;
   try {
@@ -18,10 +19,16 @@ export default function handler(req, res) {
   // socketId;button
   const [socketId] = ref.split(';');
 
-  io.to(socketId).emit(
-    MidjourneyCommand.ModelResults.toString(),
-    body as WebhookSuccessResponse
-  );
+  const prompt = await Prompt.create({
+    prompt: body.content,
+    imageUrl: body.imageUrl,
+    parentId: 1,
+  });
 
-  return res.status(200).json({ success: true });
+  io.to(socketId).emit(MidjourneyCommand.ModelResults.toString(), {
+    ...body,
+    prompt,
+  } as WebhookSuccessResponse);
+
+  return res.status(200).json({ success: true, prompt });
 }

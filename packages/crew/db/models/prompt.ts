@@ -1,9 +1,8 @@
 import { DataTypes, FloatDataType, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config/connection';
 
-export interface PromptAttributes {
+export interface SubPromptsAttributes {
   id?: number;
-  parentId?: number;
   prompt?: string | null;
   imageUrl?: string | null;
   creatorAddress?: string | null;
@@ -17,6 +16,24 @@ export interface PromptAttributes {
   parentId?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface PromptAttributes {
+  id?: number;
+  prompt?: string | null;
+  imageUrl?: string | null;
+  creatorAddress?: string | null;
+  objectName?: string | null;
+  objectNameIsUnique?: boolean | null;
+  showPromptFee?: FloatDataType | null;
+  maximumMint?: number | null;
+  mintFee?: FloatDataType | null;
+  ipfsUrl?: string | null;
+  imageUrlIsUnique?: boolean | null;
+  parentId?: number | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  SubPrompts?: SubPromptsAttributes;
 }
 
 export type PromptInput = Optional<PromptAttributes, 'id'>;
@@ -48,13 +65,13 @@ class Prompt
 
   public imageUrlIsUnique!: boolean;
 
-  public parentId!: number;
-
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
 
   public parentId: number;
+
+  public readonly SubPrompts: SubPromptsAttributes;
 }
 
 Prompt.init(
@@ -115,6 +132,7 @@ Prompt.init(
     sequelize: sequelizeConnection,
     underscored: false,
   }
+  // @todo implement shadow attribute
 );
 
 // include: [{ model: Prompt, as: 'SubPrompts' }],

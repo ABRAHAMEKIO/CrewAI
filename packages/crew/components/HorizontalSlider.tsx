@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { PromptAttributes } from '../db/models/prompt';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -10,6 +11,10 @@ interface ItemInterface {
   objectName: string;
   creatorAddress: string;
   prompt: string;
+}
+
+export interface NewChildrenPrompt {
+  prompt: PromptAttributes;
 }
 
 // eslint-disable-next-line no-shadow
@@ -30,12 +35,17 @@ function HorizontalSlider(props: {
   };
   setOpenBottomSlideOver: (bool: boolean) => void;
   setOpenModalPrompt: (bool: boolean) => void;
+  newChildrenPrompt?: NewChildrenPrompt;
 }) {
-  const { item, setOpenBottomSlideOver, setOpenModalPrompt } = props;
+  const {
+    item,
+    setOpenBottomSlideOver,
+    setOpenModalPrompt,
+    newChildrenPrompt,
+  } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
   const [ref3ImageSize, setRef3ImageSize] = useState([0, 0]);
-  const [isLandscapeRef1, setIsLandscapeRef1] = useState(false);
   const [imageOrientation, setImageOrientation] = useState(
     ImageOrientation.portrait
   );
@@ -50,6 +60,12 @@ function HorizontalSlider(props: {
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
   }, [item]);
+
+  useEffect(() => {
+    if (item?.id === newChildrenPrompt?.prompt?.parentId) {
+      setAllItem((prevItem) => [...prevItem, newChildrenPrompt.prompt]);
+    }
+  }, [newChildrenPrompt, item]);
 
   // handle horizontal slider
   useEffect(() => {
@@ -88,8 +104,6 @@ function HorizontalSlider(props: {
         return [ref3Image.current.clientWidth, ref3Image.current.clientHeight];
       });
     }, 1000);
-
-    setIsLandscapeRef1(ref1.current.clientWidth >= ref1.current.clientHeight);
   }, [ref1, ref2, ref3Image]);
 
   useEffect(() => {
@@ -199,6 +213,7 @@ function HorizontalSlider(props: {
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
         <div className="sm:col-span-8" ref={ref1}>
           {/* ini perlu di ganti pake ukuran gambar */}
+          {newChildrenPrompt?.prompt?.id}
           <div
             className="snap-x snap-mandatory overflow-x-scroll scrollbar-hide gap-x-6 rounded-2xl mx-auto transition-all
             h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-156px)]
@@ -303,5 +318,9 @@ function HorizontalSlider(props: {
     </div>
   );
 }
+
+HorizontalSlider.defaultProps = {
+  newChildrenPrompt: undefined,
+};
 
 export default HorizontalSlider;

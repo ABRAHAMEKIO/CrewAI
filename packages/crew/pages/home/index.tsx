@@ -4,6 +4,7 @@ import Wrap from '../../components/Wrap';
 import Nav from '../../components/Nav';
 import Section from '../../components/Section';
 import { PromptAttributes } from '../../db/models/prompt';
+import SocketClient from '../../components/SocketClient';
 
 import PromptClient, {
   PaginationSuccessResponse,
@@ -11,7 +12,10 @@ import PromptClient, {
 } from '../../domain/prompt/promptClient';
 import BottomSlideOver from '../../components/BottomSlideOver';
 import ModalPrompt from '../../components/ModalPrompt';
-import HorizontalSlider from '../../components/HorizontalSlider';
+import HorizontalSlider, {
+  NewChildrenPrompt,
+} from '../../components/HorizontalSlider';
+import { WebhookSuccessResponse } from '../../domain/midjourney/midjourneyClient';
 
 function Index() {
   const mixpanel = useMixpanel();
@@ -23,6 +27,8 @@ function Index() {
   const [current, setCurrent] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
+  const [newChildPrompt, setNewChildPrompt] =
+    useState<NewChildrenPrompt>(undefined);
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -135,9 +141,20 @@ function Index() {
     });
   }, [dataPrompt.page, dataPrompt.rows]);
 
+  function socketSuccessResponse(data: WebhookSuccessResponse) {
+    setNewChildPrompt({
+      prompt: data.prompt,
+    });
+  }
+
   return (
     <Wrap className="mx-auto relative">
       <>
+        <SocketClient
+          onSocketSuccessResponse={(success: WebhookSuccessResponse) =>
+            socketSuccessResponse(success)
+          }
+        />
         <div
           className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity"
           style={{
@@ -162,6 +179,7 @@ function Index() {
                   data-index={index}
                 >
                   <HorizontalSlider
+                    newChildrenPrompt={newChildPrompt}
                     item={item}
                     setOpenBottomSlideOver={setOpenBottomSlideOver}
                     setOpenModalPrompt={setOpenModalPrompt}
