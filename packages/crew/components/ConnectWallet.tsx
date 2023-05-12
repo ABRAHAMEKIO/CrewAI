@@ -35,12 +35,12 @@ function ConnectWallet() {
       >
         <div className="lex items-center sm:static sm:inset-auto w-fit">
           <div className="flex space-x-4">
-            <Disclosure.Button
+            {/* <Disclosure.Button
               key="network-active"
               className="bg-white rounded-lg px-[1rem] text-lg shadow-lg font-semibold text-gray-700"
             >
               {gnosis.name}
-            </Disclosure.Button>
+            </Disclosure.Button> */}
             <ConnectButton accountStatus="avatar" />
           </div>
         </div>
