@@ -7,7 +7,6 @@ import {
   lightTheme,
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
-import { Disclosure } from '@headlessui/react';
 import { gnosis } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
@@ -35,12 +34,6 @@ function ConnectWallet() {
       >
         <div className="lex items-center sm:static sm:inset-auto w-fit">
           <div className="flex space-x-4">
-            {/* <Disclosure.Button
-              key="network-active"
-              className="bg-white rounded-lg px-[1rem] text-lg shadow-lg font-semibold text-gray-700"
-            >
-              {gnosis.name}
-            </Disclosure.Button> */}
             <ConnectButton accountStatus="avatar" />
           </div>
         </div>
