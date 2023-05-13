@@ -1,9 +1,8 @@
 import { DataTypes, FloatDataType, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config/connection';
 
-export interface PromptAttributes {
+export interface SubPromptsAttributes {
   id?: number;
-  parentId?: number;
   prompt?: string | null;
   imageUrl?: string | null;
   creatorAddress?: string | null;
@@ -14,8 +13,29 @@ export interface PromptAttributes {
   mintFee?: FloatDataType | null;
   ipfsUrl?: string | null;
   imageUrlIsUnique?: boolean | null;
+  parentId?: number | null;
+  extendedPrompt?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface PromptAttributes {
+  id?: number;
+  prompt?: string | null;
+  imageUrl?: string | null;
+  creatorAddress?: string | null;
+  objectName?: string | null;
+  objectNameIsUnique?: boolean | null;
+  showPromptFee?: FloatDataType | null;
+  maximumMint?: number | null;
+  mintFee?: FloatDataType | null;
+  ipfsUrl?: string | null;
+  imageUrlIsUnique?: boolean | null;
+  parentId?: number | null;
+  extendedPrompt?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  SubPrompts?: SubPromptsAttributes[];
 }
 
 export type PromptInput = Optional<PromptAttributes, 'id'>;
@@ -52,6 +72,10 @@ class Prompt
   public readonly updatedAt!: Date;
 
   public parentId: number;
+
+  public extendedPrompt!: string;
+
+  public readonly SubPrompts: SubPromptsAttributes[];
 }
 
 Prompt.init(
@@ -105,6 +129,10 @@ Prompt.init(
     parentId: {
       allowNull: true,
       type: DataTypes.INTEGER,
+    },
+    extendedPrompt: {
+      allowNull: true,
+      type: DataTypes.TEXT,
     },
   },
   {

@@ -1,6 +1,10 @@
 /* eslint-disable class-methods-use-this */
 import axios from 'axios';
 import { PromptAttributes } from '../../db/models/prompt';
+import {
+  IsNaughtySuccessResponse,
+  SuccessResponse,
+} from '../midjourney/midjourneyClient';
 
 export interface ErrorResponse {
   error: string;
@@ -26,9 +30,9 @@ export default class PromptClient {
       'Content-Type': 'application/json',
     };
 
-    const config = {
+    return {
       method: reqMethod,
-      url: `/${path}`,
+      url: `${path}`,
       headers,
       data,
       params,
@@ -36,7 +40,6 @@ export default class PromptClient {
         return status < 500; // Resolve only if the status code is less than 500
       },
     };
-    return config;
   }
 
   async pagination({
@@ -50,6 +53,28 @@ export default class PromptClient {
     const response = await axios.request<
       PaginationSuccessResponse | ErrorResponse
     >(config);
+    return response.data;
+  }
+
+  async generate(props: {
+    promptId: number;
+    msg: string;
+    socketId: string;
+  }): Promise<SuccessResponse | IsNaughtySuccessResponse> {
+    const { promptId, msg, socketId } = props;
+
+    const data = {
+      promptId,
+      msg,
+      socketId,
+    };
+
+    const config = this.getConfig(data, 'api/thenextleg/imagine', 'POST', '');
+
+    const response = await axios.request<
+      SuccessResponse | IsNaughtySuccessResponse
+    >(config);
+
     return response.data;
   }
 }

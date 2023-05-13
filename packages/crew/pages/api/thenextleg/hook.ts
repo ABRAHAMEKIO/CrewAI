@@ -1,10 +1,10 @@
-import MidjourneyCommand from '../../../domain/midjourney/wsCommands';
-import { WebhookSuccessResponse } from '../../../domain/midjourney/midjourneyClient';
+import MidjourneyClient from '../../../domain/midjourney/midjourneyClient';
+import Webhook, { WebhookStep } from '../../../db/models/webhook';
 
 const SECRET = process.env.WEBHOOK_THENEXTLEG_SECRET;
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const secret = req?.query?.hook;
-  const { io } = res.socket.server;
+  // const { io } = res.socket.server;
   try {
     if (atob(secret) !== SECRET)
       return res.status(401).json({ message: 'Not authorized' });
@@ -13,15 +13,41 @@ export default function handler(req, res) {
   }
 
   const { body } = req;
-  const { ref } = body;
+  const { ref, buttonMessageId } = body;
 
-  // socketId;button
-  const [socketId] = ref.split(';');
+  await Webhook.update({ step: WebhookStep.hook }, { where: { id: ref } });
+  const webhookTable = await Webhook.findByPk(ref);
 
-  io.to(socketId).emit(
-    MidjourneyCommand.ModelResults.toString(),
-    body as WebhookSuccessResponse
+  const AUTH_SECRET = process.env.AUTH_SECRET_THENEXTLEG;
+  const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
+  // replace string "hook" first string found
+  const WEBHOOK_BUTTON_OVERRIDE: string = WEBHOOK_OVERRIDE.replace(
+    /hook/,
+    'hook-button'
   );
 
-  return res.status(200).json({ success: true });
+  const webhook = WEBHOOK_BUTTON_OVERRIDE;
+
+  const midjourneyClient = new MidjourneyClient(AUTH_SECRET);
+
+  await midjourneyClient.button(
+    'U1',
+    buttonMessageId,
+    webhookTable.id?.toString(),
+    WEBHOOK_BUTTON_OVERRIDE
+  );
+
+  // hanya untuk debug
+  // const prompt = await Prompt.findByPk(webhookTable.promptId);
+  //
+  // io.to(webhookTable.socketId).emit(MidjourneyCommand.ModelResults.toString(), {
+  //   ...body,
+  //   prompt: {
+  //     ...prompt,
+  //     imageUrl,
+  //     parentId: webhookTable.promptId,
+  //   },
+  // } as WebhookSuccessResponse);
+
+  return res.status(200).json({ success: true, webhook });
 }

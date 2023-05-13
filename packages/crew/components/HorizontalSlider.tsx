@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { PromptAttributes } from '../db/models/prompt';
+
+import PromptClient from '../domain/prompt/promptClient';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
-}
-
-interface ItemInterface {
-  id: number;
-  imageUrl: string;
-  objectName: string;
-  creatorAddress: string;
-  prompt: string;
 }
 
 // eslint-disable-next-line no-shadow
@@ -19,23 +14,26 @@ enum ImageOrientation {
   square,
 }
 
-function HorizontalSlider(props: {
-  item: {
-    id: number;
-    imageUrl: string;
-    objectName: string;
-    creatorAddress: string;
-    prompt: string;
-    SubPrompts: ItemInterface[];
-  };
-  setOpenBottomSlideOver: (bool: boolean) => void;
-  setOpenModalPrompt: (bool: boolean) => void;
+function HorizontalSlider({
+  loading,
+  setLoading,
+  item,
+  setOpenBottomSlideOver,
+  setOpenModalPrompt,
+  newPrompt,
+  socketId,
+}: {
+  loading: boolean;
+  setLoading: (bool: boolean) => void;
+  item: PromptAttributes;
+  setOpenBottomSlideOver: (prompt: PromptAttributes, bool: boolean) => void;
+  setOpenModalPrompt: (prompt: PromptAttributes, bool: boolean) => void;
+  newPrompt?: PromptAttributes;
+  socketId: string;
 }) {
-  const { item, setOpenBottomSlideOver, setOpenModalPrompt } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
   const [ref3ImageSize, setRef3ImageSize] = useState([0, 0]);
-  const [isLandscapeRef1, setIsLandscapeRef1] = useState(false);
   const [imageOrientation, setImageOrientation] = useState(
     ImageOrientation.portrait
   );
@@ -45,11 +43,17 @@ function HorizontalSlider(props: {
   const ref3Image = React.useRef<HTMLImageElement>(null);
 
   const [allItem, setAllItem] = useState([]);
-  const [current, setCurrent] = useState(item);
+  const [current, setCurrent] = useState<PromptAttributes>(item);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
   }, [item]);
+
+  useEffect(() => {
+    if (item?.id.toString() === newPrompt?.parentId.toString()) {
+      setAllItem((prevItem) => [...prevItem, newPrompt]);
+    }
+  }, [newPrompt, item]);
 
   // handle horizontal slider
   useEffect(() => {
@@ -88,8 +92,6 @@ function HorizontalSlider(props: {
         return [ref3Image.current.clientWidth, ref3Image.current.clientHeight];
       });
     }, 1000);
-
-    setIsLandscapeRef1(ref1.current.clientWidth >= ref1.current.clientHeight);
   }, [ref1, ref2, ref3Image]);
 
   useEffect(() => {
@@ -136,7 +138,6 @@ function HorizontalSlider(props: {
   }, [allItem]);
 
   const [windowSize, setWindowSize] = useState([null, null]);
-  const [isWindowLandscape, setIsWindowLandscape] = useState(false);
 
   const getStyle = () => {
     const arr = [
@@ -180,7 +181,6 @@ function HorizontalSlider(props: {
     function mount() {
       function onResize() {
         setWindowSize([window.innerWidth, window.innerHeight]);
-        setIsWindowLandscape(window.innerWidth > window.innerHeight);
       }
 
       onResize();
@@ -193,6 +193,16 @@ function HorizontalSlider(props: {
     },
     [setWindowSize]
   );
+
+  async function handleSubmit() {
+    if (loading) return;
+    const promptClient = new PromptClient();
+    await promptClient.generate({
+      promptId: item.id,
+      msg: current.prompt,
+      socketId,
+    });
+  }
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
@@ -222,8 +232,8 @@ function HorizontalSlider(props: {
                   className="flex items-center rounded-2xl justify-center"
                   style={getStyle()}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   {/* mencoba biin objec contain untuk mulitple gambar varian version ratio */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     className="object-contain rounded-2xl mx-auto max-h-[calc(100vh)] max-w-[calc(100vw)] "
                     src={myItem.imageUrl}
@@ -251,7 +261,7 @@ function HorizontalSlider(props: {
           </div>
           <div className="mt-4">
             <button
-              onClick={() => setOpenBottomSlideOver(true)}
+              onClick={() => setOpenBottomSlideOver(current, true)}
               type="button"
               className="block sm:hidden"
             >
@@ -264,7 +274,7 @@ function HorizontalSlider(props: {
               </p>
             </button>
             <button
-              onClick={() => setOpenModalPrompt(true)}
+              onClick={() => setOpenModalPrompt(current, true)}
               type="button"
               className="hidden sm:block sm:mt-4"
             >
@@ -282,17 +292,25 @@ function HorizontalSlider(props: {
               {
                 name: 'Generate Now',
                 bgDark: false,
+                onClick: () => handleSubmit(),
               },
             ].map((it) => {
               return (
                 <button
+                  disabled={loading}
+                  onClick={it.onClick}
                   type="button"
                   key={it.name}
                   className={classNames(
-                    it.bgDark
-                      ? '!bg-black'
-                      : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
-                    'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white'
+                    loading
+                      ? 'text-white bg-gray-150'
+                      : classNames(
+                          it.bgDark
+                            ? 'text-white bg-black'
+                            : 'text-white bg-primer',
+                          ''
+                        ),
+                    'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px]'
                   )}
                 >
                   {it.name}
@@ -306,5 +324,9 @@ function HorizontalSlider(props: {
     </div>
   );
 }
+
+HorizontalSlider.defaultProps = {
+  newPrompt: undefined,
+};
 
 export default HorizontalSlider;
