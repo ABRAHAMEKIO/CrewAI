@@ -29,7 +29,6 @@ function CustomApp({ Component, pageProps }: AppProps) {
           console.info('connected');
           // eslint-disable-next-line no-console
           console.info(`${socket.id}`);
-          setLoading(false);
           setSocketId(socket.id);
         });
 
@@ -38,6 +37,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
           (val: WebhookSuccessResponse) => {
             // eslint-disable-next-line no-console
             console.info(val);
+            setLoading(false);
             setNewPrompt(val.prompt);
           }
         );
