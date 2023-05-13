@@ -32,6 +32,8 @@ function CustomApp({ Component, pageProps }: AppProps) {
         socket.on(
           MidjourneyCommand.ModelResults.toString(),
           (val: WebhookSuccessResponse) => {
+            // eslint-disable-next-line no-console
+            console.info(val);
             setNewPrompt(val.prompt);
           }
         );

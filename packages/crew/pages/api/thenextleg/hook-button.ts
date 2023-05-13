@@ -23,11 +23,14 @@ export default async function handler(req, res) {
   );
 
   const webhookTable = await Webhook.findByPk(ref);
+  const parentPrompt = await Prompt.findByPk(webhookTable.promptId);
 
   const prompt = await Prompt.create({
     prompt: webhookTable.msg,
     imageUrl,
     parentId: webhookTable.promptId,
+    objectName: parentPrompt.objectName,
+    creatorAddress: parentPrompt.creatorAddress,
   });
 
   io.to(webhookTable.socketId).emit(MidjourneyCommand.ModelResults.toString(), {
@@ -35,5 +38,5 @@ export default async function handler(req, res) {
     prompt,
   } as WebhookSuccessResponse);
 
-  return res.status(200).json({ success: true, prompt });
+  return res.status(200).json({ success: true, webhookTable, prompt });
 }

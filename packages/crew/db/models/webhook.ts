@@ -70,6 +70,8 @@ Webhook.init(
   }
 );
 
-Webhook.belongsTo(Prompt);
+Webhook.belongsTo(Prompt, {
+  foreignKey: 'promptId',
+});
 
 export default Webhook;

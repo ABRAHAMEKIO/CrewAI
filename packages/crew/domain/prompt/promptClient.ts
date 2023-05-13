@@ -32,7 +32,7 @@ export default class PromptClient {
 
     return {
       method: reqMethod,
-      url: `api/prompt/${path}`,
+      url: `${path}`,
       headers,
       data,
       params,
@@ -47,7 +47,7 @@ export default class PromptClient {
   }: {
     page: number;
   }): Promise<PaginationSuccessResponse | ErrorResponse> {
-    const config = this.getConfig({}, `pagination`, 'GET', {
+    const config = this.getConfig({}, `api/prompt/pagination`, 'GET', {
       page,
     });
     const response = await axios.request<
@@ -69,7 +69,7 @@ export default class PromptClient {
       socketId,
     };
 
-    const config = this.getConfig(data, 'imagine', 'POST', '');
+    const config = this.getConfig(data, 'api/thenextleg/imagine', 'POST', '');
 
     const response = await axios.request<
       SuccessResponse | IsNaughtySuccessResponse

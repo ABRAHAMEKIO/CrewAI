@@ -14,6 +14,7 @@ export interface SubPromptsAttributes {
   ipfsUrl?: string | null;
   imageUrlIsUnique?: boolean | null;
   parentId?: number | null;
+  extendedPrompt?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -31,6 +32,7 @@ export interface PromptAttributes {
   ipfsUrl?: string | null;
   imageUrlIsUnique?: boolean | null;
   parentId?: number | null;
+  extendedPrompt?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
   SubPrompts?: SubPromptsAttributes;
@@ -70,6 +72,8 @@ class Prompt
   public readonly updatedAt!: Date;
 
   public parentId: number;
+
+  public extendedPrompt!: string;
 
   public readonly SubPrompts: SubPromptsAttributes;
 }
@@ -125,6 +129,10 @@ Prompt.init(
     parentId: {
       allowNull: true,
       type: DataTypes.INTEGER,
+    },
+    extendedPrompt: {
+      allowNull: true,
+      type: DataTypes.TEXT,
     },
   },
   {

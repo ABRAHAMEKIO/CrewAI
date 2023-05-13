@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
 
+import PromptClient, {
+  PaginationSuccessResponse,
+  ErrorResponse,
+} from '../domain/prompt/promptClient';
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
@@ -59,6 +64,7 @@ function HorizontalSlider(props: {
 
   const [allItem, setAllItem] = useState([]);
   const [current, setCurrent] = useState(item);
+  const [aspect, setAspect] = useState<string>(null);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
@@ -125,6 +131,8 @@ function HorizontalSlider(props: {
       } else {
         setImageOrientation(ImageOrientation.portrait);
       }
+
+      setAspect();
     });
   }, [item]);
 
@@ -208,6 +216,15 @@ function HorizontalSlider(props: {
     },
     [setWindowSize]
   );
+
+  async function handleSubmit() {
+    const promptClient = new PromptClient();
+    await promptClient.generate({
+      promptId: item.id,
+      msg: current.prompt,
+      socketId,
+    });
+  }
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
@@ -294,10 +311,12 @@ function HorizontalSlider(props: {
               {
                 name: 'Generate Now',
                 bgDark: false,
+                onClick: () => handleSubmit(),
               },
             ].map((it) => {
               return (
                 <button
+                  onClick={it.onClick}
                   type="button"
                   key={it.name}
                   className={classNames(
