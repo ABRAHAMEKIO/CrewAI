@@ -1,21 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
 
-import PromptClient, {
-  PaginationSuccessResponse,
-  ErrorResponse,
-} from '../domain/prompt/promptClient';
+import PromptClient from '../domain/prompt/promptClient';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
-}
-
-interface ItemInterface {
-  id: number;
-  imageUrl: string;
-  objectName: string;
-  creatorAddress: string;
-  prompt: string;
 }
 
 // eslint-disable-next-line no-shadow
@@ -31,16 +20,9 @@ interface ParamsGenerate {
 }
 
 function HorizontalSlider(props: {
-  item: {
-    id: number;
-    imageUrl: string;
-    objectName: string;
-    creatorAddress: string;
-    prompt: string;
-    SubPrompts: ItemInterface[];
-  };
-  setOpenBottomSlideOver: (bool: boolean) => void;
-  setOpenModalPrompt: (bool: boolean) => void;
+  item: PromptAttributes;
+  setOpenBottomSlideOver: (prompt: PromptAttributes, bool: boolean) => void;
+  setOpenModalPrompt: (prompt: PromptAttributes, bool: boolean) => void;
   newPrompt?: PromptAttributes;
   socketId: string;
 }) {
@@ -63,8 +45,7 @@ function HorizontalSlider(props: {
   const ref3Image = React.useRef<HTMLImageElement>(null);
 
   const [allItem, setAllItem] = useState([]);
-  const [current, setCurrent] = useState(item);
-  const [aspect, setAspect] = useState<string>(null);
+  const [current, setCurrent] = useState<PromptAttributes>(item);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
@@ -131,8 +112,6 @@ function HorizontalSlider(props: {
       } else {
         setImageOrientation(ImageOrientation.portrait);
       }
-
-      setAspect();
     });
   }, [item]);
 
@@ -280,7 +259,7 @@ function HorizontalSlider(props: {
           </div>
           <div className="mt-4">
             <button
-              onClick={() => setOpenBottomSlideOver(true)}
+              onClick={() => setOpenBottomSlideOver(current, true)}
               type="button"
               className="block sm:hidden"
             >
@@ -293,7 +272,7 @@ function HorizontalSlider(props: {
               </p>
             </button>
             <button
-              onClick={() => setOpenModalPrompt(true)}
+              onClick={() => setOpenModalPrompt(current, true)}
               type="button"
               className="hidden sm:block sm:mt-4"
             >

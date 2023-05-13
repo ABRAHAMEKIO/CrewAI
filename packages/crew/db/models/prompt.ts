@@ -35,7 +35,7 @@ export interface PromptAttributes {
   extendedPrompt?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
-  SubPrompts?: SubPromptsAttributes;
+  SubPrompts?: SubPromptsAttributes[];
 }
 
 export type PromptInput = Optional<PromptAttributes, 'id'>;
@@ -75,7 +75,7 @@ class Prompt
 
   public extendedPrompt!: string;
 
-  public readonly SubPrompts: SubPromptsAttributes;
+  public readonly SubPrompts: SubPromptsAttributes[];
 }
 
 Prompt.init(

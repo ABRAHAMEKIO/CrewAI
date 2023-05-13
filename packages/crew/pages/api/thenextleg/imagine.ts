@@ -23,7 +23,8 @@ export default async function handler(
   const promptMessage = `${msg} ${extendedPrompt.slice(indexOfFirst)}`;
 
   const webhookTable = await Webhook.create({
-    msg: promptMessage,
+    prompt: msg,
+    extendedPrompt: promptMessage,
     socketId,
     promptId,
     step: WebhookStep.create,

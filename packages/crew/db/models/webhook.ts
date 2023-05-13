@@ -8,7 +8,8 @@ export interface WebhookAttributes {
   socketId?: string | null;
   step?: string | null;
   promptId?: number | null;
-  msg?: string | null;
+  prompt?: string | null;
+  extendedPrompt?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -34,7 +35,9 @@ class Webhook
 
   public promptId: number;
 
-  public msg: string;
+  public prompt: string;
+
+  public extendedPrompt: string;
 }
 
 Webhook.init(
@@ -58,7 +61,11 @@ Webhook.init(
       allowNull: true,
       type: DataTypes.INTEGER,
     },
-    msg: {
+    prompt: {
+      allowNull: true,
+      type: DataTypes.TEXT,
+    },
+    extendedPrompt: {
       allowNull: true,
       type: DataTypes.TEXT,
     },

@@ -22,6 +22,7 @@ function Index({ socketId }: { socketId: string }) {
     page: 0,
   });
   const [current, setCurrent] = useState<PromptAttributes>({});
+  const [modalData, setModalData] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
 
@@ -169,8 +170,14 @@ function Index({ socketId }: { socketId: string }) {
                         socketId={socketId}
                         newPrompt={newPrompt}
                         item={item}
-                        setOpenBottomSlideOver={setOpenBottomSlideOver}
-                        setOpenModalPrompt={setOpenModalPrompt}
+                        setOpenBottomSlideOver={(prompt, bool) => {
+                          setModalData(prompt);
+                          setOpenBottomSlideOver(bool);
+                        }}
+                        setOpenModalPrompt={(prompt, bool) => {
+                          setModalData(prompt);
+                          setOpenModalPrompt(bool);
+                        }}
                       />
                     </div>
                   );
@@ -182,14 +189,18 @@ function Index({ socketId }: { socketId: string }) {
       </Section>
 
       <BottomSlideOver
-        prompt={current.prompt}
+        parentId={current.id}
+        socketId={socketId}
+        prompt={modalData}
         modalOpen={openBottomSlideOver}
         modalClose={() => setOpenBottomSlideOver(false)}
       />
       <div />
 
       <ModalPrompt
-        prompt={current.prompt}
+        parentId={current.id}
+        socketId={socketId}
+        prompt={modalData}
         modalOpen={openModalPrompt}
         modalClose={() => setOpenModalPrompt(false)}
       />

@@ -26,7 +26,8 @@ export default async function handler(req, res) {
   const parentPrompt = await Prompt.findByPk(webhookTable.promptId);
 
   const prompt = await Prompt.create({
-    prompt: webhookTable.msg,
+    prompt: webhookTable.prompt, // so we don't need the body.content and letter we can use for regenerate
+    extendedPrompt: webhookTable.extendedPrompt,
     imageUrl,
     parentId: webhookTable.promptId,
     objectName: parentPrompt.objectName,
