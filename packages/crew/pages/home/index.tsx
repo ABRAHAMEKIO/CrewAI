@@ -13,7 +13,6 @@ import PromptClient, {
 import BottomSlideOver from '../../components/BottomSlideOver';
 import ModalPrompt from '../../components/ModalPrompt';
 import HorizontalSlider from '../../components/HorizontalSlider';
-import { WebhookSuccessResponse } from '../../domain/midjourney/midjourneyClient';
 
 function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
@@ -168,7 +167,7 @@ function Index({ socketId }: { socketId: string }) {
                     >
                       <HorizontalSlider
                         socketId={socketId}
-                        newChildrenPrompt={newPrompt}
+                        newPrompt={newPrompt}
                         item={item}
                         setOpenBottomSlideOver={setOpenBottomSlideOver}
                         setOpenModalPrompt={setOpenModalPrompt}

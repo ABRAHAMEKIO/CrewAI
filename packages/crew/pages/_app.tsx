@@ -7,7 +7,6 @@ import { MixpanelProvider } from 'react-mixpanel-browser';
 import io from 'socket.io-client';
 import { mixPanelId, server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
-import Homepage from './home/index';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import { PromptAttributes } from '../db/models/prompt';
@@ -50,10 +49,10 @@ function CustomApp({ Component, pageProps }: AppProps) {
       </Head>
       <main className="app">
         <PromptContext.Provider value={newPrompt}>
-          <Homepage socketId={socketId} />
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+          <Component {...pageProps} socketId={socketId} newPrompt={newPrompt} />
+          {/* set global socket id to component */}
         </PromptContext.Provider>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        {/* <Component {...pageProps} /> */}
       </main>
     </MixpanelProvider>
   );

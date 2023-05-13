@@ -36,14 +36,14 @@ function HorizontalSlider(props: {
   };
   setOpenBottomSlideOver: (bool: boolean) => void;
   setOpenModalPrompt: (bool: boolean) => void;
-  newChildrenPrompt?: PromptAttributes;
+  newPrompt?: PromptAttributes;
   socketId: string;
 }) {
   const {
     item,
     setOpenBottomSlideOver,
     setOpenModalPrompt,
-    newChildrenPrompt,
+    newPrompt,
     socketId,
   } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
@@ -65,10 +65,10 @@ function HorizontalSlider(props: {
   }, [item]);
 
   useEffect(() => {
-    if (item?.id === newChildrenPrompt?.parentId) {
-      setAllItem((prevItem) => [...prevItem, newChildrenPrompt]);
+    if (item?.id.toString() === newPrompt?.parentId.toString()) {
+      setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
-  }, [newChildrenPrompt, item]);
+  }, [newPrompt, item]);
 
   // handle horizontal slider
   useEffect(() => {
@@ -214,7 +214,6 @@ function HorizontalSlider(props: {
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
         <div className="sm:col-span-8" ref={ref1}>
           {/* ini perlu di ganti pake ukuran gambar */}
-          {newChildrenPrompt?.prompt?.id}
           <div
             className="snap-x snap-mandatory overflow-x-scroll scrollbar-hide gap-x-6 rounded-2xl mx-auto transition-all
             h-[calc(100vh-112px-226px)] sm:h-[calc(100vh-156px)]
@@ -253,7 +252,7 @@ function HorizontalSlider(props: {
         <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
           <div className="space-y-1 sm:space-y-2">
             <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-              {socketId} | {item.id} |{current.objectName}
+              {current.objectName}
             </h1>
             <div className="flex space-x-2">
               <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
@@ -321,7 +320,7 @@ function HorizontalSlider(props: {
 }
 
 HorizontalSlider.defaultProps = {
-  newChildrenPrompt: undefined,
+  newPrompt: undefined,
 };
 
 export default HorizontalSlider;
