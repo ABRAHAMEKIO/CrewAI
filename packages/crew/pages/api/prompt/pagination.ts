@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 
-import Prompt, { PromptAttributes } from '../../../db/models/prompt';
+import Prompt from '../../../db/models/prompt';
 
 // ref: https://www.npmjs.com/package/next-connect
 interface ExtendedRequest {
@@ -22,7 +22,6 @@ const apiRoute = nextConnect<ExtendedRequest, NextApiResponse>({
   },
 });
 
-// 'file' is params name
 apiRoute.get(async (req, res) => {
   const { page } = req.query;
   const limit = 20;

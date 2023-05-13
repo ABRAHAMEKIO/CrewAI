@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { PromptAttributes } from '../../db/models/prompt';
 
 export interface Request {
   cmd?: string;
@@ -25,10 +26,6 @@ export interface IsNaughtySuccessResponse {
   phrase: string;
 }
 
-interface ServerSuccessResponse {
-  data: SuccessResponse | IsNaughtySuccessResponse;
-}
-
 export interface WebhookSuccessResponse {
   content: string;
   imageUrl: string;
@@ -38,7 +35,9 @@ export interface WebhookSuccessResponse {
   ref: string;
   originatingMessageId: string;
   buttonMessageId: string;
+  prompt?: PromptAttributes;
 }
+
 export default class MidjourneyClient {
   BASE_URL = 'https://api.thenextleg.io/v2';
 

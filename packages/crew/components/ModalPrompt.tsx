@@ -1,21 +1,39 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CrossIcon } from './Icons';
+import { PromptAttributes } from '../db/models/prompt';
+import PromptClient from '../domain/prompt/promptClient';
 
-function ModalPrompt(props: {
-  prompt: string;
+function ModalPrompt({
+  prompt,
+  modalOpen,
+  socketId,
+  modalClose,
+  parentId,
+}: {
+  parentId: number;
+  prompt: PromptAttributes;
   modalOpen: boolean;
+  socketId: string;
   modalClose: () => void;
 }) {
-  const { prompt, modalOpen, modalClose } = props;
   const [text, setText] = useState<string>('');
 
   useEffect(() => {
-    setText(prompt);
+    setText(prompt.prompt);
   }, [prompt]);
 
-  async function handleSubmit(event): Promise<void> {
-    // logic here, or create function usable
+  async function handleSubmit(): Promise<void> {
+    const promptClient = new PromptClient();
+    await promptClient
+      .generate({
+        promptId: parentId,
+        msg: text,
+        socketId,
+      })
+      .then(() => {
+        modalClose();
+      });
   }
 
   return (
@@ -83,7 +101,7 @@ function ModalPrompt(props: {
                     <button
                       type="button"
                       className="bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)] rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white"
-                      onClick={(e) => handleSubmit(e)}
+                      onClick={() => handleSubmit()}
                     >
                       Generate Now
                     </button>
