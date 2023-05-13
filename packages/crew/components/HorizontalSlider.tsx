@@ -13,15 +13,16 @@ interface ItemInterface {
   prompt: string;
 }
 
-export interface NewChildrenPrompt {
-  prompt: PromptAttributes;
-}
-
 // eslint-disable-next-line no-shadow
 enum ImageOrientation {
   portrait,
   landscape,
   square,
+}
+
+interface ParamsGenerate {
+  msg: string;
+  promptId: number;
 }
 
 function HorizontalSlider(props: {
@@ -35,13 +36,15 @@ function HorizontalSlider(props: {
   };
   setOpenBottomSlideOver: (bool: boolean) => void;
   setOpenModalPrompt: (bool: boolean) => void;
-  newChildrenPrompt?: NewChildrenPrompt;
+  newChildrenPrompt?: PromptAttributes;
+  socketId: string;
 }) {
   const {
     item,
     setOpenBottomSlideOver,
     setOpenModalPrompt,
     newChildrenPrompt,
+    socketId,
   } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
@@ -62,8 +65,8 @@ function HorizontalSlider(props: {
   }, [item]);
 
   useEffect(() => {
-    if (item?.id === newChildrenPrompt?.prompt?.parentId) {
-      setAllItem((prevItem) => [...prevItem, newChildrenPrompt.prompt]);
+    if (item?.id === newChildrenPrompt?.parentId) {
+      setAllItem((prevItem) => [...prevItem, newChildrenPrompt]);
     }
   }, [newChildrenPrompt, item]);
 
@@ -250,7 +253,7 @@ function HorizontalSlider(props: {
         <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
           <div className="space-y-1 sm:space-y-2">
             <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-              {current.objectName}
+              {socketId} | {item.id} |{current.objectName}
             </h1>
             <div className="flex space-x-2">
               <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />

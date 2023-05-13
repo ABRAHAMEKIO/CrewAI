@@ -1,4 +1,5 @@
 import MidjourneyClient, {
+  IsNaughtySuccessResponse,
   SuccessResponse,
 } from '../../../domain/midjourney/midjourneyClient';
 import Webhook, { WebhookStep } from '../../../db/models/webhook';
@@ -6,7 +7,10 @@ import Webhook, { WebhookStep } from '../../../db/models/webhook';
 const AUTH_SECRET = process.env.AUTH_SECRET_THENEXTLEG;
 const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
 
-export default async function handler(req, res): Promise<SuccessResponse> {
+export default async function handler(
+  req,
+  res
+): Promise<SuccessResponse | IsNaughtySuccessResponse> {
   const {
     body: { msg, promptId, socketId },
   } = req;

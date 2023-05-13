@@ -4,7 +4,7 @@ import Wrap from '../../components/Wrap';
 import Nav from '../../components/Nav';
 import Section from '../../components/Section';
 import { PromptAttributes } from '../../db/models/prompt';
-import SocketClient from '../../components/SocketClient';
+import PromptContext from '../../context/prompt-context';
 
 import PromptClient, {
   PaginationSuccessResponse,
@@ -12,12 +12,10 @@ import PromptClient, {
 } from '../../domain/prompt/promptClient';
 import BottomSlideOver from '../../components/BottomSlideOver';
 import ModalPrompt from '../../components/ModalPrompt';
-import HorizontalSlider, {
-  NewChildrenPrompt,
-} from '../../components/HorizontalSlider';
+import HorizontalSlider from '../../components/HorizontalSlider';
 import { WebhookSuccessResponse } from '../../domain/midjourney/midjourneyClient';
 
-function Index() {
+function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [dataPrompt, setDataPrompt] = useState({
@@ -27,8 +25,6 @@ function Index() {
   const [current, setCurrent] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
-  const [newChildPrompt, setNewChildPrompt] =
-    useState<NewChildrenPrompt>(undefined);
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -141,20 +137,9 @@ function Index() {
     });
   }, [dataPrompt.page, dataPrompt.rows]);
 
-  function socketSuccessResponse(data: WebhookSuccessResponse) {
-    setNewChildPrompt({
-      prompt: data.prompt,
-    });
-  }
-
   return (
     <Wrap className="mx-auto relative">
       <>
-        <SocketClient
-          onSocketSuccessResponse={(success: WebhookSuccessResponse) =>
-            socketSuccessResponse(success)
-          }
-        />
         <div
           className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity"
           style={{
@@ -165,30 +150,36 @@ function Index() {
       </>
       <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
       <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
-        <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
-          <div
-            className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px] overflow-x-hidden"
-            ref={scrollRef}
-          >
-            {dataPrompt.rows.map((item, index) => {
-              return (
-                <div
-                  className="snap-start pt-[112px] sm:pt-[136px]"
-                  key={item.id}
-                  data-id={item.id}
-                  data-index={index}
-                >
-                  <HorizontalSlider
-                    newChildrenPrompt={newChildPrompt}
-                    item={item}
-                    setOpenBottomSlideOver={setOpenBottomSlideOver}
-                    setOpenModalPrompt={setOpenModalPrompt}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <PromptContext.Consumer>
+          {(newPrompt) => (
+            <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
+              <div
+                className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px] overflow-x-hidden"
+                ref={scrollRef}
+              >
+                {newPrompt?.id}
+                {dataPrompt.rows.map((item, index) => {
+                  return (
+                    <div
+                      className="snap-start pt-[112px] sm:pt-[136px]"
+                      key={item.id}
+                      data-id={item.id}
+                      data-index={index}
+                    >
+                      <HorizontalSlider
+                        socketId={socketId}
+                        newChildrenPrompt={newPrompt}
+                        item={item}
+                        setOpenBottomSlideOver={setOpenBottomSlideOver}
+                        setOpenModalPrompt={setOpenModalPrompt}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </PromptContext.Consumer>
       </Section>
 
       <BottomSlideOver
