@@ -29,3 +29,39 @@ html {
 .h-15 {
     height: 3.75rem; /* 60px */
 }
+
+.text-gray-130 {
+    color: #EBEBEB !important;
+}
+
+.bg-gray-130 {
+    background-color: #EBEBEB !important;
+}
+
+.text-gray-150 {
+    color: #D8D8D8 !important;
+}
+
+.bg-gray-150 {
+    background-color: #D8D8D8 !important;
+}
+
+.text-gray-170 {
+    color: #959595 !important;
+}
+
+.bg-gray-170 {
+    background-color: #959595 !important;
+}
+
+.text-black-150 {
+    color: #777777 !important;
+}
+
+.bg-black-150 {
+    background-color: #777777 !important;
+}
+
+.bg-primer {
+    background-image: linear-gradient(224.03deg, #211093 -1.74%, #A323A3 47.01%, #FFA01B 100%) !important;
+}

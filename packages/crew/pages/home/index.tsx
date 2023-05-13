@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
+import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/Wrap';
 import Nav from '../../components/Nav';
 import Section from '../../components/Section';
@@ -138,74 +139,81 @@ function Index({ socketId }: { socketId: string }) {
   }, [dataPrompt.page, dataPrompt.rows]);
 
   return (
-    <Wrap className="mx-auto relative">
-      <>
-        <div
-          className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity"
-          style={{
-            backgroundImage: `url(${current.imageUrl})`,
-          }}
-        />
-        <div className="absolute inset-0 -z-10 backdrop-blur-[35px]" />
-      </>
-      <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
-      <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
-        <PromptContext.Consumer>
-          {(newPrompt) => (
-            <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
-              <div
-                className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px] overflow-x-hidden"
-                ref={scrollRef}
-              >
-                {newPrompt?.id}
-                {dataPrompt.rows.map((item, index) => {
-                  return (
-                    <div
-                      className="snap-start pt-[112px] sm:pt-[136px]"
-                      key={item.id}
-                      data-id={item.id}
-                      data-index={index}
-                    >
-                      <HorizontalSlider
-                        socketId={socketId}
-                        newPrompt={newPrompt}
-                        item={item}
-                        setOpenBottomSlideOver={(prompt, bool) => {
-                          setModalData(prompt);
-                          setOpenBottomSlideOver(bool);
-                        }}
-                        setOpenModalPrompt={(prompt, bool) => {
-                          setModalData(prompt);
-                          setOpenModalPrompt(bool);
-                        }}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </PromptContext.Consumer>
-      </Section>
+    <LoadingContext.Consumer>
+      {({ loading, setLoading }) => (
+        <Wrap className="mx-auto relative">
+          <>
+            <div
+              className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity"
+              style={{
+                backgroundImage: `url(${current.imageUrl})`,
+              }}
+            />
+            <div className="absolute inset-0 -z-10 backdrop-blur-[35px]" />
+          </>
+          <Nav className="z-10 absolute mt-4 sm:mt-0 inset-x-0 bg-none" />
+          <Section className="container mx-auto sm:max-w-[64rem] sm:px-[2rem] xl:px-0">
+            <PromptContext.Consumer>
+              {(newPrompt) => (
+                <div className="h-[calc(100vh)] sm:h-[calc(100vh)] relative">
+                  <div
+                    className="mx-auto space-y-10 px-6 sm:px-0 overflow-y-scroll scrollbar-hide h-[calc(100vh)] snap-mandatory snap-y scroll-smooth gap-y-[112px] overflow-x-hidden"
+                    ref={scrollRef}
+                  >
+                    {dataPrompt.rows.map((item, index) => {
+                      return (
+                        <div
+                          className="snap-start pt-[112px] sm:pt-[136px]"
+                          key={item.id}
+                          data-id={item.id}
+                          data-index={index}
+                        >
+                          <HorizontalSlider
+                            loading={loading}
+                            setLoading={setLoading}
+                            socketId={socketId}
+                            newPrompt={newPrompt}
+                            item={item}
+                            setOpenBottomSlideOver={(prompt, bool) => {
+                              setModalData(prompt);
+                              setOpenBottomSlideOver(bool);
+                            }}
+                            setOpenModalPrompt={(prompt, bool) => {
+                              setModalData(prompt);
+                              setOpenModalPrompt(bool);
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </PromptContext.Consumer>
+          </Section>
 
-      <BottomSlideOver
-        parentId={current.id}
-        socketId={socketId}
-        prompt={modalData}
-        modalOpen={openBottomSlideOver}
-        modalClose={() => setOpenBottomSlideOver(false)}
-      />
-      <div />
+          <BottomSlideOver
+            loading={loading}
+            setLoading={setLoading}
+            parentId={current.id}
+            socketId={socketId}
+            prompt={modalData}
+            modalOpen={openBottomSlideOver}
+            modalClose={() => setOpenBottomSlideOver(false)}
+          />
 
-      <ModalPrompt
-        parentId={current.id}
-        socketId={socketId}
-        prompt={modalData}
-        modalOpen={openModalPrompt}
-        modalClose={() => setOpenModalPrompt(false)}
-      />
-      <div />
-    </Wrap>
+          <ModalPrompt
+            loading={loading}
+            setLoading={setLoading}
+            parentId={current.id}
+            socketId={socketId}
+            prompt={modalData}
+            modalOpen={openModalPrompt}
+            modalClose={() => setOpenModalPrompt(false)}
+          />
+        </Wrap>
+      )}
+    </LoadingContext.Consumer>
   );
 }
 

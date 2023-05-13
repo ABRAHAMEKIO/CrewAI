@@ -14,25 +14,23 @@ enum ImageOrientation {
   square,
 }
 
-interface ParamsGenerate {
-  msg: string;
-  promptId: number;
-}
-
-function HorizontalSlider(props: {
+function HorizontalSlider({
+  loading,
+  setLoading,
+  item,
+  setOpenBottomSlideOver,
+  setOpenModalPrompt,
+  newPrompt,
+  socketId,
+}: {
+  loading: boolean;
+  setLoading: (bool: boolean) => void;
   item: PromptAttributes;
   setOpenBottomSlideOver: (prompt: PromptAttributes, bool: boolean) => void;
   setOpenModalPrompt: (prompt: PromptAttributes, bool: boolean) => void;
   newPrompt?: PromptAttributes;
   socketId: string;
 }) {
-  const {
-    item,
-    setOpenBottomSlideOver,
-    setOpenModalPrompt,
-    newPrompt,
-    socketId,
-  } = props;
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
   const [ref3ImageSize, setRef3ImageSize] = useState([0, 0]);
@@ -197,6 +195,7 @@ function HorizontalSlider(props: {
   );
 
   async function handleSubmit() {
+    if (loading) return;
     const promptClient = new PromptClient();
     await promptClient.generate({
       promptId: item.id,
@@ -230,8 +229,8 @@ function HorizontalSlider(props: {
                   className="flex items-center rounded-2xl justify-center"
                   style={getStyle()}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   {/* mencoba biin objec contain untuk mulitple gambar varian version ratio */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     className="object-contain rounded-2xl mx-auto max-h-[calc(100vh)] max-w-[calc(100vw)] "
                     src={myItem.imageUrl}
@@ -295,14 +294,20 @@ function HorizontalSlider(props: {
             ].map((it) => {
               return (
                 <button
+                  disabled={loading}
                   onClick={it.onClick}
                   type="button"
                   key={it.name}
                   className={classNames(
-                    it.bgDark
-                      ? '!bg-black'
-                      : 'bg-[linear-gradient(224.03deg,#211093_-1.74%,#A323A3_47.01%,#FFA01B_100%)]',
-                    'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] text-white'
+                    loading
+                      ? 'text-white bg-gray-150'
+                      : classNames(
+                          it.bgDark
+                            ? 'text-white bg-black'
+                            : 'text-white bg-primer',
+                          ''
+                        ),
+                    'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px]'
                   )}
                 >
                   {it.name}
