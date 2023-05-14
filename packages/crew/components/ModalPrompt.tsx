@@ -27,7 +27,7 @@ function ModalPrompt({
     setText(prompt.prompt);
   }, [prompt]);
 
-  async function handleSubmit(): Promise<void> {
+  async function handleSubmit(modelType: string): Promise<void> {
     if (loading) return;
     setLoading(true);
     const promptClient = new PromptClient();
@@ -117,7 +117,7 @@ function ModalPrompt({
                           : 'text-white bg-primer',
                         'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px]'
                       )}
-                      onClick={() => handleSubmit()}
+                      onClick={() => handleSubmit(prompt.modelType)}
                     >
                       Generate Now
                     </button>

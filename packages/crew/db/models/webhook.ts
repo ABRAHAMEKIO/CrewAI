@@ -12,6 +12,7 @@ export interface WebhookAttributes {
   extendedPrompt?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
+  modelType?: string | null;
 }
 
 // eslint-disable-next-line no-shadow
@@ -38,6 +39,8 @@ class Webhook
   public prompt: string;
 
   public extendedPrompt: string;
+
+  public modelType: string;
 }
 
 Webhook.init(
@@ -68,6 +71,10 @@ Webhook.init(
     extendedPrompt: {
       allowNull: true,
       type: DataTypes.TEXT,
+    },
+    modelType: {
+      allowNull: true,
+      type: DataTypes.STRING,
     },
   },
   {

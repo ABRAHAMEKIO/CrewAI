@@ -32,6 +32,7 @@ export default async function handler(req, res) {
     parentId: webhookTable.promptId,
     objectName: parentPrompt.objectName,
     creatorAddress: parentPrompt.creatorAddress,
+    modelType: 'midjourney',
   });
 
   io.to(webhookTable.socketId).emit(MidjourneyCommand.ModelResults.toString(), {
