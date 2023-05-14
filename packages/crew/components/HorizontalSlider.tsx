@@ -202,6 +202,7 @@ function HorizontalSlider({
       promptId: item.id,
       msg: current.prompt,
       socketId,
+      modelType: current.modelType,
     });
   }
 

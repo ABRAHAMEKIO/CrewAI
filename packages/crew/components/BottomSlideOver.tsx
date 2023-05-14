@@ -36,6 +36,7 @@ function BottomSlideOver({
         promptId: parentId,
         msg: text,
         socketId,
+        modelType: prompt.modelType,
       })
       .then(() => {
         modalClose();

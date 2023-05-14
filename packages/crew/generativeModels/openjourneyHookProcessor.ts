@@ -36,6 +36,7 @@ class OpenHookProcessor implements HookProcessor {
       });
 
       if (this.io) {
+        console.log(`Sending to the socketId: ${webhookTable.socketId}`);
         this.io
           .to(webhookTable.socketId)
           .emit(MidjourneyCommand.ModelResults.toString(), {

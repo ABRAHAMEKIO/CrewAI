@@ -27,7 +27,7 @@ function ModalPrompt({
     setText(prompt.prompt);
   }, [prompt]);
 
-  async function handleSubmit(modelType: string): Promise<void> {
+  async function handleSubmit(): Promise<void> {
     if (loading) return;
     setLoading(true);
     const promptClient = new PromptClient();
@@ -36,6 +36,7 @@ function ModalPrompt({
         promptId: parentId,
         msg: text,
         socketId,
+        modelType: prompt.modelType,
       })
       .then(() => {
         modalClose();
@@ -117,7 +118,7 @@ function ModalPrompt({
                           : 'text-white bg-primer',
                         'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px]'
                       )}
-                      onClick={() => handleSubmit(prompt.modelType)}
+                      onClick={() => handleSubmit()}
                     >
                       Generate Now
                     </button>
