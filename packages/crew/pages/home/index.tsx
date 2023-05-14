@@ -23,6 +23,7 @@ function Index({ socketId }: { socketId: string }) {
     page: 0,
   });
   const [current, setCurrent] = useState<PromptAttributes>({});
+  const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
   const [modalData, setModalData] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
@@ -117,6 +118,7 @@ function Index({ socketId }: { socketId: string }) {
             const item = dataPrompt.rows.find((i) => i.id.toString() === id);
             if (item) {
               setCurrent(item);
+              setBackgroundImageUrl(item.imageUrl);
             }
             const len = dataPrompt.rows.length;
             if (len - parseInt(dataIndex, 10) === 5) {
@@ -146,7 +148,7 @@ function Index({ socketId }: { socketId: string }) {
             <div
               className="absolute inset-0 bg-center bg-cover -z-20 transition-all transition-opacity"
               style={{
-                backgroundImage: `url(${current.imageUrl})`,
+                backgroundImage: `url(${backgroundImageUrl})`,
               }}
             />
             <div className="absolute inset-0 -z-10 backdrop-blur-[35px]" />
@@ -182,6 +184,7 @@ function Index({ socketId }: { socketId: string }) {
                               setModalData(prompt);
                               setOpenModalPrompt(bool);
                             }}
+                            setBackgroundImageUrl={setBackgroundImageUrl}
                           />
                         </div>
                       );
