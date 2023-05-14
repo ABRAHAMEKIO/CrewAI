@@ -4,7 +4,11 @@ import OpenjourneyHookProcessor from './openjourneyHookProcessor';
 
 type MidjourneyHook = { buttonMessageId: string; ref: string };
 
-type OpenjourneyHook = { id: string; output: string[] };
+type OpenjourneyHook = {
+  id: string;
+  output: string[];
+  input: { prompt: string };
+};
 
 class HookFactory {
   static resolveHookProcessor(

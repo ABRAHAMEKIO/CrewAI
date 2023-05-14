@@ -13,6 +13,7 @@ export interface WebhookAttributes {
   createdAt?: Date;
   updatedAt?: Date;
   modelType?: string | null;
+  replicatemeGenId?: string | null;
 }
 
 // eslint-disable-next-line no-shadow
@@ -41,6 +42,8 @@ class Webhook
   public extendedPrompt: string;
 
   public modelType: string;
+
+  public replicatemeGenId: string;
 }
 
 Webhook.init(
@@ -73,6 +76,10 @@ Webhook.init(
       type: DataTypes.TEXT,
     },
     modelType: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    replicatemeGenId: {
       allowNull: true,
       type: DataTypes.STRING,
     },
