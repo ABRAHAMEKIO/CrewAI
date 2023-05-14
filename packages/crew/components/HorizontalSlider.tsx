@@ -196,6 +196,7 @@ function HorizontalSlider({
 
   async function handleSubmit() {
     if (loading) return;
+    setLoading(true);
     const promptClient = new PromptClient();
     await promptClient.generate({
       promptId: item.id,
