@@ -44,6 +44,8 @@ function HorizontalSlider({
 
   const [allItem, setAllItem] = useState([]);
   const [current, setCurrent] = useState<PromptAttributes>(item);
+  const [currentSlide, setCurrentSlide] = useState(1);
+  const [totalSlide, setTotalSlide] = useState(1);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
@@ -119,8 +121,14 @@ function HorizontalSlider({
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute('data-id');
-
-            const x = allItem.find((i) => i.id.toString() === id);
+            setTotalSlide(allItem.length);
+            const x = allItem.find((value, index) => {
+              if (value.id.toString() === id) {
+                setCurrentSlide(index + 1);
+                return value;
+              }
+              return null;
+            });
             if (x) {
               setCurrent(x);
             }
@@ -208,7 +216,7 @@ function HorizontalSlider({
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
-        <div className="sm:col-span-8 relative" ref={ref1}>
+        <div className="sm:col-span-8" ref={ref1}>
           {/* ini perlu di ganti pake ukuran gambar */}
           <div
             className="snap-x snap-mandatory overflow-x-scroll scrollbar-hide gap-x-6 rounded-2xl mx-auto transition-all
@@ -220,9 +228,6 @@ function HorizontalSlider({
               width: ref3ImageSize[0],
             }}
           >
-            <div style={getStyle()} className="absolute bg-gray-700 h-2 px-2">
-              <div className="h-1 w-[100px] bg-white" />
-            </div>
             {allItem.map((myItem) => (
               <div
                 className="snap-start flex items-center"
@@ -267,6 +272,7 @@ function HorizontalSlider({
               className="block sm:hidden"
             >
               <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                ({currentSlide}/{totalSlide}){' \u2022 '}
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 {current.prompt.length > 70
                   ? `${current.prompt.slice(0, 70)}...`
@@ -280,6 +286,7 @@ function HorizontalSlider({
               className="hidden sm:block sm:mt-4"
             >
               <p className="text-base font-normal text-left">
+                ({currentSlide}/{totalSlide}){' \u2022 '}
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 {current.prompt.length > 70
                   ? `${current.prompt.slice(0, 70)}...`
