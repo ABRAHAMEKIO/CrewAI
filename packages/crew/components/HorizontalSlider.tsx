@@ -265,9 +265,11 @@ function HorizontalSlider({
             >
               <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                {current.prompt.length > 70
-                  ? `${current.prompt.slice(0, 70)}...`
-                  : current.prompt}{' '}
+                {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
+                  current.prompt.length > 70
+                    ? `${current.prompt.slice(0, 70)}...`
+                    : current.prompt
+                }`}{' '}
                 <span className="font-bold">Edit Prompt</span>
               </p>
             </button>
@@ -278,9 +280,11 @@ function HorizontalSlider({
             >
               <p className="text-base font-normal text-left">
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                {current.prompt.length > 70
-                  ? `${current.prompt.slice(0, 70)}...`
-                  : current.prompt}{' '}
+                {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
+                  current.prompt.length > 70
+                    ? `${current.prompt.slice(0, 70)}...`
+                    : current.prompt
+                }`}{' '}
                 <span className="font-bold">Edit Prompt</span>
               </p>
             </button>
