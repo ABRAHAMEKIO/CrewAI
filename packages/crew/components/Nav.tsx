@@ -32,7 +32,7 @@ function Nav({ className }: { className?: string }) {
                   <div
                     className={classNames(
                       loading ? 'flex' : 'hidden',
-                      'absolute h-10 w-10 bg-red justify-center items-center'
+                      'absolute h-10 w-10 bg-gray-130 justify-center items-center rounded-full'
                     )}
                   >
                     <div className="relative h-8 w-8 flex justify-center items-center">
