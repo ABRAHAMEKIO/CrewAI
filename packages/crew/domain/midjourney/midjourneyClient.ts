@@ -26,16 +26,18 @@ export interface IsNaughtySuccessResponse {
   phrase: string;
 }
 
+// TODO: need to separate it from the OpenJourney usage in openjourneyHookProcessor.js
 export interface WebhookSuccessResponse {
-  content: string;
-  imageUrl: string;
-  buttons: string[];
-  createdAt: string;
-  responseAt: string;
-  ref: string;
-  originatingMessageId: string;
-  buttonMessageId: string;
+  content?: string;
+  imageUrl?: string;
+  buttons?: string[];
+  createdAt?: string;
+  responseAt?: string;
+  ref?: string;
+  originatingMessageId?: string;
+  buttonMessageId?: string;
   prompt?: PromptAttributes;
+  output?: string[];
 }
 
 export default class MidjourneyClient {

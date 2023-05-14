@@ -33,6 +33,7 @@ apiRoute.get(async (req, res) => {
       imageUrlIsUnique: true,
       parentId: null,
     },
+    order: [['modelType', 'DESC']],
     offset,
     limit,
   });

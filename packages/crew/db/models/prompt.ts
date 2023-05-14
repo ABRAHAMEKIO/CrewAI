@@ -36,6 +36,7 @@ export interface PromptAttributes {
   createdAt?: Date;
   updatedAt?: Date;
   SubPrompts?: SubPromptsAttributes[];
+  modelType?: string | null;
 }
 
 export type PromptInput = Optional<PromptAttributes, 'id'>;
@@ -76,6 +77,8 @@ class Prompt
   public extendedPrompt!: string;
 
   public readonly SubPrompts: SubPromptsAttributes[];
+
+  public modelType!: string;
 }
 
 Prompt.init(
@@ -133,6 +136,10 @@ Prompt.init(
     extendedPrompt: {
       allowNull: true,
       type: DataTypes.TEXT,
+    },
+    modelType: {
+      allowNull: true,
+      type: DataTypes.STRING,
     },
   },
   {
