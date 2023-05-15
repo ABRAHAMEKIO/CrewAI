@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
-
+import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 
 function classNames(...classes) {
@@ -266,50 +266,75 @@ function HorizontalSlider({
         </div>
 
         <div className="max-h-[calc(226px)] sm:max-h-full w-full text-white sm:col-span-4 sm:place-self-center">
-          <div className="space-y-1 sm:space-y-2">
-            <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-              {current.objectName}
-            </h1>
-            <div className="flex space-x-2">
-              <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
-              <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
-                {current.creatorAddress}
-              </p>
+          <div className="grid grid-cols-12">
+            <div className="col-span-10">
+              <div className="space-y-1 sm:space-y-2">
+                <h1 className="text-base font-bold sm:text-xl text-ellipsis overflow-hidden max-w-[16rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                  {current.objectName}
+                </h1>
+                <div className="flex space-x-2">
+                  <div className="rounded-full bg-gradient h-[14px] w-[14px] sm:h-5 sm:w-5" />
+                  <p className="font-normal text-xs sm:text-sm text-ellipsis overflow-hidden max-w-[12rem] sm:max-w-[4rem] md:max-w-[8rem] lg:max-w-[12rem]">
+                    {current.creatorAddress}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="col-span-2 text-right">
+              <span className="text-sm font-bold text-[#959595]">
+                {currentSlide}/{totalSlide}
+              </span>
             </div>
           </div>
           <div className="mt-4">
-            <button
-              onClick={() => setOpenBottomSlideOver(current, true)}
-              type="button"
-              className="block sm:hidden"
-            >
-              <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
-                ({currentSlide}/{totalSlide}){' \u2022 '}
-                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
-                  current.prompt.length > 70
-                    ? `${current.prompt.slice(0, 70)}...`
-                    : current.prompt
-                }`}{' '}
-                <span className="font-bold">Edit Prompt</span>
-              </p>
-            </button>
-            <button
-              onClick={() => setOpenModalPrompt(current, true)}
-              type="button"
-              className="hidden sm:block sm:mt-4"
-            >
-              <p className="text-base font-normal text-left">
-                ({currentSlide}/{totalSlide}){' \u2022 '}
-                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
-                  current.prompt.length > 70
-                    ? `${current.prompt.slice(0, 70)}...`
-                    : current.prompt
-                }`}{' '}
-                <span className="font-bold">Edit Prompt</span>
-              </p>
-            </button>
+            <div className="grid grid-cols-12 block sm:hidden">
+              <div className="col-span-10">
+                <button
+                  onClick={() => setOpenBottomSlideOver(current, true)}
+                  type="button"
+                >
+                  <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                    {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
+                      current.prompt.length > 70
+                        ? `${current.prompt.slice(0, 70)}...`
+                        : current.prompt
+                    }`}{' '}
+                    <span className="font-bold">Edit Prompt</span>
+                  </p>
+                </button>
+              </div>
+              <div className="col-span-2">
+                <button type="button" className="float-right">
+                  <ShareButtonIcon fill="white" />
+                </button>
+              </div>
+            </div>
+            <div className="hidden sm:block sm:mt-4">
+              <div className="grid grid-cols-12">
+                <div className="col-span-10">
+                  <button
+                    onClick={() => setOpenModalPrompt(current, true)}
+                    type="button"
+                  >
+                    <p className="text-base font-normal text-left">
+                      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                      {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
+                        current.prompt.length > 70
+                          ? `${current.prompt.slice(0, 70)}...`
+                          : current.prompt
+                      }`}{' '}
+                      <span className="font-bold">Edit Prompt</span>
+                    </p>
+                  </button>
+                </div>
+                <div className="col-span-2">
+                  <button type="button" className="float-right">
+                    <ShareButtonIcon fill="white" />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="mt-4 sm:mt-6">
             {[
