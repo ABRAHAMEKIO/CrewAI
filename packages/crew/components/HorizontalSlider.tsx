@@ -122,6 +122,11 @@ function HorizontalSlider({
 
             const x = allItem.find((i) => i.id.toString() === id);
             if (x) {
+              window.history.replaceState(
+                null,
+                `Hologram - ${x.prompt}`,
+                `?prompt_id=${x.id}`
+              );
               setCurrent(x);
             }
           }
