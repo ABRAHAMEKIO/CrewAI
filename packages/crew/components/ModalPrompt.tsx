@@ -36,6 +36,7 @@ function ModalPrompt({
         promptId: parentId,
         msg: text,
         socketId,
+        modelType: prompt.modelType,
       })
       .then(() => {
         modalClose();

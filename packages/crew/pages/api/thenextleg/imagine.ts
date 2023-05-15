@@ -28,6 +28,7 @@ export default async function handler(
     socketId,
     promptId,
     step: WebhookStep.create,
+    modelType: 'midjourney',
   });
 
   const midjourneyClient = new MidjourneyClient(AUTH_SECRET);
