@@ -15,6 +15,7 @@ export interface SubPromptsAttributes {
   imageUrlIsUnique?: boolean | null;
   parentId?: number | null;
   extendedPrompt?: string | null;
+  modelType?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
