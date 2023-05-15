@@ -44,6 +44,8 @@ function HorizontalSlider({
 
   const [allItem, setAllItem] = useState([]);
   const [current, setCurrent] = useState<PromptAttributes>(item);
+  const [currentSlide, setCurrentSlide] = useState(1);
+  const [totalSlide, setTotalSlide] = useState(1);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
@@ -119,8 +121,14 @@ function HorizontalSlider({
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute('data-id');
-
-            const x = allItem.find((i) => i.id.toString() === id);
+            setTotalSlide(allItem.length);
+            const x = allItem.find((value, index) => {
+              if (value.id.toString() === id) {
+                setCurrentSlide(index + 1);
+                return value;
+              }
+              return null;
+            });
             if (x) {
               setCurrent(x);
             }
@@ -265,6 +273,7 @@ function HorizontalSlider({
               className="block sm:hidden"
             >
               <p className="[@media(min-width:280px)]:text-[10px] [@media(min-width:389px)]:text-sm sm:text-base font-normal text-left">
+                ({currentSlide}/{totalSlide}){' \u2022 '}
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
                   current.prompt.length > 70
@@ -280,6 +289,7 @@ function HorizontalSlider({
               className="hidden sm:block sm:mt-4"
             >
               <p className="text-base font-normal text-left">
+                ({currentSlide}/{totalSlide}){' \u2022 '}
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 {`(${current.modelType === 'midjourney' ? 'MJ' : 'OJ'}) ${
                   current.prompt.length > 70
