@@ -61,12 +61,6 @@ function Nav({ className }: { className?: string }) {
                 )}
               </div>
 
-              <div className="flex items-center sm:static sm:inset-auto w-fit">
-                <div className="flex space-x-4">
-                  <ConnectWallet />
-                </div>
-              </div>
-
               {showFeature && (
                 <div className="lex items-center sm:static sm:inset-auto w-fit">
                   <div className="flex space-x-4">
