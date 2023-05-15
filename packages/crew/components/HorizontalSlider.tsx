@@ -22,6 +22,7 @@ function HorizontalSlider({
   setOpenModalPrompt,
   newPrompt,
   socketId,
+  setBackgroundImageUrl,
 }: {
   loading: boolean;
   setLoading: (bool: boolean) => void;
@@ -30,6 +31,7 @@ function HorizontalSlider({
   setOpenModalPrompt: (prompt: PromptAttributes, bool: boolean) => void;
   newPrompt?: PromptAttributes;
   socketId: string;
+  setBackgroundImageUrl: (imageUrl: string) => void;
 }) {
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
@@ -46,6 +48,10 @@ function HorizontalSlider({
   const [current, setCurrent] = useState<PromptAttributes>(item);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
+
+  useEffect(() => {
+    setBackgroundImageUrl(current.imageUrl);
+  }, [current.imageUrl, setBackgroundImageUrl]);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
