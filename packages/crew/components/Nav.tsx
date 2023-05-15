@@ -1,5 +1,8 @@
 import React from 'react';
 import { Disclosure } from '@headlessui/react';
+import { signOut, useSession } from 'next-auth/react';
+import { useBalance, useDisconnect } from 'wagmi';
+import { Link } from '@nextui-org/react';
 import LoadingContext from '../context/loading-context';
 import { LoadingIcon } from './Icons';
 import Section from './Section';
@@ -21,6 +24,10 @@ function classNames(...classes) {
 const showFeature = false;
 
 function Nav({ className }: { className?: string }) {
+  const { data } = useBalance();
+  const { data: session } = useSession();
+  const { disconnect } = useDisconnect();
+
   return (
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
       {({ open }) => (
@@ -80,11 +87,41 @@ function Nav({ className }: { className?: string }) {
                 )}
               </div>
 
-              <div className="flex items-center sm:static sm:inset-auto w-fit">
-                <div className="flex space-x-4">
-                  <ConnectWallet />
+              {!session && (
+                <div className="flex items-center sm:static sm:inset-auto w-fit">
+                  <div className="flex space-x-4">
+                    <ConnectWallet />
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {session?.user && (
+                <>
+                  {session.user.image && (
+                    <span
+                      style={{
+                        backgroundImage: `url('${session.user.image}')`,
+                      }}
+                    />
+                  )}
+                  <span>
+                    {data?.decimals.toString()}
+                    <small>Signed in as</small>
+                    <br />
+                    <strong>{session.user.email ?? session.user.name}</strong>
+                  </span>
+                  <Link
+                    href="/api/auth/signout"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      disconnect();
+                      signOut();
+                    }}
+                  >
+                    Sign out
+                  </Link>
+                </>
+              )}
 
               {showFeature && (
                 <div className="lex items-center sm:static sm:inset-auto w-fit">
