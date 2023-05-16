@@ -111,9 +111,10 @@ export default async function handler(
 
   const txReceipt = await provider.getTransaction(transactionHash);
   const { to, from } = txReceipt;
+  const addressKulkul = '0x2ab35CA8EFEbD8663B709160ACAcb160692dBfB1';
 
   // 1. transactionHash dipake berapa kali apakah 1? jika lebih maka error
-  if (!(creatorAddress === to)) {
+  if (!(to === addressKulkul)) {
     return res.status(200).json({ success: false });
   }
 
