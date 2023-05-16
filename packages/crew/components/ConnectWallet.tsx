@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 import { getCsrfToken, signIn, signOut, useSession } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import {
@@ -15,17 +16,18 @@ import { Menu, Transition } from '@headlessui/react';
 import { ArrowDownIcon } from './Icons';
 
 function ConnectWallet() {
-  const { data } = useBalance();
   const { signMessageAsync } = useSignMessage();
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
-  // eslint-disable-next-line object-shorthand
-  const balance = useBalance({ address: address });
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
   const { disconnect } = useDisconnect();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const balance = useBalance({
+    address: session?.user?.name as `0x${string}`,
+    watch: true,
+  });
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -52,16 +54,8 @@ function ConnectWallet() {
         signature,
         callbackUrl,
       });
-      // eslint-disable-next-line no-console
-      console.log({
-        // eslint-disable-next-line object-shorthand
-        address: address,
-        balanceDecimals: balance.data.decimals,
-        balanceFormatted: balance.data.formatted,
-        balanceSymbol: balance.data.symbol,
-      });
     } catch (error) {
-      window.alert(error);
+      console.log(error);
     }
   };
 
@@ -101,7 +95,7 @@ function ConnectWallet() {
           <div className="h-10">
             <Menu.Button
               type="button"
-              className="h-full inline-flex items-center gap-x-1.5 rounded-md bg-white p-2 text-sm font-semibold text-white shadow-sm shadow-[0px_4px_12px_rgba(0,0,0,0.1)] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white "
+              className="h-full inline-flex items-center gap-x-1.5 border-slate-200 rounded-md bg-white p-2 text-sm font-semibold text-white shadow-md hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <span className="sr-only">Open user menu</span>
               {/* disable until feature user profile delivered */}
@@ -112,8 +106,12 @@ function ConnectWallet() {
               {/*    alt={session.user.email ?? session.user.name} */}
               {/*  /> */}
               {/* )} */}
-              <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
-                {data?.decimals.toString()}
+              {balance && balance?.data && balance?.data?.formatted && (
+                <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
+                  {balance.data.formatted.slice(0, 6)} {balance.data.symbol}
+                </p>
+              )}
+              <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden hidden sm:block">
                 {session.user.email ?? session.user.name}
               </p>
               <ArrowDownIcon fill="#111827" size="16" />
@@ -131,7 +129,7 @@ function ConnectWallet() {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-22 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <Menu.Item>
                 {({ active }) => (
                   <Link

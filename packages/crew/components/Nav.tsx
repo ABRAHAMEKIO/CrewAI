@@ -28,20 +28,22 @@ function Nav({ className }: { className?: string }) {
             <div className="relative flex h-[4rem] items-center justify-between bg-white rounded-2xl py-3 px-4">
               <LoadingContext.Consumer>
                 {({ loading }) => (
-                  <div
-                    className={classNames(
-                      loading ? 'flex' : 'hidden',
-                      'absolute h-10 w-10 bg-gray-130 justify-center items-center rounded-full'
-                    )}
-                  >
-                    <div className="relative h-8 w-8 flex justify-center items-center">
-                      <LoadingIcon
-                        fill="#959595"
-                        size={32}
-                        className="absolute animate-spin"
-                      />
-                      {/* count of total image loading */}
-                      <span className="hidden text-xs font-bold">4</span>
+                  <div className={classNames(loading ? 'pr-2' : 'pr-0')}>
+                    <div
+                      className={classNames(
+                        loading ? 'flex' : 'hidden',
+                        'h-10 w-10 bg-gray-130 justify-center items-center rounded-full'
+                      )}
+                    >
+                      <div className="relative h-8 w-8 flex justify-center items-center">
+                        <LoadingIcon
+                          fill="#959595"
+                          size={32}
+                          className="absolute animate-spin"
+                        />
+                        {/* count of total image loading */}
+                        <span className="hidden text-xs font-bold">4</span>
+                      </div>
                     </div>
                   </div>
                 )}

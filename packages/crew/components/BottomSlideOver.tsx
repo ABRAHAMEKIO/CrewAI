@@ -31,7 +31,9 @@ function BottomSlideOver({
   async function handleSubmit(): Promise<void> {
     if (loading) return;
     setLoading(true);
-    const transaction = await sendTransaction('0.0000001');
+    const transaction = await sendTransaction('0.01');
+    // eslint-disable-next-line no-console
+    console.log({ transaction });
     if (transaction) {
       const promptClient = new PromptClient();
       const response = await promptClient.generate({
@@ -122,7 +124,7 @@ function BottomSlideOver({
                         )}
                         onClick={() => handleSubmit()}
                       >
-                        Generate Now
+                        Generate ($0.01 xDai)
                       </button>
                     </div>
                   </div>
