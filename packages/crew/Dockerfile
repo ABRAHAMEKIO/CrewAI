@@ -4,7 +4,7 @@ FROM node:16-alpine AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY . .
-RUN npm install --frozen-lockfile
+RUN npm install --legacy-peer-deps --frozen-lockfile
 RUN mkdir -p node_modules/.cache && chmod -R 777 node_modules/.cache
 
 # If using npm with a `package-lock.json` comment out above and use below instead
