@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { CrossIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import { PromptAttributes } from '../db/models/prompt';
+import sendTransaction from '../helpers/sendTransaction';
 
 function BottomSlideOver({
   loading,
@@ -28,19 +29,22 @@ function BottomSlideOver({
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
-    if (loading) return;
-    const promptClient = new PromptClient();
-    setLoading(true);
-    await promptClient
-      .generate({
-        promptId: parentId,
-        msg: text,
-        socketId,
-        modelType: prompt.modelType,
-      })
-      .then(() => {
-        modalClose();
-      });
+    const transaction = await sendTransaction('0.0000001');
+    if (transaction) {
+      if (loading) return;
+      const promptClient = new PromptClient();
+      setLoading(true);
+      await promptClient
+        .generate({
+          promptId: parentId,
+          msg: text,
+          socketId,
+          modelType: prompt.modelType,
+        })
+        .then(() => {
+          modalClose();
+        });
+    }
   }
 
   function classNames(...classes) {
