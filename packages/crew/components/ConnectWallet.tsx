@@ -1,3 +1,4 @@
+/* eslint-disable object-shorthand */
 import { getCsrfToken, signIn, signOut, useSession } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import {
@@ -15,7 +16,6 @@ import { Menu, Transition } from '@headlessui/react';
 import { ArrowDownIcon } from './Icons';
 
 function ConnectWallet() {
-  const { data } = useBalance();
   const { signMessageAsync } = useSignMessage();
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
@@ -25,7 +25,9 @@ function ConnectWallet() {
     connector: new InjectedConnector(),
   });
   const { disconnect } = useDisconnect();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const userAddress = session?.user?.name.slice(2, -1);
+  const { data } = useBalance({ address: `0x${userAddress}` });
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -61,16 +63,9 @@ function ConnectWallet() {
         balanceSymbol: balance.data.symbol,
       });
     } catch (error) {
-      window.alert(error);
+      console.log(error);
     }
   };
-
-  useEffect(() => {
-    if (isConnected && !session) {
-      handleLogin();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected]);
 
   return (
     <>
@@ -101,7 +96,7 @@ function ConnectWallet() {
           <div className="h-10">
             <Menu.Button
               type="button"
-              className="h-full inline-flex items-center gap-x-1.5 rounded-md bg-white p-2 text-sm font-semibold text-white shadow-sm shadow-[0px_4px_12px_rgba(0,0,0,0.1)] hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white "
+              className="h-full inline-flex items-center gap-x-1.5 border-slate-200 rounded-md bg-white p-2 text-sm font-semibold text-white shadow-md hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <span className="sr-only">Open user menu</span>
               {/* disable until feature user profile delivered */}
@@ -112,8 +107,12 @@ function ConnectWallet() {
               {/*    alt={session.user.email ?? session.user.name} */}
               {/*  /> */}
               {/* )} */}
+              {data && (
+                <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden hidden md:block">
+                  {data.formatted.toString().slice(0, 5)} {data.symbol}
+                </p>
+              )}
               <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
-                {data?.decimals.toString()}
                 {session.user.email ?? session.user.name}
               </p>
               <ArrowDownIcon fill="#111827" size="16" />
