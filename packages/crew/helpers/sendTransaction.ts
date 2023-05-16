@@ -10,7 +10,7 @@ async function sendTransaction(sendTokenAmount: string) {
 
   const rc = await tx.wait();
   if (rc.status === 1) {
-    return true;
+    return tx;
   }
 
   return false;

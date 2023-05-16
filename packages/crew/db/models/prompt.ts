@@ -1,6 +1,11 @@
 import { DataTypes, FloatDataType, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config/connection';
 
+export const ModelType = {
+  midJourney: 'midjourney',
+  openJourney: 'openjourney',
+};
+
 export interface SubPromptsAttributes {
   id?: number;
   prompt?: string | null;

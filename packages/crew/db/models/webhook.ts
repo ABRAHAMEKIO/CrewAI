@@ -14,6 +14,8 @@ export interface WebhookAttributes {
   updatedAt?: Date;
   modelType?: string | null;
   replicatemeGenId?: string | null;
+  transactionHash?: string;
+  creatorAddress?: string;
 }
 
 // eslint-disable-next-line no-shadow
@@ -44,6 +46,10 @@ class Webhook
   public modelType: string;
 
   public replicatemeGenId: string;
+
+  public transactionHash: string;
+
+  public creatorAddress: string;
 }
 
 Webhook.init(
@@ -80,6 +86,14 @@ Webhook.init(
       type: DataTypes.STRING,
     },
     replicatemeGenId: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    transactionHash: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    creatorAddress: {
       allowNull: true,
       type: DataTypes.STRING,
     },

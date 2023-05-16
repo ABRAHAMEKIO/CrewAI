@@ -210,17 +210,27 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
+    if (loading) return;
+    setLoading(true);
     const transaction = await sendTransaction('0.0000001');
+    // eslint-disable-next-line no-console
+    console.log({ transaction });
     if (transaction) {
-      if (loading) return;
-      setLoading(true);
-      const promptClient = new PromptClient();
-      await promptClient.generate({
-        promptId: item.id,
-        msg: current.prompt,
-        socketId,
-        modelType: current.modelType,
-      });
+      if ('hash' in transaction) {
+        const promptClient = new PromptClient();
+        const response = await promptClient.generate({
+          promptId: item.id,
+          msg: current.prompt,
+          socketId,
+          transactionHash: transaction.hash.toString(),
+        });
+
+        if ('success' in response && !response.success) {
+          setLoading(false);
+          // eslint-disable-next-line no-alert
+          window.alert('Generate Fail');
+        }
+      }
     }
   }
 

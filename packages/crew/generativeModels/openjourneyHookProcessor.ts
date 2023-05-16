@@ -39,7 +39,7 @@ class OpenHookProcessor implements HookProcessor {
         imageUrl,
         parentId: webhookTable.promptId,
         objectName: parentPrompt ? parentPrompt?.objectName : null,
-        creatorAddress: parentPrompt ? parentPrompt?.creatorAddress : null,
+        creatorAddress: webhookTable?.creatorAddress,
         modelType: 'openjourney',
       });
 

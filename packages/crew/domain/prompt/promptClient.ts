@@ -60,23 +60,18 @@ export default class PromptClient {
     promptId: number;
     msg: string;
     socketId: string;
-    modelType: string;
+    transactionHash: string;
   }): Promise<SuccessResponse | IsNaughtySuccessResponse> {
-    const { promptId, msg, socketId } = props;
+    const { promptId, msg, socketId, transactionHash } = props;
 
     const data = {
+      transactionHash,
       promptId,
       msg,
       socketId,
     };
 
-    // TODO: implement strategy pattern
-    let config;
-    if (props.modelType === 'midjourney') {
-      config = this.getConfig(data, 'api/thenextleg/imagine', 'POST', '');
-    } else {
-      config = this.getConfig(data, 'api/openjourney', 'POST', '');
-    }
+    const config = this.getConfig(data, 'api/prompt/generate', 'POST', '');
 
     const response = await axios.request<
       SuccessResponse | IsNaughtySuccessResponse
