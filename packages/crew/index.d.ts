@@ -6,3 +6,10 @@ declare module '*.svg' {
 }
 export { Header2 } from './components/Heading';
 export { Header1 } from './components/Heading';
+
+declare global {
+  interface Window {
+    ethereum: any;
+    ethersProvider: any;
+  }
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
 
 import PromptClient from '../domain/prompt/promptClient';
+import sendTransaction from '../helpers/sendTransaction';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -209,15 +210,21 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    if (loading) return;
-    setLoading(true);
-    const promptClient = new PromptClient();
-    await promptClient.generate({
-      promptId: item.id,
-      msg: current.prompt,
-      socketId,
-      modelType: current.modelType,
-    });
+    const transaction = await sendTransaction(
+      '0x2AA62e3f0e2722FA04B2ff0b7960DEd488400419',
+      '0.001'
+    );
+    if (transaction) {
+      if (loading) return;
+      setLoading(true);
+      const promptClient = new PromptClient();
+      await promptClient.generate({
+        promptId: item.id,
+        msg: current.prompt,
+        socketId,
+        modelType: current.modelType,
+      });
+    }
   }
 
   return (
