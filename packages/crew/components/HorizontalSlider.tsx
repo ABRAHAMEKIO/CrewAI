@@ -215,7 +215,7 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    const transaction = await sendTransaction('0.0000001');
+    const transaction = await sendTransaction('0.01');
     if (transaction) {
       if (loading) return;
       setLoading(true);
@@ -365,7 +365,7 @@ function HorizontalSlider({
           <div className="mt-4 sm:mt-6">
             {[
               {
-                name: 'Generate Now',
+                name: 'Generate ($0.01 xDai)',
                 bgDark: false,
                 onClick: () => handleSubmit(),
               },

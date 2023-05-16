@@ -29,7 +29,7 @@ function ModalPrompt({
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
-    const transaction = await sendTransaction('0.0000001');
+    const transaction = await sendTransaction('0.01');
     if (transaction) {
       if (loading) return;
       setLoading(true);
@@ -124,7 +124,7 @@ function ModalPrompt({
                       )}
                       onClick={() => handleSubmit()}
                     >
-                      Generate Now
+                      Generate ($0.01 xDai)
                     </button>
                   </div>
                 </div>
