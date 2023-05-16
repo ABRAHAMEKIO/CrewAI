@@ -136,11 +136,11 @@ function HorizontalSlider({
               return null;
             });
             if (x) {
-              window.history.replaceState(
-                null,
-                `Hologram - ${x.prompt}`,
-                `?prompt_id=${x.id}`
-              );
+              // window.history.replaceState(
+              //   null,
+              //   `Hologram - ${x.prompt}`,
+              //   `?prompt_id=${x.id}`
+              // );
               setCurrent(x);
             }
           }
@@ -295,7 +295,7 @@ function HorizontalSlider({
               </div>
             </div>
             <div className="col-span-2 text-right">
-              <span className="text-sm font-bold text-[#959595]">
+              <span className="text-sm font-bold text-gray-170">
                 {currentSlide}/{totalSlide}
               </span>
             </div>
