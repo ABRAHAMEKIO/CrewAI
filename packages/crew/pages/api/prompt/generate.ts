@@ -76,10 +76,7 @@ async function generateByMj({
   const { extendedPrompt } = prompt;
   const searchTerm = '--';
   const indexOfFirst = extendedPrompt.indexOf(searchTerm);
-  const changeMsg = msg.indexOf(searchTerm);
-  const promptMessage = `${msg.slice(0, changeMsg)} ${extendedPrompt.slice(
-    indexOfFirst
-  )}`;
+  const promptMessage = `${msg} ${extendedPrompt.slice(indexOfFirst)}`;
 
   const webhook = await Webhook.create({
     prompt: msg,
