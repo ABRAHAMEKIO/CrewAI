@@ -29,21 +29,31 @@ function BottomSlideOver({
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
+    if (loading) return;
+    setLoading(true);
     const transaction = await sendTransaction('0.01');
+    // eslint-disable-next-line no-console
+    console.log({ transaction });
     if (transaction) {
-      if (loading) return;
       const promptClient = new PromptClient();
-      setLoading(true);
-      await promptClient
-        .generate({
-          promptId: parentId,
-          msg: text,
-          socketId,
-          modelType: prompt.modelType,
-        })
-        .then(() => {
-          modalClose();
-        });
+      const response = await promptClient.generate({
+        promptId: parentId,
+        msg: text,
+        socketId,
+        transactionHash: transaction.hash.toString(),
+      });
+
+      if ('success' in response && !response.success) {
+        setLoading(false);
+        // eslint-disable-next-line no-alert
+        window.alert('Generate Fail');
+      }
+
+      modalClose();
+    } else {
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
     }
   }
 

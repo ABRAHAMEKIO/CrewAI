@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     imageUrl,
     parentId: webhookTable.promptId,
     objectName: parentPrompt.objectName,
-    creatorAddress: parentPrompt.creatorAddress,
+    creatorAddress: webhookTable.creatorAddress,
     modelType: 'midjourney',
   });
 
