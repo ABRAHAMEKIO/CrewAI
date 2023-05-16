@@ -468,6 +468,32 @@ export function CrossIcon({ fill, size, width = 24, height = 24, ...props }) {
   );
 }
 
+export function ArrowDownIcon({
+  fill = '#111827',
+  size,
+  width = 24,
+  height = 24,
+  ...props
+}) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      height={size || height}
+      width={size || width}
+      {...props}
+    >
+      <path
+        d="M12.6663 6L7.99967 10.6667L3.33301 6"
+        stroke={fill}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function LoadingTwIcon({
   fill,
   size,
@@ -531,6 +557,7 @@ const icons = {
   heart: <HeartIcon fill="var(--nextui-colors-secondary)" size={24} />,
   chat: <ChatIcon fill="var(--nextui-colors-secondary)" size={20} />,
   arrowUp: <ArrowUpIcon fill="var(--nextui-colors-secondary)" size={20} />,
+  arrowDown: <ArrowDownIcon fill="currentColor" size={16} />,
   copy: <CopyIcon fill="white" size={20} />,
   close: <CloseIcon fill="var(--nextui-colors-error)" size={20} />,
   plus: <PlusIcon fill="var(--nextui-colors-success)" size={20} />,

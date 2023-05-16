@@ -58,8 +58,12 @@ html {
     color: #777777 !important;
 }
 
-.bg-black-150 {
-    background-color: #777777 !important;
+.text-black-190 {
+    color: #101010 !important;
+}
+
+.bg-black-190 {
+    background-color: #101010 !important;
 }
 
 .bg-primer {
