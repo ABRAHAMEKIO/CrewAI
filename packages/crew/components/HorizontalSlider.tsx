@@ -225,6 +225,20 @@ function HorizontalSlider({
     });
   }
 
+  const handleShareButton = () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'Hologram AI',
+          url: window.location.href,
+        })
+        .then(() => {
+          console.log('Thanks for sharing!');
+        })
+        .catch(console.error);
+    }
+  };
+
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
       <div className="flex flex-col space-y-[32px] sm:space-y-0 sm:grid sm:gap-10 sm:grid-cols-12">
@@ -288,7 +302,7 @@ function HorizontalSlider({
           </div>
           <div className="mt-4">
             <div className="grid grid-cols-12 block sm:hidden">
-              <div className="col-span-10">
+              <div className="col-span-12">
                 <button
                   onClick={() => setOpenBottomSlideOver(current, true)}
                   type="button"
@@ -304,15 +318,19 @@ function HorizontalSlider({
                   </p>
                 </button>
               </div>
-              <div className="col-span-2">
-                <button type="button" className="float-right">
-                  <ShareButtonIcon fill="white" />
-                </button>
-              </div>
+              {/* <div className="col-span-2"> */}
+              {/*  <button */}
+              {/*    type="button" */}
+              {/*    onClick={handleShareButton} */}
+              {/*    className="float-right" */}
+              {/*  > */}
+              {/*    <ShareButtonIcon fill="white" /> */}
+              {/*  </button> */}
+              {/* </div> */}
             </div>
             <div className="hidden sm:block sm:mt-4">
               <div className="grid grid-cols-12">
-                <div className="col-span-10">
+                <div className="col-span-12">
                   <button
                     onClick={() => setOpenModalPrompt(current, true)}
                     type="button"
@@ -328,11 +346,15 @@ function HorizontalSlider({
                     </p>
                   </button>
                 </div>
-                <div className="col-span-2">
-                  <button type="button" className="float-right">
-                    <ShareButtonIcon fill="white" />
-                  </button>
-                </div>
+                {/* <div className="col-span-2"> */}
+                {/*  <button */}
+                {/*    type="button" */}
+                {/*    onClick={handleShareButton} */}
+                {/*    className="float-right" */}
+                {/*  > */}
+                {/*    <ShareButtonIcon fill="white" /> */}
+                {/*  </button> */}
+                {/* </div> */}
               </div>
             </div>
           </div>
