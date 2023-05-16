@@ -26,36 +26,38 @@ function Nav({ className }: { className?: string }) {
           <Section className="container max-w-[64rem] mx-auto px-[1.5rem] sm:pt-8 xl:px-0">
             {/* <div className="relative flex h-[4rem] sm:h-[4rem] items-center justify-between rounded-2xl py-3 px-4 border"> */}
             <div className="relative flex h-[4rem] items-center justify-between bg-white rounded-2xl py-3 px-4">
-              <div className="flex flex-1 items-center justify-between sm:items-stretch">
-                <div className="flex flex-shrink-0 items-center space-x-14">
-                  <LoadingContext.Consumer>
-                    {({ loading }) => (
-                      <div
-                        className={classNames(
-                          loading ? 'flex' : 'hidden',
-                          'absolute h-10 w-10 bg-gray-130 justify-center items-center rounded-full'
-                        )}
-                      >
-                        <div className="relative h-8 w-8 flex justify-center items-center">
-                          <LoadingIcon
-                            fill="#959595"
-                            size={32}
-                            className="absolute animate-spin"
-                          />
-                          {/* count of total image loading */}
-                          <span className="hidden text-xs font-bold">4</span>
-                        </div>
+              <LoadingContext.Consumer>
+                {({ loading }) => (
+                  <div className={classNames(loading ? 'pr-2' : 'pr-0')}>
+                    <div
+                      className={classNames(
+                        loading ? 'flex' : 'hidden',
+                        'h-10 w-10 bg-gray-130 justify-center items-center rounded-full'
+                      )}
+                    >
+                      <div className="relative h-8 w-8 flex justify-center items-center">
+                        <LoadingIcon
+                          fill="#959595"
+                          size={32}
+                          className="absolute animate-spin"
+                        />
+                        {/* count of total image loading */}
+                        <span className="hidden text-xs font-bold">4</span>
                       </div>
-                    )}
-                  </LoadingContext.Consumer>
-                  {showFeature && (
-                    <div className="absolute inset-y-0 left-0 flex items-center">
-                      {/* Mobile menu button */}
-                      <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                        <span className="sr-only">Open main menu</span>
-                      </Disclosure.Button>
                     </div>
-                  )}
+                  </div>
+                )}
+              </LoadingContext.Consumer>
+              {showFeature && (
+                <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                  {/* Mobile menu button */}
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span className="sr-only">Open main menu</span>
+                  </Disclosure.Button>
+                </div>
+              )}
+              <div className="flex flex-1 items-center justify-between sm:items-stretch">
+                <div className="flex flex-shrink-0 items-center space-x-4">
                   <h1 className="font-bold text-base sm:text-xl not-italic">
                     Hologram
                   </h1>
