@@ -114,7 +114,7 @@ function BottomSlideOver({
                         )}
                         onClick={() => handleSubmit()}
                       >
-                        Generate Now
+                        Generate ($0.01 xDai)
                       </button>
                     </div>
                   </div>

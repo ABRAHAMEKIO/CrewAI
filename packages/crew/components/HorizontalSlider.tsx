@@ -313,7 +313,7 @@ function HorizontalSlider({
           <div className="mt-4 sm:mt-6">
             {[
               {
-                name: 'Generate Now',
+                name: 'Generate ($0.01 xDai)',
                 bgDark: false,
                 onClick: () => handleSubmit(),
               },
