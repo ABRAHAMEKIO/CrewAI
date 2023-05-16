@@ -230,17 +230,21 @@ function HorizontalSlider({
           transactionHash: transaction.hash.toString(),
         });
 
+        setLoading(false);
+        if ('success' in response && response.success) {
+          return;
+        }
         if ('success' in response && !response.success) {
-          setLoading(false);
           // eslint-disable-next-line no-alert
           window.alert('Generate Fail');
+          return;
         }
       }
-    } else {
-      setLoading(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
     }
+
+    setLoading(false);
+    // eslint-disable-next-line no-alert
+    window.alert('Transaction Fail');
   }
 
   const handleShareButton = () => {

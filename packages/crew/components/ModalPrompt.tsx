@@ -44,18 +44,23 @@ function ModalPrompt({
         transactionHash: transaction.hash.toString(),
       });
 
-      if ('success' in response && !response.success) {
-        setLoading(false);
-        // eslint-disable-next-line no-alert
-        window.alert('Generate Fail');
+      modalClose();
+      setLoading(false);
+      if ('success' in response && response.success) {
+        return;
       }
 
-      modalClose();
-    } else {
-      setLoading(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
+      if ('success' in response && !response.success) {
+        // eslint-disable-next-line no-alert
+        window.alert('Generate Fail');
+        return;
+      }
     }
+
+    modalClose();
+    setLoading(false);
+    // eslint-disable-next-line no-alert
+    window.alert('Transaction Fail');
   }
 
   function classNames(...classes) {
