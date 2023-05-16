@@ -29,7 +29,7 @@ function BottomSlideOver({
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
-    const transaction = await sendTransaction('0.0000001');
+    const transaction = await sendTransaction('0.01');
     if (transaction) {
       if (loading) return;
       const promptClient = new PromptClient();
