@@ -210,10 +210,7 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    const transaction = await sendTransaction(
-      '0x2AA62e3f0e2722FA04B2ff0b7960DEd488400419',
-      '0.001'
-    );
+    const transaction = await sendTransaction('0.0000001');
     if (transaction) {
       if (loading) return;
       setLoading(true);
