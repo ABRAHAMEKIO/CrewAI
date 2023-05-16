@@ -30,6 +30,7 @@ function ModalPrompt({
 
   async function handleSubmit(): Promise<void> {
     if (loading) return;
+    setLoading(true);
     const transaction = await sendTransaction('0.0000001');
     if (transaction) {
       setLoading(true);
