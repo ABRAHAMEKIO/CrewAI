@@ -25,7 +25,7 @@ function ConnectWallet() {
   const { disconnect } = useDisconnect();
   const { data: session } = useSession();
   const balance = useBalance({
-    address: session?.user?.name,
+    address: session?.user?.name as `0x${string}`,
     watch: true,
   });
 
