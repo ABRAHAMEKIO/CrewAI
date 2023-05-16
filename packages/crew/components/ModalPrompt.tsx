@@ -45,12 +45,12 @@ function ModalPrompt({
       });
 
       modalClose();
-      setLoading(false);
       if ('success' in response && response.success) {
         return;
       }
 
       if ('success' in response && !response.success) {
+        setLoading(false);
         // eslint-disable-next-line no-alert
         window.alert('Generate Fail');
         return;

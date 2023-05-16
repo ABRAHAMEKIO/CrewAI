@@ -123,12 +123,12 @@ function HorizontalSlider({
   }, [item]);
 
   useEffect(() => {
+    setTotalSlide(allItem.length);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute('data-id');
-            setTotalSlide(allItem.length);
             const x = allItem.find((value, index) => {
               if (value.id.toString() === id) {
                 setCurrentSlide(index + 1);
@@ -230,11 +230,11 @@ function HorizontalSlider({
           transactionHash: transaction.hash.toString(),
         });
 
-        setLoading(false);
         if ('success' in response && response.success) {
           return;
         }
         if ('success' in response && !response.success) {
+          setLoading(false);
           // eslint-disable-next-line no-alert
           window.alert('Generate Fail');
           return;
