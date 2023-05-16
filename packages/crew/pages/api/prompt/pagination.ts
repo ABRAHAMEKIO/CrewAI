@@ -33,7 +33,10 @@ apiRoute.get(async (req, res) => {
       imageUrlIsUnique: true,
       parentId: null,
     },
-    order: [['modelType', 'DESC']],
+    order: [
+      ['modelType', 'DESC'],
+      ['SubPrompts', 'createdAt', 'ASC'],
+    ],
     offset,
     limit,
   });

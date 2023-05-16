@@ -49,6 +49,10 @@ function ModalPrompt({
       }
 
       modalClose();
+    } else {
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
     }
   }
 

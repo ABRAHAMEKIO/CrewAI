@@ -231,6 +231,10 @@ function HorizontalSlider({
           window.alert('Generate Fail');
         }
       }
+    } else {
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
     }
   }
 
