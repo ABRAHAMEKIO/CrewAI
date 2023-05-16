@@ -106,7 +106,7 @@ function ConnectWallet() {
               {/*    alt={session.user.email ?? session.user.name} */}
               {/*  /> */}
               {/* )} */}
-              {balance && (
+              {balance && balance?.data && balance?.data?.formatted && (
                 <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
                   {balance.data.formatted.slice(0, 6)} {balance.data.symbol}
                 </p>
