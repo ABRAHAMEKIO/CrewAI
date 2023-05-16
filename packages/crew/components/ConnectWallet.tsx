@@ -19,15 +19,15 @@ function ConnectWallet() {
   const { signMessageAsync } = useSignMessage();
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
-  // eslint-disable-next-line object-shorthand
-  const balance = useBalance({ address: address });
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
   const { disconnect } = useDisconnect();
   const { data: session } = useSession();
-  const userAddress = session?.user?.name.slice(2, -1);
-  const { data } = useBalance({ address: `0x${userAddress}` });
+  const balance = useBalance({
+    address: session?.user?.name,
+    watch: true,
+  });
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -54,18 +54,17 @@ function ConnectWallet() {
         signature,
         callbackUrl,
       });
-      // eslint-disable-next-line no-console
-      console.log({
-        // eslint-disable-next-line object-shorthand
-        address: address,
-        balanceDecimals: balance.data.decimals,
-        balanceFormatted: balance.data.formatted,
-        balanceSymbol: balance.data.symbol,
-      });
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (isConnected && !session) {
+      handleLogin();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected]);
 
   return (
     <>
@@ -107,12 +106,12 @@ function ConnectWallet() {
               {/*    alt={session.user.email ?? session.user.name} */}
               {/*  /> */}
               {/* )} */}
-              {data && (
-                <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden hidden md:block">
-                  {data.formatted.toString().slice(0, 5)} {data.symbol}
+              {balance && (
+                <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
+                  {balance.data.formatted.slice(0, 6)} {balance.data.symbol}
                 </p>
               )}
-              <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
+              <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden hidden sm:block">
                 {session.user.email ?? session.user.name}
               </p>
               <ArrowDownIcon fill="#111827" size="16" />
@@ -130,7 +129,7 @@ function ConnectWallet() {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-22 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <Menu.Item>
                 {({ active }) => (
                   <Link
