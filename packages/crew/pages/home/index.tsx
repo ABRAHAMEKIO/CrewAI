@@ -165,6 +165,7 @@ function Index({ socketId }: { socketId: string }) {
                     {dataPrompt.rows.map((item, index) => {
                       return (
                         <div
+                          id={item.id}
                           className="snap-start pt-[112px] sm:pt-[136px]"
                           key={item.id}
                           data-id={item.id}
