@@ -70,6 +70,29 @@ function HorizontalSlider({
     if (item?.id.toString() === newPrompt?.parentId.toString()) {
       setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
+    const timeOut = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('parent')) {
+        const interval = setInterval(() => {
+          const element = document.getElementById(
+            params.get('parent').toString()
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            if (params.has('child')) {
+              const child = document.getElementById(
+                `horizontal-${params.get('child')}`
+              );
+              if (child) {
+                child.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+            clearInterval(interval);
+            clearTimeout(timeOut);
+          }
+        }, 100);
+      }
+    }, 2000);
   }, [newPrompt, item]);
 
   // handle horizontal slider
@@ -315,6 +338,7 @@ function HorizontalSlider({
                 className="snap-start flex items-center"
                 key={myItem.id}
                 data-id={myItem.id}
+                id={`horizontal-${myItem.id}`}
               >
                 <div
                   className="flex items-center rounded-2xl justify-center"
