@@ -1,167 +1,106 @@
-/* eslint-disable object-shorthand */
-import { getCsrfToken, signIn, signOut, useSession } from 'next-auth/react';
-import { SiweMessage } from 'siwe';
-import {
-  useAccount,
-  useConnect,
-  useNetwork,
-  useSignMessage,
-  useBalance,
-  useDisconnect,
-} from 'wagmi';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import React, { useEffect, Fragment } from 'react';
-import { Link } from '@nextui-org/react';
-import { Menu, Transition } from '@headlessui/react';
-import { ArrowDownIcon } from './Icons';
+import React from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 function ConnectWallet() {
-  const { signMessageAsync } = useSignMessage();
-  const { chain } = useNetwork();
-  const { address, isConnected } = useAccount();
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  });
-  const { disconnect } = useDisconnect();
-  const { data: session } = useSession();
-  const balance = useBalance({
-    address: session?.user?.name as `0x${string}`,
-    watch: true,
-  });
-
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(' ');
-  }
-
-  const handleLogin = async () => {
-    try {
-      const callbackUrl = '/';
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address,
-        statement: 'Sign in with Ethereum to the app.',
-        uri: window.location.origin,
-        version: '1',
-        chainId: chain?.id,
-        nonce: await getCsrfToken(),
-      });
-      const signature = await signMessageAsync({
-        message: message.prepareMessage(),
-      });
-      await signIn('credentials', {
-        message: JSON.stringify(message),
-        redirect: false,
-        signature,
-        callbackUrl,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (isConnected && !session) {
-      handleLogin();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected]);
-
   return (
-    <>
-      {!session && (
-        <div className="flex items-center sm:static sm:inset-auto w-fit">
-          <div className="flex space-x-4">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                if (!isConnected) {
-                  connect();
-                } else {
-                  handleLogin();
-                }
-              }}
-              type="button"
-              className="bg-gray-900 text-white border rounded-lg px-[1.5rem] text-sm font-medium h-[2.5rem] sm:h-12 min-w-[117px]"
-            >
-              Connect Wallet
-            </button>
-          </div>
-        </div>
-      )}
+    <ConnectButton.Custom>
+      {({
+        account,
+        chain,
+        openAccountModal,
+        openChainModal,
+        openConnectModal,
+        authenticationStatus,
+        mounted,
+      }) => {
+        const ready = mounted && authenticationStatus !== 'loading';
+        const connected =
+          ready &&
+          account &&
+          chain &&
+          (!authenticationStatus || authenticationStatus === 'authenticated');
 
-      {/* Profile dropdown */}
-      {session?.user && (
-        <Menu as="div" className="relative">
-          <div className="h-10">
-            <Menu.Button
-              type="button"
-              className="h-full inline-flex items-center gap-x-1.5 border-slate-200 rounded-md bg-white p-2 text-sm font-semibold text-white shadow-md hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              <span className="sr-only">Open user menu</span>
-              {/* disable until feature user profile delivered */}
-              {/* {session.user.image && ( */}
-              {/*  <img */}
-              {/*    className="h-8 w-8 rounded-full" */}
-              {/*    src={getProfileImage(session.user.image)} */}
-              {/*    alt={session.user.email ?? session.user.name} */}
-              {/*  /> */}
-              {/* )} */}
-              {balance && balance?.data && balance?.data?.formatted && (
-                <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden">
-                  {balance.data.formatted.slice(0, 6)} {balance.data.symbol}
-                </p>
-              )}
-              <p className="w-[98px] text-black-190 text-ellipsis overflow-hidden hidden sm:block">
-                {session.user.email ?? session.user.name}
-              </p>
-              <ArrowDownIcon fill="#111827" size="16" />
-            </Menu.Button>
-            {/* <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"> */}
-
-            {/* </Menu.Button> */}
-          </div>
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+        return (
+          <div
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...(!ready && {
+              'aria-hidden': true,
+              style: {
+                opacity: 0,
+                pointerEvents: 'none',
+                userSelect: 'none',
+              },
+            })}
           >
-            <Menu.Items className="absolute right-0 z-10 mt-2 w-22 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
-                    href="/api/auth/signout"
-                    className={classNames(
-                      active ? 'bg-gray-100' : '',
-                      'block px-4 py-2 text-sm text-black-190'
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      disconnect();
-                      signOut();
-                    }}
+            {(() => {
+              if (!connected) {
+                return (
+                  <button
+                    onClick={openConnectModal}
+                    type="button"
+                    className="bg-gray-900 text-white border rounded-lg px-[1.5rem] text-sm font-medium h-[2.5rem] sm:h-12 min-w-[117px]"
                   >
-                    Sign out
-                  </Link>
-                )}
-              </Menu.Item>
-            </Menu.Items>
-          </Transition>
-        </Menu>
-      )}
-    </>
-  );
-}
+                    Connect Wallet
+                  </button>
+                );
+              }
 
-export async function getServerSideProps(context: any) {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context),
-    },
-  };
+              if (chain.unsupported) {
+                return (
+                  <button
+                    onClick={openChainModal}
+                    type="button"
+                    className="bg-red-500 text-white border rounded-lg px-[1.5rem] text-sm font-medium h-[2.5rem] sm:h-12 min-w-[117px]"
+                  >
+                    Wrong network
+                  </button>
+                );
+              }
+
+              return (
+                <div className="flex gap-3">
+                  <button
+                    onClick={openChainModal}
+                    type="button"
+                    className="h-full inline-flex items-center gap-x-1.5 border-slate-200 rounded-md bg-white p-2 text-sm font-semibold text-black-190 shadow-md hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-whit"
+                  >
+                    {chain.hasIcon && (
+                      <div className="overflow-hidden border-rounded-full">
+                        {chain.iconUrl && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            alt={chain.name ?? 'Chain icon'}
+                            src={chain.iconUrl}
+                            className="w-5"
+                          />
+                        )}
+                      </div>
+                    )}
+                    <div className="hidden sm:block">{chain.name}</div>
+                  </button>
+
+                  <button
+                    onClick={openAccountModal}
+                    type="button"
+                    className="h-full inline-flex items-center border-slate-200 rounded-md bg-white p-2 text-sm font-semibold text-black-190 shadow-md hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 text-center divide-x divide-gray-400">
+                      <div className="">
+                        {account.displayBalance ? account.displayBalance : ''}
+                      </div>
+                      <div className="px-[10px] hidden sm:block">
+                        {account.displayName}
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        );
+      }}
+    </ConnectButton.Custom>
+  );
 }
 
 export default ConnectWallet;

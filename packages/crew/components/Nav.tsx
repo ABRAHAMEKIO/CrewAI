@@ -3,6 +3,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import LoadingContext from '../context/loading-context';
 import { LoadingIcon } from './Icons';
 import Section from './Section';
+import ConnectWallet from './ConnectWallet';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -77,6 +78,12 @@ function Nav({ className }: { className?: string }) {
                     </div>
                   </div>
                 )}
+              </div>
+
+              <div className="flex items-center sm:static sm:inset-auto w-fit">
+                <div className="flex space-x-4">
+                  <ConnectWallet />
+                </div>
               </div>
 
               {showFeature && (

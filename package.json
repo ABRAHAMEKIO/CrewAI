@@ -14,7 +14,6 @@
     "@nextui-org/react": "^1.0.0-beta.12",
     "@nrwl/next": "^15.8.9",
     "@rainbow-me/rainbowkit": "^1.0.0",
-    "@rainbow-me/rainbowkit": "^1.0.0",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.2.0",
     "@sentry/nextjs": "^7.52.1",
     "awesome-debounce-promise": "^2.1.0",
@@ -48,7 +47,9 @@
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
     "tslib": "^2.3.0",
-    "use-constant": "^1.1.1"
+    "use-constant": "^1.1.1",
+    "viem": "^0.3.27",
+    "wagmi": "^1.0.5"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",

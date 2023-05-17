@@ -2,10 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
-import { getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { gnosis } from 'wagmi/chains';
+import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets';
+import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth';
+import {
+  connectorsForWallets,
+  RainbowKitProvider,
+} from '@rainbow-me/rainbowkit';
+import { gnosis, polygon } from 'wagmi/chains';
 import './styles.css';
 import 'tailwindcss/tailwind.css';
 import { MixpanelProvider } from 'react-mixpanel-browser';
@@ -28,14 +34,15 @@ const gnosisChain = {
 };
 
 const { chains, publicClient } = configureChains(
-  [gnosisChain],
+  [gnosisChain, polygon],
   [publicProvider()]
 );
-
-const { connectors } = getDefaultWallets({
-  appName: 'Crew AI',
-  chains,
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [metaMaskWallet({ chains })],
+  },
+]);
 
 const wagmiConfig = createConfig({
   autoConnect: true,
@@ -43,7 +50,12 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
-function CustomApp({ Component, pageProps }: AppProps) {
+function CustomApp({
+  Component,
+  pageProps,
+}: AppProps<{
+  session: Session;
+}>) {
   const [socketId, setSocketId] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -80,24 +92,31 @@ function CustomApp({ Component, pageProps }: AppProps) {
     <MixpanelProvider token={mixPanelId || ''}>
       <WagmiConfig config={wagmiConfig}>
         <SessionProvider session={pageProps.session} refetchInterval={0}>
-          <Head>
-            <title>Hologram</title>
-            <meta httpEquiv="ScreenOrientation" content="autoRotate:disabled" />
-          </Head>
-          <main className="app">
-            <PromptContext.Provider value={newPrompt}>
-              {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-              <LoadingContext.Provider value={{ loading, setLoading }}>
-                {/* eslint-disable react/jsx-props-no-spreading */}
-                <Component
-                  {...pageProps}
-                  socketId={socketId}
-                  newPrompt={newPrompt}
+          <RainbowKitSiweNextAuthProvider>
+            <RainbowKitProvider chains={chains}>
+              <Head>
+                <title>Hologram</title>
+                <meta
+                  httpEquiv="ScreenOrientation"
+                  content="autoRotate:disabled"
                 />
-                {/* set global socket id to component */}
-              </LoadingContext.Provider>
-            </PromptContext.Provider>
-          </main>
+              </Head>
+              <main className="app">
+                <PromptContext.Provider value={newPrompt}>
+                  {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+                  <LoadingContext.Provider value={{ loading, setLoading }}>
+                    {/* eslint-disable react/jsx-props-no-spreading */}
+                    <Component
+                      {...pageProps}
+                      socketId={socketId}
+                      newPrompt={newPrompt}
+                    />
+                    {/* set global socket id to component */}
+                  </LoadingContext.Provider>
+                </PromptContext.Provider>
+              </main>
+            </RainbowKitProvider>
+          </RainbowKitSiweNextAuthProvider>
         </SessionProvider>
       </WagmiConfig>
     </MixpanelProvider>
