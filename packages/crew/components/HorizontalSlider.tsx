@@ -112,12 +112,14 @@ function HorizontalSlider({
     };
 
     getMeta(item.imageUrl, (err, img) => {
-      if (img.naturalWidth > img.naturalHeight) {
-        setImageOrientation(ImageOrientation.landscape);
-      } else if (img.naturalWidth === img.naturalHeight) {
-        setImageOrientation(ImageOrientation.square);
-      } else {
-        setImageOrientation(ImageOrientation.portrait);
+      if (img) {
+        if (img.naturalWidth > img.naturalHeight) {
+          setImageOrientation(ImageOrientation.landscape);
+        } else if (img.naturalWidth === img.naturalHeight) {
+          setImageOrientation(ImageOrientation.square);
+        } else {
+          setImageOrientation(ImageOrientation.portrait);
+        }
       }
     });
   }, [item]);
