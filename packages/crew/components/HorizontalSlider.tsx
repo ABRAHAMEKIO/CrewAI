@@ -3,6 +3,7 @@ import { PromptAttributes } from '../db/models/prompt';
 import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
+import { server } from '../config';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -160,11 +161,6 @@ function HorizontalSlider({
               return null;
             });
             if (x) {
-              // window.history.replaceState(
-              //   null,
-              //   `Hologram - ${x.prompt}`,
-              //   `?prompt_id=${x.id}`
-              // );
               setCurrent(x);
             }
           }
@@ -272,10 +268,16 @@ function HorizontalSlider({
 
   const handleShareButton = () => {
     if (navigator.share) {
+      let param = '';
+      if (current.parentId) {
+        param = `?parent=${current.parentId}&child=${current.id}`;
+      } else {
+        param = `?parent=${current.id}`;
+      }
       navigator
         .share({
           title: 'Hologram AI',
-          url: window.location.href,
+          url: `${server}/${param}`,
         })
         .then(() => {
           console.log('Thanks for sharing!');
@@ -348,7 +350,7 @@ function HorizontalSlider({
           </div>
           <div className="mt-4">
             <div className="grid grid-cols-12 block sm:hidden">
-              <div className="col-span-12">
+              <div className="col-span-10">
                 <button
                   onClick={() => setOpenBottomSlideOver(current, true)}
                   type="button"
@@ -364,19 +366,19 @@ function HorizontalSlider({
                   </p>
                 </button>
               </div>
-              {/* <div className="col-span-2"> */}
-              {/*  <button */}
-              {/*    type="button" */}
-              {/*    onClick={handleShareButton} */}
-              {/*    className="float-right" */}
-              {/*  > */}
-              {/*    <ShareButtonIcon fill="white" /> */}
-              {/*  </button> */}
-              {/* </div> */}
+              <div className="col-span-2">
+                <button
+                  type="button"
+                  onClick={handleShareButton}
+                  className="float-right"
+                >
+                  <ShareButtonIcon fill="white" />
+                </button>
+              </div>
             </div>
             <div className="hidden sm:block sm:mt-4">
               <div className="grid grid-cols-12">
-                <div className="col-span-12">
+                <div className="col-span-10">
                   <button
                     onClick={() => setOpenModalPrompt(current, true)}
                     type="button"
@@ -392,15 +394,15 @@ function HorizontalSlider({
                     </p>
                   </button>
                 </div>
-                {/* <div className="col-span-2"> */}
-                {/*  <button */}
-                {/*    type="button" */}
-                {/*    onClick={handleShareButton} */}
-                {/*    className="float-right" */}
-                {/*  > */}
-                {/*    <ShareButtonIcon fill="white" /> */}
-                {/*  </button> */}
-                {/* </div> */}
+                <div className="col-span-2">
+                  <button
+                    type="button"
+                    onClick={handleShareButton}
+                    className="float-right"
+                  >
+                    <ShareButtonIcon fill="white" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
