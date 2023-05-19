@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNetwork, useAccount } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { PromptAttributes } from '../db/models/prompt';
-// import { ShareButtonIcon } from './Icons';
+import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
