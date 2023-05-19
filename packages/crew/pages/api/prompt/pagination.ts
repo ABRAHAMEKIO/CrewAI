@@ -24,20 +24,28 @@ const apiRoute = nextConnect<ExtendedRequest, NextApiResponse>({
 });
 
 apiRoute.get(async (req, res) => {
+  function isNotNullParent(parent) {
+    return parent && parent !== '' && parent !== null;
+  }
+
   const { page, parent } = req.query;
   const limit = 20;
   const offset = parseInt(page, 10) * limit;
 
+  const where = {
+    imageUrlIsUnique: true,
+    parentId: null,
+    id: { [Op.ne]: null },
+  };
+
+  if (isNotNullParent(parent)) {
+    where.id = { [Op.ne]: parent };
+  }
+
   const prompt = await Prompt.findAndCountAll({
     distinct: true,
     include: [{ model: Prompt, as: 'SubPrompts' }],
-    where: {
-      imageUrlIsUnique: true,
-      parentId: null,
-      id: {
-        [Op.ne]: parent && parent !== '' && parent !== null ? parent : null,
-      },
-    },
+    where,
     order: [
       ['modelType', 'DESC'],
       ['SubPrompts', 'createdAt', 'ASC'],
@@ -46,7 +54,7 @@ apiRoute.get(async (req, res) => {
     limit,
   });
 
-  if (parent && parent !== '' && parent !== null) {
+  if (isNotNullParent(parent)) {
     const firstRow = await Prompt.findAndCountAll({
       distinct: true,
       include: [{ model: Prompt, as: 'SubPrompts' }],
