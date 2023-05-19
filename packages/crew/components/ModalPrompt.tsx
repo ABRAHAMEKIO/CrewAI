@@ -1,5 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { useNetwork, useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { CrossIcon } from './Icons';
 import { PromptAttributes } from '../db/models/prompt';
 import PromptClient from '../domain/prompt/promptClient';
@@ -23,44 +25,51 @@ function ModalPrompt({
   modalClose: () => void;
 }) {
   const [text, setText] = useState<string>('');
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     setText(prompt.prompt);
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
-    if (loading) return;
-    setLoading(true);
-    const transaction = await sendTransaction('0.01');
-    // eslint-disable-next-line no-console
-    console.log({ transaction });
-    if (transaction) {
+    if (!address) {
+      openConnectModal();
+    } else {
+      if (loading) return;
       setLoading(true);
-      const promptClient = new PromptClient();
-      const response = await promptClient.generate({
-        promptId: parentId,
-        msg: text,
-        socketId,
-        transactionHash: transaction.hash.toString(),
-      });
+      const transaction = await sendTransaction('0.01');
+      // eslint-disable-next-line no-console
+      console.log({ transaction });
+      if (transaction) {
+        setLoading(true);
+        const promptClient = new PromptClient();
+        const response = await promptClient.generate({
+          promptId: parentId,
+          msg: text,
+          socketId,
+          transactionHash: transaction.hash.toString(),
+        });
+
+        modalClose();
+        if ('success' in response && response.success) {
+          return;
+        }
+
+        if ('success' in response && !response.success) {
+          setLoading(false);
+          // eslint-disable-next-line no-alert
+          window.alert('Generate Fail');
+          return;
+        }
+      }
 
       modalClose();
-      if ('success' in response && response.success) {
-        return;
-      }
-
-      if ('success' in response && !response.success) {
-        setLoading(false);
-        // eslint-disable-next-line no-alert
-        window.alert('Generate Fail');
-        return;
-      }
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
     }
-
-    modalClose();
-    setLoading(false);
-    // eslint-disable-next-line no-alert
-    window.alert('Transaction Fail');
   }
 
   function classNames(...classes) {
@@ -103,7 +112,7 @@ function ModalPrompt({
                       <div className="ml-3 flex h-7 items-center">
                         <button
                           type="button"
-                          className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                          className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-offset-0"
                           onClick={() => modalClose()}
                         >
                           <span className="sr-only">Close panel</span>
@@ -121,7 +130,7 @@ function ModalPrompt({
                     {/* Your content */}
                     <div className="border border-[#EBEBEB] ring-[#EBEBEB] rounded-lg h-[136px] p-4 ">
                       <textarea
-                        className="text-base h-full w-full focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                        className="text-base h-full w-full focus:outline-none focus:ring-0 focus:ring-offset-0"
                         style={{
                           resize: 'none',
                         }}
@@ -140,7 +149,15 @@ function ModalPrompt({
                       )}
                       onClick={() => handleSubmit()}
                     >
-                      Generate ($0.01 xDai)
+                      Generate (0.01
+                      {chain
+                        ? `${
+                            !chain.unsupported
+                              ? ` ${chain.nativeCurrency.symbol}`
+                              : ''
+                          }`
+                        : ''}
+                      )
                     </button>
                   </div>
                 </div>

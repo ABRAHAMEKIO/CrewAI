@@ -1,5 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { useNetwork, useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { CrossIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import { PromptAttributes } from '../db/models/prompt';
@@ -23,43 +25,50 @@ function BottomSlideOver({
   modalClose: () => void;
 }) {
   const [text, setText] = useState<string>('');
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     setText(prompt.prompt);
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
-    if (loading) return;
-    setLoading(true);
-    const transaction = await sendTransaction('0.01');
-    // eslint-disable-next-line no-console
-    console.log({ transaction });
-    if (transaction) {
-      const promptClient = new PromptClient();
-      const response = await promptClient.generate({
-        promptId: parentId,
-        msg: text,
-        socketId,
-        transactionHash: transaction.hash.toString(),
-      });
+    if (!address) {
+      openConnectModal();
+    } else {
+      if (loading) return;
+      setLoading(true);
+      const transaction = await sendTransaction('0.01');
+      // eslint-disable-next-line no-console
+      console.log({ transaction });
+      if (transaction) {
+        const promptClient = new PromptClient();
+        const response = await promptClient.generate({
+          promptId: parentId,
+          msg: text,
+          socketId,
+          transactionHash: transaction.hash.toString(),
+        });
+
+        modalClose();
+        if ('success' in response && response.success) {
+          return;
+        }
+
+        if ('success' in response && !response.success) {
+          setLoading(false);
+          // eslint-disable-next-line no-alert
+          window.alert('Generate Fail');
+          return;
+        }
+      }
 
       modalClose();
-      if ('success' in response && response.success) {
-        return;
-      }
-
-      if ('success' in response && !response.success) {
-        setLoading(false);
-        // eslint-disable-next-line no-alert
-        window.alert('Generate Fail');
-        return;
-      }
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
     }
-
-    modalClose();
-    setLoading(false);
-    // eslint-disable-next-line no-alert
-    window.alert('Transaction Fail');
   }
 
   function classNames(...classes) {
@@ -110,7 +119,7 @@ function BottomSlideOver({
                       {/* Your content */}
                       <div className="border border-[#EBEBEB] ring-[#EBEBEB] rounded-lg h-[104px] p-4">
                         <textarea
-                          className="text-sm h-full w-full focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                          className="text-sm h-full w-full focus:outline-none focus:ring-0 focus:ring-offset-0"
                           style={{
                             resize: 'none',
                           }}
@@ -129,7 +138,15 @@ function BottomSlideOver({
                         )}
                         onClick={() => handleSubmit()}
                       >
-                        Generate ($0.01 xDai)
+                        Generate (0.01
+                        {chain
+                          ? `${
+                              !chain.unsupported
+                                ? ` ${chain.nativeCurrency.symbol}`
+                                : ''
+                            }`
+                          : ''}
+                        )
                       </button>
                     </div>
                   </div>

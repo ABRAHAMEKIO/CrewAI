@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNetwork, useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { PromptAttributes } from '../db/models/prompt';
 import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
@@ -49,6 +51,10 @@ function HorizontalSlider({
   const [current, setCurrent] = useState<PromptAttributes>(item);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
+
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
@@ -215,36 +221,40 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    if (loading) return;
-    setLoading(true);
-    const transaction = await sendTransaction('0.01');
-    // eslint-disable-next-line no-console
-    console.log({ transaction });
-    if (transaction) {
-      if ('hash' in transaction) {
-        const promptClient = new PromptClient();
-        const response = await promptClient.generate({
-          promptId: item.id,
-          msg: current.prompt,
-          socketId,
-          transactionHash: transaction.hash.toString(),
-        });
+    if (!address) {
+      openConnectModal();
+    } else {
+      if (loading) return;
+      setLoading(true);
+      const transaction = await sendTransaction('0.01');
+      // eslint-disable-next-line no-console
+      console.log({ transaction });
+      if (transaction) {
+        if ('hash' in transaction) {
+          const promptClient = new PromptClient();
+          const response = await promptClient.generate({
+            promptId: item.id,
+            msg: current.prompt,
+            socketId,
+            transactionHash: transaction.hash.toString(),
+          });
 
-        if ('success' in response && response.success) {
-          return;
-        }
-        if ('success' in response && !response.success) {
-          setLoading(false);
-          // eslint-disable-next-line no-alert
-          window.alert('Generate Fail');
-          return;
+          if ('success' in response && response.success) {
+            return;
+          }
+          if ('success' in response && !response.success) {
+            setLoading(false);
+            // eslint-disable-next-line no-alert
+            window.alert('Generate Fail');
+            return;
+          }
         }
       }
-    }
 
-    setLoading(false);
-    // eslint-disable-next-line no-alert
-    window.alert('Transaction Fail');
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
+    }
   }
 
   const handleShareButton = () => {
@@ -383,7 +393,15 @@ function HorizontalSlider({
           <div className="mt-4 sm:mt-6">
             {[
               {
-                name: 'Generate ($0.01 xDai)',
+                name: `Generate (0.01${
+                  chain
+                    ? `${
+                        !chain.unsupported
+                          ? ` ${chain.nativeCurrency.symbol}`
+                          : ''
+                      }`
+                    : ''
+                })`,
                 bgDark: false,
                 onClick: () => handleSubmit(),
               },
