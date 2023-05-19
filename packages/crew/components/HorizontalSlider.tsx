@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
 // import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -49,6 +50,8 @@ function HorizontalSlider({
   const [current, setCurrent] = useState<PromptAttributes>(item);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
+
+  const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
@@ -245,10 +248,12 @@ function HorizontalSlider({
     }
 
     setLoading(false);
+    navNewPromptContext?.setIndicatorNewPromptDisplay(false);
     // eslint-disable-next-line no-alert
     window.alert('Transaction Fail');
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const handleShareButton = () => {
     if (navigator.share) {
       navigator
@@ -257,25 +262,29 @@ function HorizontalSlider({
           url: window.location.href,
         })
         .then(() => {
+          // eslint-disable-next-line no-console
           console.log('Thanks for sharing!');
         })
+        // eslint-disable-next-line no-console
         .catch(console.error);
     }
   };
 
-  function scrollToLast() {
+  function scrollToPrompt(promptId) {
     // console.log(ref2.current.childElementCount);
-    ref2.current?.lastElementChild?.scrollIntoView({
+    ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
       behavior: 'smooth',
     });
   }
 
-  // setelah ada newPrompt maka akan otomati ke scroll into view
   useEffect(() => {
-    if (newPrompt && allItem.find((i) => i.id === newPrompt.id)) {
-      scrollToLast();
+    if (
+      navNewPromptContext?.promptId &&
+      allItem.find((i) => i.id === navNewPromptContext?.promptId)
+    ) {
+      scrollToPrompt(navNewPromptContext?.promptId);
     }
-  }, [newPrompt, allItem]);
+  }, [allItem, navNewPromptContext?.promptId]);
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
