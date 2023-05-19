@@ -1,10 +1,10 @@
 // eslint-disable react/jsx-no-constructed-context-values
-import React, { useContext, useState, Fragment, useEffect } from 'react';
+import React, { useContext, Fragment, useEffect } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { LoadingIcon } from './Icons';
 import LoadingContext from '../context/loading-context';
 import PromptContext from '../context/prompt-context';
-import ScrollIntoPromptContext from '../context/scroll-into-prompt-context';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 import { classNames } from '../helpers/component';
 import { PromptAttributes } from '../db/models/prompt';
 
@@ -13,34 +13,36 @@ import { PromptAttributes } from '../db/models/prompt';
 function NavNewPrompt() {
   const { loading } = useContext(LoadingContext);
   const newPrompt = useContext<PromptAttributes>(PromptContext);
-  const { setPromptId } = useContext(ScrollIntoPromptContext);
-
-  const [badgeDisplay, setBadgeDisplay] = useState<boolean>(false);
+  const {
+    setPromptId,
+    indicatorNewPromptDisplay,
+    setIndicatorNewPromptDisplay,
+  } = useContext(NavNewPromptContext);
 
   function handleClickImageAfterLoading(promptId) {
     setPromptId(promptId);
-    setBadgeDisplay(false);
+    setIndicatorNewPromptDisplay(false);
   }
 
   useEffect(() => {
     if (loading) {
-      setBadgeDisplay(true);
+      setIndicatorNewPromptDisplay(true);
     }
     if (newPrompt) {
-      setBadgeDisplay(true);
+      setIndicatorNewPromptDisplay(true);
     }
-  }, [loading, newPrompt]);
+  }, [loading, newPrompt, setIndicatorNewPromptDisplay]);
 
   const showFeature = false;
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
-      {badgeDisplay && (
+      {indicatorNewPromptDisplay && (
         <Menu as="div" className="relative mr-2">
           <div>
-            {/* disabled={loading} */}
             <Menu.Button
+              disabled={loading}
               className="flex justify-center items-center rounded-full h-10 w-10 bg-gray-130 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
               onClick={() => handleClickImageAfterLoading(newPrompt?.id)}
             >

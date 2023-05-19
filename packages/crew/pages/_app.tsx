@@ -15,7 +15,7 @@ import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
-import ScrollIntoPromptContext from '../context/scroll-into-prompt-context';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -79,11 +79,15 @@ function CustomApp({ Component, pageProps }: AppProps) {
   }, []);
 
   const [promptId, setPromptId] = useState<number>(null);
+  const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
+    useState<boolean>(null);
 
   // eslint-disable-next-line react/jsx-no-constructed-context-values
-  const sipContextValue = {
+  const NavNewPromptContextValue = {
     promptId,
     setPromptId,
+    indicatorNewPromptDisplay,
+    setIndicatorNewPromptDisplay,
   };
 
   return (
@@ -98,7 +102,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
             <PromptContext.Provider value={newPrompt}>
               {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
               <LoadingContext.Provider value={{ loading, setLoading }}>
-                <ScrollIntoPromptContext.Provider value={sipContextValue}>
+                <NavNewPromptContext.Provider value={NavNewPromptContextValue}>
                   {/* eslint-disable react/jsx-props-no-spreading */}
                   <Component
                     {...pageProps}
@@ -106,7 +110,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
                     newPrompt={newPrompt}
                   />
                   {/* set global socket id to component */}
-                </ScrollIntoPromptContext.Provider>
+                </NavNewPromptContext.Provider>
               </LoadingContext.Provider>
             </PromptContext.Provider>
           </main>

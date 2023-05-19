@@ -3,8 +3,7 @@ import { PromptAttributes } from '../db/models/prompt';
 // import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
-import LoadingContext from '../context/loading-context';
-import ScrollIntoPromptContext from '../context/scroll-into-prompt-context';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -52,7 +51,7 @@ function HorizontalSlider({
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
 
-  const scrollIntoPromptContext = useContext(ScrollIntoPromptContext);
+  const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
@@ -249,10 +248,12 @@ function HorizontalSlider({
     }
 
     setLoading(false);
+    navNewPromptContext?.setIndicatorNewPromptDisplay(false);
     // eslint-disable-next-line no-alert
     window.alert('Transaction Fail');
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const handleShareButton = () => {
     if (navigator.share) {
       navigator
@@ -261,13 +262,15 @@ function HorizontalSlider({
           url: window.location.href,
         })
         .then(() => {
+          // eslint-disable-next-line no-console
           console.log('Thanks for sharing!');
         })
+        // eslint-disable-next-line no-console
         .catch(console.error);
     }
   };
 
-  function scrollToLast(promptId) {
+  function scrollToPrompt(promptId) {
     // console.log(ref2.current.childElementCount);
     ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
       behavior: 'smooth',
@@ -276,12 +279,12 @@ function HorizontalSlider({
 
   useEffect(() => {
     if (
-      scrollIntoPromptContext?.promptId &&
-      allItem.find((i) => i.id === scrollIntoPromptContext?.promptId)
+      navNewPromptContext?.promptId &&
+      allItem.find((i) => i.id === navNewPromptContext?.promptId)
     ) {
-      scrollToLast(scrollIntoPromptContext?.promptId);
+      scrollToPrompt(navNewPromptContext?.promptId);
     }
-  }, [allItem, scrollIntoPromptContext?.promptId]);
+  }, [allItem, navNewPromptContext?.promptId]);
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
