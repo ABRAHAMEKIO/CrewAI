@@ -44,11 +44,14 @@ export default class PromptClient {
 
   async pagination({
     page,
+    parent,
   }: {
     page: number;
+    parent: string;
   }): Promise<PaginationSuccessResponse | ErrorResponse> {
     const config = this.getConfig({}, `api/prompt/pagination`, 'GET', {
       page,
+      parent,
     });
     const response = await axios.request<
       PaginationSuccessResponse | ErrorResponse

@@ -63,8 +63,10 @@ function HorizontalSlider({
     if (item?.id.toString() === newPrompt?.parentId.toString()) {
       setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
+    const querySearch = window.location.search;
+    window.history.replaceState(null, null, `/`);
     const timeOut = setTimeout(() => {
-      const params = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(querySearch);
       if (params.has('parent')) {
         const interval = setInterval(() => {
           const element = document.getElementById(
@@ -83,7 +85,7 @@ function HorizontalSlider({
             clearInterval(interval);
             clearTimeout(timeOut);
           }
-        }, 100);
+        }, 200);
       }
     }, 2000);
   }, [newPrompt, item]);
@@ -280,7 +282,7 @@ function HorizontalSlider({
       });
     } else {
       navigator.clipboard.writeText(`${server}/${param}`);
-      alert('Link copied!');
+      window.alert('Link copied!');
     }
   };
 

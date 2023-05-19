@@ -41,9 +41,14 @@ function Index({ socketId }: { socketId: string }) {
     const promptClient1 = new PromptClient();
     // fetch data
     const dataFetch = async () => {
+      const params = new URLSearchParams(window.location.search);
+      let parent = null;
+      if (params.has('parent')) {
+        parent = params.get('parent');
+      }
       const promptPaginationResponse:
         | PaginationSuccessResponse
-        | ErrorResponse = await promptClient1.pagination({ page: 0 });
+        | ErrorResponse = await promptClient1.pagination({ page: 0, parent });
 
       if (
         'error' in promptPaginationResponse &&
@@ -74,10 +79,16 @@ function Index({ socketId }: { socketId: string }) {
     const promptClient2 = new PromptClient();
     const limit = 20;
     const dataFetch = async (page: number) => {
+      const params = new URLSearchParams(window.location.search);
+      let parent = null;
+      if (params.has('parent')) {
+        parent = params.get('parent');
+      }
       const promptPaginationResponse:
         | PaginationSuccessResponse
         | ErrorResponse = await promptClient2.pagination({
         page,
+        parent,
       });
 
       if (
