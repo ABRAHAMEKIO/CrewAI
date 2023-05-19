@@ -6,7 +6,10 @@ import type { Session } from 'next-auth';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets';
-import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth';
+import {
+  RainbowKitSiweNextAuthProvider,
+  GetSiweMessageOptions,
+} from '@rainbow-me/rainbowkit-siwe-next-auth';
 import {
   connectorsForWallets,
   RainbowKitProvider,
@@ -48,6 +51,10 @@ const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
   publicClient,
+});
+
+const getSiweMessageOptions: GetSiweMessageOptions = () => ({
+  statement: 'You are going to connect your wallet and signed in to Hologram.',
 });
 
 function CustomApp({
@@ -92,7 +99,9 @@ function CustomApp({
     <MixpanelProvider token={mixPanelId || ''}>
       <WagmiConfig config={wagmiConfig}>
         <SessionProvider session={pageProps.session} refetchInterval={0}>
-          <RainbowKitSiweNextAuthProvider>
+          <RainbowKitSiweNextAuthProvider
+            getSiweMessageOptions={getSiweMessageOptions}
+          >
             <RainbowKitProvider chains={chains}>
               <Head>
                 <title>Hologram</title>
