@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
-import { ShareButtonIcon } from './Icons';
+// import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 
@@ -260,6 +260,20 @@ function HorizontalSlider({
         .catch(console.error);
     }
   };
+
+  function scrollToLast() {
+    // console.log(ref2.current.childElementCount);
+    ref2.current?.lastElementChild?.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
+
+  // setelah ada newPrompt maka akan otomati ke scroll into view
+  useEffect(() => {
+    if (newPrompt && allItem.find((i) => i.id === newPrompt.id)) {
+      scrollToLast();
+    }
+  }, [newPrompt, allItem]);
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
