@@ -15,6 +15,7 @@ import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
+import ScrollIntoPromptContext from '../context/scroll-into-prompt-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -76,6 +77,15 @@ function CustomApp({ Component, pageProps }: AppProps) {
         console.error(e);
       });
   }, []);
+
+  const [promptId, setPromptId] = useState<number>(null);
+
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
+  const sipContextValue = {
+    promptId,
+    setPromptId,
+  };
+
   return (
     <MixpanelProvider token={mixPanelId || ''}>
       <WagmiConfig config={wagmiConfig}>
@@ -88,13 +98,15 @@ function CustomApp({ Component, pageProps }: AppProps) {
             <PromptContext.Provider value={newPrompt}>
               {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
               <LoadingContext.Provider value={{ loading, setLoading }}>
-                {/* eslint-disable react/jsx-props-no-spreading */}
-                <Component
-                  {...pageProps}
-                  socketId={socketId}
-                  newPrompt={newPrompt}
-                />
-                {/* set global socket id to component */}
+                <ScrollIntoPromptContext.Provider value={sipContextValue}>
+                  {/* eslint-disable react/jsx-props-no-spreading */}
+                  <Component
+                    {...pageProps}
+                    socketId={socketId}
+                    newPrompt={newPrompt}
+                  />
+                  {/* set global socket id to component */}
+                </ScrollIntoPromptContext.Provider>
               </LoadingContext.Provider>
             </PromptContext.Provider>
           </main>

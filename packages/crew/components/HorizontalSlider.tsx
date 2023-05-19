@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { PromptAttributes } from '../db/models/prompt';
 // import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
+import LoadingContext from '../context/loading-context';
+import ScrollIntoPromptContext from '../context/scroll-into-prompt-context';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -49,6 +51,8 @@ function HorizontalSlider({
   const [current, setCurrent] = useState<PromptAttributes>(item);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
+
+  const scrollIntoPromptContext = useContext(ScrollIntoPromptContext);
 
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
@@ -263,19 +267,21 @@ function HorizontalSlider({
     }
   };
 
-  function scrollToLast() {
+  function scrollToLast(promptId) {
     // console.log(ref2.current.childElementCount);
-    ref2.current?.lastElementChild?.scrollIntoView({
+    ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
       behavior: 'smooth',
     });
   }
 
-  // setelah ada newPrompt maka akan otomati ke scroll into view
   useEffect(() => {
-    if (newPrompt && allItem.find((i) => i.id === newPrompt.id)) {
-      scrollToLast();
+    if (
+      scrollIntoPromptContext?.promptId &&
+      allItem.find((i) => i.id === scrollIntoPromptContext?.promptId)
+    ) {
+      scrollToLast(scrollIntoPromptContext?.promptId);
     }
-  }, [newPrompt, allItem]);
+  }, [allItem, scrollIntoPromptContext?.promptId]);
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">
