@@ -267,22 +267,20 @@ function HorizontalSlider({
   }
 
   const handleShareButton = () => {
+    let param = '';
+    if (current.parentId) {
+      param = `?parent=${current.parentId}&child=${current.id}`;
+    } else {
+      param = `?parent=${current.id}`;
+    }
     if (navigator.share) {
-      let param = '';
-      if (current.parentId) {
-        param = `?parent=${current.parentId}&child=${current.id}`;
-      } else {
-        param = `?parent=${current.id}`;
-      }
-      navigator
-        .share({
-          title: 'Hologram AI',
-          url: `${server}/${param}`,
-        })
-        .then(() => {
-          console.log('Thanks for sharing!');
-        })
-        .catch(console.error);
+      navigator.share({
+        title: 'Hologram AI',
+        url: `${server}/${param}`,
+      });
+    } else {
+      navigator.clipboard.writeText(`${server}/${param}`);
+      alert('Link copied!');
     }
   };
 
