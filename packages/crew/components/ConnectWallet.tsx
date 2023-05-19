@@ -46,6 +46,7 @@ function ConnectWallet() {
               }
 
               if (chain.unsupported) {
+                openChainModal();
                 return (
                   <button
                     onClick={openChainModal}
