@@ -4,6 +4,7 @@ import LoadingContext from '../context/loading-context';
 import { LoadingIcon } from './Icons';
 import Section from './Section';
 import ConnectWallet from './ConnectWallet';
+import NavNewPrompt from './NavNewPrompt';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -26,28 +27,8 @@ function Nav({ className }: { className?: string }) {
           <Section className="container max-w-[64rem] mx-auto px-[1.5rem] sm:pt-8 xl:px-0">
             {/* <div className="relative flex h-[4rem] sm:h-[4rem] items-center justify-between rounded-2xl py-3 px-4 border"> */}
             <div className="relative flex h-[4rem] items-center justify-between bg-white rounded-2xl py-3 px-4">
-              <LoadingContext.Consumer>
-                {({ loading }) => (
-                  <div className={classNames(loading ? 'pr-2' : 'pr-0')}>
-                    <div
-                      className={classNames(
-                        loading ? 'flex' : 'hidden',
-                        'h-10 w-10 bg-gray-130 justify-center items-center rounded-full'
-                      )}
-                    >
-                      <div className="relative h-8 w-8 flex justify-center items-center">
-                        <LoadingIcon
-                          fill="#959595"
-                          size={32}
-                          className="absolute animate-spin"
-                        />
-                        {/* count of total image loading */}
-                        <span className="hidden text-xs font-bold">4</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </LoadingContext.Consumer>
+              <NavNewPrompt />
+
               {showFeature && (
                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                   {/* Mobile menu button */}
