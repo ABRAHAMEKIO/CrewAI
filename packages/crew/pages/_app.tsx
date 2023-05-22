@@ -128,7 +128,9 @@ function CustomApp({
                 <PromptContext.Provider value={newPrompt}>
                   {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
                   <LoadingContext.Provider value={{ loading, setLoading }}>
-                    <NavNewPromptContext.Provider value={NavNewPromptContextValue}>
+                    <NavNewPromptContext.Provider
+                      value={NavNewPromptContextValue}
+                    >
                       {/* eslint-disable react/jsx-props-no-spreading */}
                       <Component
                         {...pageProps}
