@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
 import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/Wrap';
@@ -14,6 +14,8 @@ import PromptClient, {
 import BottomSlideOver from '../../components/BottomSlideOver';
 import ModalPrompt from '../../components/ModalPrompt';
 import HorizontalSlider from '../../components/HorizontalSlider';
+
+const promptClient = new PromptClient();
 
 function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
@@ -38,48 +40,12 @@ function Index({ socketId }: { socketId: string }) {
     }
   });
 
-  useEffect(() => {
-    const promptClient1 = new PromptClient();
-    // fetch data
-    const dataFetch = async () => {
+  const limit = 20;
+  const dataFetch = useCallback(
+    async (page: number) => {
       const promptPaginationResponse:
         | PaginationSuccessResponse
-        | ErrorResponse = await promptClient1.pagination({
-        page: randomNumber,
-      });
-
-      if (
-        'error' in promptPaginationResponse &&
-        promptPaginationResponse.error
-      ) {
-        // setError(true);
-        // setErrorMessage(promptPaginationResponse.error);
-        // setLoading(false);
-      } else {
-        // setLoading(true);
-      }
-      if (
-        'prompt' in promptPaginationResponse &&
-        promptPaginationResponse.prompt
-      ) {
-        setDataPrompt(() => ({
-          rows: promptPaginationResponse.prompt.rows,
-          page: randomNumber,
-        }));
-        setCurrent(promptPaginationResponse.prompt.rows[0]);
-      }
-    };
-
-    dataFetch().then((r) => r);
-  }, [randomNumber]);
-
-  useEffect(() => {
-    const promptClient2 = new PromptClient();
-    const limit = 20;
-    const dataFetch = async (page: number) => {
-      const promptPaginationResponse:
-        | PaginationSuccessResponse
-        | ErrorResponse = await promptClient2.pagination({
+        | ErrorResponse = await promptClient.pagination({
         page,
       });
 
@@ -110,7 +76,15 @@ function Index({ socketId }: { socketId: string }) {
           page: promptPaginationResponse.page,
         }));
       }
-    };
+    },
+    [setDataPrompt]
+  );
+
+  useEffect(() => {
+    dataFetch(randomNumber).then(() => true);
+  }, [dataFetch, randomNumber]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -142,7 +116,7 @@ function Index({ socketId }: { socketId: string }) {
     scrollRef.current.querySelectorAll('.snap-start').forEach((snap) => {
       observer.observe(snap);
     });
-  }, [dataPrompt.page, dataPrompt.rows, randomNumber]);
+  }, [dataFetch, dataPrompt.page, dataPrompt.rows, randomNumber]);
 
   return (
     <LoadingContext.Consumer>
