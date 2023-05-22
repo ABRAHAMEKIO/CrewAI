@@ -8,7 +8,7 @@ interface ExtendedRequest {
   method: string;
   query: {
     page: string;
-    parent?: string;
+    v?: string;
   };
 }
 
@@ -28,7 +28,7 @@ apiRoute.get(async (req, res) => {
     return parent && parent !== '' && parent !== null;
   }
 
-  const { page, parent } = req.query;
+  const { page, v } = req.query;
   const limit = 20;
   const offset = parseInt(page, 10) * limit;
 
@@ -38,8 +38,8 @@ apiRoute.get(async (req, res) => {
     id: { [Op.ne]: null },
   };
 
-  if (isNotNullParent(parent)) {
-    where.id = { [Op.ne]: parent };
+  if (isNotNullParent(v)) {
+    where.id = { [Op.ne]: v };
   }
 
   const prompt = await Prompt.findAndCountAll({
@@ -54,13 +54,13 @@ apiRoute.get(async (req, res) => {
     limit,
   });
 
-  if (isNotNullParent(parent)) {
+  if (isNotNullParent(v)) {
     const firstRow = await Prompt.findAndCountAll({
       distinct: true,
       include: [{ model: Prompt, as: 'SubPrompts' }],
       where: {
         imageUrlIsUnique: true,
-        id: parent,
+        id: v,
       },
       order: [
         ['modelType', 'DESC'],

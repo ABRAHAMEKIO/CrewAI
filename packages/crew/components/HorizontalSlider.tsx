@@ -67,30 +67,25 @@ function HorizontalSlider({
       setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
     const querySearch = window.location.search;
-    window.history.replaceState(null, null, `/`);
-    const timeOut = setTimeout(() => {
-      const params = new URLSearchParams(querySearch);
-      if (params.has('parent')) {
-        const interval = setInterval(() => {
-          const element = document.getElementById(
-            params.get('parent').toString()
-          );
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-            if (params.has('child')) {
-              const child = document.getElementById(
-                `horizontal-${params.get('child')}`
-              );
-              if (child) {
-                child.scrollIntoView({ behavior: 'smooth' });
-              }
-            }
-            clearInterval(interval);
-            clearTimeout(timeOut);
-          }
-        }, 200);
-      }
-    }, 2000);
+
+    const params = new URLSearchParams(querySearch);
+    let paramElement = null;
+    if (params.has('v')) {
+      paramElement = params.get('v').toString();
+    }
+
+    if (paramElement) {
+      const interval = setInterval(() => {
+        const element = document.getElementById(`horizontal-${paramElement}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 200);
+      const timeOut = setTimeout(() => {
+        clearInterval(interval);
+        clearTimeout(timeOut);
+      }, 4000);
+    }
   }, [newPrompt, item]);
 
   // handle horizontal slider
@@ -168,12 +163,12 @@ function HorizontalSlider({
               return null;
             });
             if (x) {
-              // window.history.replaceState(
-              //   null,
-              //   `Hologram - ${x.prompt}`,
-              //   `?prompt_id=${x.id}`
-              // );
               setCurrent(x);
+              window.history.replaceState(
+                null,
+                `Hologram - ${x.prompt}`,
+                `?v=${x.id}`
+              );
             }
           }
         });
@@ -280,12 +275,7 @@ function HorizontalSlider({
   }
 
   const handleShareButton = () => {
-    let param = '';
-    if (current.parentId) {
-      param = `?parent=${current.parentId}&child=${current.id}`;
-    } else {
-      param = `?parent=${current.id}`;
-    }
+    const param = `?v=${current.id}`;
     if (navigator.share) {
       navigator.share({
         title: 'Hologram AI',
@@ -293,6 +283,7 @@ function HorizontalSlider({
       });
     } else {
       navigator.clipboard.writeText(`${server}/${param}`);
+      // eslint-disable-next-line no-alert
       window.alert('Link copied!');
     }
   };
