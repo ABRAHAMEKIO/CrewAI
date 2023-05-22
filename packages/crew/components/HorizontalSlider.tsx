@@ -66,6 +66,9 @@ function HorizontalSlider({
     if (item?.id.toString() === newPrompt?.parentId.toString()) {
       setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
+  }, [newPrompt, item]);
+
+  const findElement = () => {
     const querySearch = window.location.search;
 
     const params = new URLSearchParams(querySearch);
@@ -75,18 +78,27 @@ function HorizontalSlider({
     }
 
     if (paramElement) {
+      let timeOut;
       const interval = setInterval(() => {
         const element = document.getElementById(`horizontal-${paramElement}`);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
+          clearInterval(interval);
+          if (timeOut !== undefined) {
+            clearTimeout(timeOut);
+          }
         }
       }, 200);
-      const timeOut = setTimeout(() => {
+      timeOut = setTimeout(() => {
         clearInterval(interval);
         clearTimeout(timeOut);
       }, 4000);
     }
-  }, [newPrompt, item]);
+  };
+
+  useEffect(() => {
+    findElement();
+  }, []);
 
   // handle horizontal slider
   useEffect(() => {

@@ -24,11 +24,26 @@ const apiRoute = nextConnect<ExtendedRequest, NextApiResponse>({
 });
 
 apiRoute.get(async (req, res) => {
-  function isNotNullParent(parent) {
-    return parent && parent !== '' && parent !== null;
+  const { page, v } = req.query;
+
+  let firstRowParentId = null;
+  async function isNotNullParent() {
+    if (v) {
+      const findParent = await Prompt.findOne({
+        where: { id: v },
+      });
+      if (findParent) {
+        if (findParent.parentId) {
+          firstRowParentId = findParent.parentId;
+        } else {
+          firstRowParentId = findParent.id;
+        }
+      }
+    }
   }
 
-  const { page, v } = req.query;
+  await isNotNullParent();
+
   const limit = 20;
   const offset = parseInt(page, 10) * limit;
 
@@ -38,8 +53,8 @@ apiRoute.get(async (req, res) => {
     id: { [Op.ne]: null },
   };
 
-  if (isNotNullParent(v)) {
-    where.id = { [Op.ne]: v };
+  if (firstRowParentId) {
+    where.id = { [Op.ne]: firstRowParentId };
   }
 
   const prompt = await Prompt.findAndCountAll({
@@ -54,23 +69,17 @@ apiRoute.get(async (req, res) => {
     limit,
   });
 
-  if (isNotNullParent(v)) {
-    const firstRow = await Prompt.findAndCountAll({
-      distinct: true,
+  if (firstRowParentId) {
+    const firstRow = await Prompt.findOne({
       include: [{ model: Prompt, as: 'SubPrompts' }],
       where: {
         imageUrlIsUnique: true,
-        id: v,
+        id: firstRowParentId,
       },
-      order: [
-        ['modelType', 'DESC'],
-        ['SubPrompts', 'createdAt', 'ASC'],
-      ],
-      offset,
-      limit,
     });
-    if (firstRow.count !== 0) {
-      prompt.rows.unshift(firstRow.rows[0]);
+
+    if (firstRow) {
+      prompt.rows.unshift(firstRow);
       prompt.count += 1;
     }
   }
