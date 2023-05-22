@@ -60,30 +60,7 @@ function Nav({ className }: { className?: string }) {
                   </div>
                 )}
               </div>
-
-              {showFeature && (
-                <div className="lex items-center sm:static sm:inset-auto w-fit">
-                  <div className="flex space-x-4">
-                    {nivigationRight.map((item) => {
-                      return (
-                        <Disclosure.Button
-                          key="connect-wallet"
-                          className={classNames(
-                            item.bgDark
-                              ? 'bg-gray-900 text-white'
-                              : 'bg-white text-black ',
-                            'border rounded-lg px-[1.5rem] text-sm font-medium h-[2.5rem] sm:h-12 min-w-[117px]'
-                          )}
-                        >
-                          {item.name}
-                        </Disclosure.Button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Profile dropdown */}
-                </div>
-              )}
+              <ConnectWallet />
             </div>
           </Section>
 
