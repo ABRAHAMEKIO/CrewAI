@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNetwork, useAccount } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { PromptAttributes } from '../db/models/prompt';
-import { ShareButtonIcon } from './Icons';
+// import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -55,6 +56,7 @@ function HorizontalSlider({
   const { chain } = useNetwork();
   const { address } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
@@ -118,12 +120,14 @@ function HorizontalSlider({
     };
 
     getMeta(item.imageUrl, (err, img) => {
-      if (img.naturalWidth > img.naturalHeight) {
-        setImageOrientation(ImageOrientation.landscape);
-      } else if (img.naturalWidth === img.naturalHeight) {
-        setImageOrientation(ImageOrientation.square);
-      } else {
-        setImageOrientation(ImageOrientation.portrait);
+      if (img) {
+        if (img.naturalWidth > img.naturalHeight) {
+          setImageOrientation(ImageOrientation.landscape);
+        } else if (img.naturalWidth === img.naturalHeight) {
+          setImageOrientation(ImageOrientation.square);
+        } else {
+          setImageOrientation(ImageOrientation.portrait);
+        }
       }
     });
   }, [item]);
@@ -252,11 +256,13 @@ function HorizontalSlider({
       }
 
       setLoading(false);
+      navNewPromptContext?.setIndicatorNewPromptDisplay(false);
       // eslint-disable-next-line no-alert
       window.alert('Transaction Fail');
     }
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const handleShareButton = () => {
     if (navigator.share) {
       navigator
@@ -265,11 +271,29 @@ function HorizontalSlider({
           url: window.location.href,
         })
         .then(() => {
+          // eslint-disable-next-line no-console
           console.log('Thanks for sharing!');
         })
+        // eslint-disable-next-line no-console
         .catch(console.error);
     }
   };
+
+  function scrollToPrompt(promptId) {
+    // console.log(ref2.current.childElementCount);
+    ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
+
+  useEffect(() => {
+    if (
+      navNewPromptContext?.promptId &&
+      allItem.find((i) => i.id === navNewPromptContext?.promptId)
+    ) {
+      scrollToPrompt(navNewPromptContext?.promptId);
+    }
+  }, [allItem, navNewPromptContext?.promptId]);
 
   return (
     <div className="h-[calc(100vh-112px)] sm:h-[calc(100vh-136px)] relative">

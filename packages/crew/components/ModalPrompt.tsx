@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useNetwork, useAccount } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
@@ -6,6 +6,7 @@ import { CrossIcon } from './Icons';
 import { PromptAttributes } from '../db/models/prompt';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 
 function ModalPrompt({
   loading,
@@ -28,6 +29,8 @@ function ModalPrompt({
   const { chain } = useNetwork();
   const { address } = useAccount();
   const { openConnectModal } = useConnectModal();
+
+  const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
     setText(prompt.prompt);
@@ -67,6 +70,7 @@ function ModalPrompt({
 
       modalClose();
       setLoading(false);
+      navNewPromptContext?.setIndicatorNewPromptDisplay(false);
       // eslint-disable-next-line no-alert
       window.alert('Transaction Fail');
     }

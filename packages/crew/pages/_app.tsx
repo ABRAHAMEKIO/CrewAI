@@ -24,6 +24,7 @@ import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
+import NavNewPromptContext from '../context/nav-new-prompt-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -95,6 +96,19 @@ function CustomApp({
         console.error(e);
       });
   }, []);
+
+  const [promptId, setPromptId] = useState<number>(null);
+  const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
+    useState<boolean>(null);
+
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
+  const NavNewPromptContextValue = {
+    promptId,
+    setPromptId,
+    indicatorNewPromptDisplay,
+    setIndicatorNewPromptDisplay,
+  };
+
   return (
     <MixpanelProvider token={mixPanelId || ''}>
       <WagmiConfig config={wagmiConfig}>
@@ -114,13 +128,15 @@ function CustomApp({
                 <PromptContext.Provider value={newPrompt}>
                   {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
                   <LoadingContext.Provider value={{ loading, setLoading }}>
-                    {/* eslint-disable react/jsx-props-no-spreading */}
-                    <Component
-                      {...pageProps}
-                      socketId={socketId}
-                      newPrompt={newPrompt}
-                    />
-                    {/* set global socket id to component */}
+                    <NavNewPromptContext.Provider value={NavNewPromptContextValue}>
+                      {/* eslint-disable react/jsx-props-no-spreading */}
+                      <Component
+                        {...pageProps}
+                        socketId={socketId}
+                        newPrompt={newPrompt}
+                      />
+                      {/* set global socket id to component */}
+                    </NavNewPromptContext.Provider>
                   </LoadingContext.Provider>
                 </PromptContext.Provider>
               </main>
