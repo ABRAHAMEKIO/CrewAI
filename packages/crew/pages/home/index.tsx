@@ -17,10 +17,11 @@ import HorizontalSlider from '../../components/HorizontalSlider';
 
 function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
+  const [randomNumber] = useState(Math.floor(Math.random() * 25));
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [dataPrompt, setDataPrompt] = useState({
     rows: [],
-    page: 0,
+    page: randomNumber,
   });
   const [current, setCurrent] = useState<PromptAttributes>({});
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
@@ -43,7 +44,9 @@ function Index({ socketId }: { socketId: string }) {
     const dataFetch = async () => {
       const promptPaginationResponse:
         | PaginationSuccessResponse
-        | ErrorResponse = await promptClient1.pagination({ page: 0 });
+        | ErrorResponse = await promptClient1.pagination({
+        page: randomNumber,
+      });
 
       if (
         'error' in promptPaginationResponse &&
@@ -61,14 +64,14 @@ function Index({ socketId }: { socketId: string }) {
       ) {
         setDataPrompt(() => ({
           rows: promptPaginationResponse.prompt.rows,
-          page: 0,
+          page: randomNumber,
         }));
         setCurrent(promptPaginationResponse.prompt.rows[0]);
       }
     };
 
     dataFetch().then((r) => r);
-  }, []);
+  }, [randomNumber]);
 
   useEffect(() => {
     const promptClient2 = new PromptClient();
@@ -122,7 +125,8 @@ function Index({ socketId }: { socketId: string }) {
             }
             const len = dataPrompt.rows.length;
             if (len - parseInt(dataIndex, 10) === 5) {
-              const page = Math.ceil(len / limit);
+              const rows = Math.ceil(len / limit);
+              const page = randomNumber + rows;
               if (page > dataPrompt.page) {
                 dataFetch(page).then(() => true);
               }
@@ -131,14 +135,14 @@ function Index({ socketId }: { socketId: string }) {
         });
       },
       {
-        threshold: 0.3,
+        threshold: 0.6,
       }
     );
 
     scrollRef.current.querySelectorAll('.snap-start').forEach((snap) => {
       observer.observe(snap);
     });
-  }, [dataPrompt.page, dataPrompt.rows]);
+  }, [dataPrompt.page, dataPrompt.rows, randomNumber]);
 
   return (
     <LoadingContext.Consumer>
