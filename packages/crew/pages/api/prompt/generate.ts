@@ -5,9 +5,8 @@ import { formatUnits } from '@ethersproject/units/src.ts';
 import {
   rpcGatewayFmKey,
   web3PromptPrice,
-  web3AddressKulkul,
-  web3Polygon,
-  web3Gnosis,
+  web3AddressGnosis,
+  web3AddressPolygon,
 } from '../../../config';
 import Prompt, { ModelType, PromptAttributes } from '../../../db/models/prompt';
 import Webhook, { WebhookStep } from '../../../db/models/webhook';
@@ -117,7 +116,7 @@ export default async function handler(
   const { modelType } = prompt;
 
   const txReceipt = await provider.getTransaction(transactionHash);
-  const { to, from } = txReceipt;
+  const { to, from, chainId } = txReceipt;
 
   // ✅ 3. Jumlah yang dibayarkan sudah sesuai dengan harga belum?
   const value = utils.formatUnits(txReceipt.value.toString(), 18);
@@ -126,7 +125,7 @@ export default async function handler(
   }
 
   // ✅ 2. Tujuannya benar tidak
-  if (!(to === web3AddressKulkul)) {
+  if (!(to === web3AddressGnosis) || !(to === web3AddressPolygon)) {
     return res.status(200).json({ success: false });
   }
 
@@ -139,7 +138,14 @@ export default async function handler(
     return res.status(200).json({ success: false });
   }
 
-  // TODO 🔄 4. Wallet polygon dan gnosis
+  // ✅ 4. Wallet gnosis (chainId 100) dan polygon (chainId 137)
+  if (chainId === 100 && !(to === web3AddressGnosis)) {
+    return res.status(200).json({ success: false });
+  }
+
+  if (chainId === 137 && !(to === web3AddressPolygon)) {
+    return res.status(200).json({ success: false });
+  }
 
   console.log('modelType: ', modelType, modelType === ModelType.midJourney);
   // TODO: implement strategy pattern
