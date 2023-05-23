@@ -6,7 +6,7 @@ import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
-import { web3PromptPrice } from '../config';
+import { server, web3PromptPrice } from '../config';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -96,6 +96,38 @@ function HorizontalSlider({
     }, 2000);
   }, [newPrompt, item]);
 
+  const findElement = () => {
+    const querySearch = window.location.search;
+
+    const params = new URLSearchParams(querySearch);
+    let paramElement = null;
+    if (params.has('v')) {
+      paramElement = params.get('v').toString();
+    }
+
+    if (paramElement) {
+      let timeOut;
+      const interval = setInterval(() => {
+        const element = document.getElementById(`horizontal-${paramElement}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          clearInterval(interval);
+          if (timeOut !== undefined) {
+            clearTimeout(timeOut);
+          }
+        }
+      }, 200);
+      timeOut = setTimeout(() => {
+        clearInterval(interval);
+        clearTimeout(timeOut);
+      }, 4000);
+    }
+  };
+
+  useEffect(() => {
+    findElement();
+  }, []);
+
   // handle horizontal slider
   useEffect(() => {
     setRef1Size([ref1.current.clientWidth, ref1.current.clientHeight]);
@@ -171,12 +203,12 @@ function HorizontalSlider({
               return null;
             });
             if (x) {
-              // window.history.replaceState(
-              //   null,
-              //   `Hologram - ${x.prompt}`,
-              //   `?prompt_id=${x.id}`
-              // );
               setCurrent(x);
+              window.history.replaceState(
+                null,
+                `Hologram - ${x.prompt}`,
+                `?v=${x.id}`
+              );
             }
           }
         });
@@ -286,20 +318,17 @@ function HorizontalSlider({
     }
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const handleShareButton = () => {
+    const param = `?v=${current.id}`;
     if (navigator.share) {
-      navigator
-        .share({
-          title: 'Hologram AI',
-          url: window.location.href,
-        })
-        .then(() => {
-          // eslint-disable-next-line no-console
-          console.log('Thanks for sharing!');
-        })
-        // eslint-disable-next-line no-console
-        .catch(console.error);
+      navigator.share({
+        title: 'Hologram AI',
+        url: `${server}/${param}`,
+      });
+    } else {
+      navigator.clipboard.writeText(`${server}/${param}`);
+      // eslint-disable-next-line no-alert
+      window.alert('Link copied!');
     }
   };
 
@@ -383,7 +412,7 @@ function HorizontalSlider({
           </div>
           <div className="mt-4">
             <div className="grid grid-cols-12 block sm:hidden">
-              <div className="col-span-12">
+              <div className="col-span-10">
                 <button
                   onClick={() => setOpenBottomSlideOver(current, true)}
                   type="button"
@@ -399,19 +428,19 @@ function HorizontalSlider({
                   </p>
                 </button>
               </div>
-              {/* <div className="col-span-2"> */}
-              {/*  <button */}
-              {/*    type="button" */}
-              {/*    onClick={handleShareButton} */}
-              {/*    className="float-right" */}
-              {/*  > */}
-              {/*    <ShareButtonIcon fill="white" /> */}
-              {/*  </button> */}
-              {/* </div> */}
+              <div className="col-span-2">
+                <button
+                  type="button"
+                  onClick={handleShareButton}
+                  className="float-right"
+                >
+                  <ShareButtonIcon fill="white" />
+                </button>
+              </div>
             </div>
             <div className="hidden sm:block sm:mt-4">
               <div className="grid grid-cols-12">
-                <div className="col-span-12">
+                <div className="col-span-10">
                   <button
                     onClick={() => setOpenModalPrompt(current, true)}
                     type="button"
@@ -427,15 +456,15 @@ function HorizontalSlider({
                     </p>
                   </button>
                 </div>
-                {/* <div className="col-span-2"> */}
-                {/*  <button */}
-                {/*    type="button" */}
-                {/*    onClick={handleShareButton} */}
-                {/*    className="float-right" */}
-                {/*  > */}
-                {/*    <ShareButtonIcon fill="white" /> */}
-                {/*  </button> */}
-                {/* </div> */}
+                <div className="col-span-2">
+                  <button
+                    type="button"
+                    onClick={handleShareButton}
+                    className="float-right"
+                  >
+                    <ShareButtonIcon fill="white" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

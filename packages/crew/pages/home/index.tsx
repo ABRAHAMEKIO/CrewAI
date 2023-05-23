@@ -43,10 +43,16 @@ function Index({ socketId }: { socketId: string }) {
   const limit = 20;
   const dataFetch = useCallback(
     async (page: number) => {
+      const params = new URLSearchParams(window.location.search);
+      let v = null;
+      if (params.has('v')) {
+        v = params.get('v');
+      }
       const promptPaginationResponse:
         | PaginationSuccessResponse
         | ErrorResponse = await promptClient.pagination({
         page,
+        v,
       });
 
       if (
