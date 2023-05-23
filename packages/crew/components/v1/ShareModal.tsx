@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
   CrossIcon,
@@ -20,14 +20,27 @@ function ShareModal({
   modalClose: () => void;
   url: string;
 }) {
+  const [copied, setCopied] = useState(false);
+
   async function handleSubmit(): Promise<void> {
     await navigator.clipboard.writeText(url);
-    modalClose();
+    setCopied(true);
+    const timeout = setTimeout(() => {
+      setCopied(false);
+      clearTimeout(timeout);
+    }, 4000);
   }
 
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={modalClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => {
+          modalClose();
+          setCopied(false);
+        }}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -113,7 +126,11 @@ function ShareModal({
                         className="right-0 mr-4 absolute text-white bg-black-190 rounded-lg w-full text-base font-bold min-h-[40px] max-w-[72px]"
                         onClick={() => handleSubmit()}
                       >
-                        <TickIcon fill="none" className="mx-auto" />
+                        {copied ? (
+                          <TickIcon fill="none" className="mx-auto" />
+                        ) : (
+                          'Copy'
+                        )}
                       </button>
                     </div>
                   </div>

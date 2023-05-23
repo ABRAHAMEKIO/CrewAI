@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
   CrossIcon,
@@ -20,14 +20,27 @@ function BottomSlideOver({
   modalClose: () => void;
   url: string;
 }) {
+  const [copied, setCopied] = useState(false);
+
   async function handleSubmit(): Promise<void> {
     await navigator.clipboard.writeText(url);
-    modalClose();
+    setCopied(true);
+    const timeout = setTimeout(() => {
+      setCopied(false);
+      clearTimeout(timeout);
+    }, 4000);
   }
 
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={modalClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => {
+          modalClose();
+          setCopied(false);
+        }}
+      >
         <div className="fixed inset-0" />
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
@@ -103,7 +116,11 @@ function BottomSlideOver({
                           className="right-0 mr-8 absolute text-white bg-black-190 rounded-lg w-full text-base font-bold min-h-[40px] max-w-[72px]"
                           onClick={() => handleSubmit()}
                         >
-                          <TickIcon fill="none" className="mx-auto" />
+                          {copied ? (
+                            <TickIcon fill="none" className="mx-auto" />
+                          ) : (
+                            'Copy'
+                          )}
                         </button>
                       </div>
                     </div>
