@@ -320,20 +320,9 @@ function HorizontalSlider({
 
   const handleShareButton = async () => {
     const param = `?v=${current.id}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Hologram',
-          url: `${server}/${param}`,
-        });
-      } catch (err) {
-        console.error('Share failed:', err.message);
-      }
-    } else {
-      await navigator.clipboard.writeText(`${server}/${param}`);
-      // eslint-disable-next-line no-alert
-      window.alert('Link copied!');
-    }
+    await navigator.clipboard.writeText(`${server}/${param}`);
+    // eslint-disable-next-line no-alert
+    window.alert('Link copied!');
   };
 
   function scrollToPrompt(promptId) {
