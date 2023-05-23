@@ -318,15 +318,19 @@ function HorizontalSlider({
     }
   }
 
-  const handleShareButton = () => {
+  const handleShareButton = async () => {
     const param = `?v=${current.id}`;
     if (navigator.share) {
-      navigator.share({
-        title: 'Hologram AI',
-        url: `${server}/${param}`,
-      });
+      try {
+        await navigator.share({
+          title: 'Hologram',
+          url: `${server}/${param}`,
+        });
+      } catch (err) {
+        console.error('Share failed:', err.message);
+      }
     } else {
-      navigator.clipboard.writeText(`${server}/${param}`);
+      await navigator.clipboard.writeText(`${server}/${param}`);
       // eslint-disable-next-line no-alert
       window.alert('Link copied!');
     }
