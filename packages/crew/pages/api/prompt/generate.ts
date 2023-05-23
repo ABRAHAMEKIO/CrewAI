@@ -1,7 +1,13 @@
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import Replicate from 'replicate';
-import { rpcGatewayFmKey } from '../../../config';
+import { formatUnits } from '@ethersproject/units/src.ts';
+import {
+  rpcGatewayFmKey,
+  web3PromptPrice,
+  web3AddressGnosis,
+  web3AddressPolygon,
+} from '../../../config';
 import Prompt, { ModelType, PromptAttributes } from '../../../db/models/prompt';
 import Webhook, { WebhookStep } from '../../../db/models/webhook';
 import MidjourneyClient from '../../../domain/midjourney/midjourneyClient';
@@ -107,14 +113,19 @@ export default async function handler(
 
   const prompt = await Prompt.findByPk(promptId);
 
-  const { creatorAddress, modelType } = prompt;
+  const { modelType } = prompt;
 
   const txReceipt = await provider.getTransaction(transactionHash);
-  const { to, from } = txReceipt;
-  const addressKulkul = '0xd54E6A61332657eCac42146f226e44C6166C86bE';
+  const { to, from, chainId } = txReceipt;
 
-  // 1. transactionHash dipake berapa kali apakah 1? jika lebih maka error
-  if (!(to === addressKulkul)) {
+  // ✅ 3. Jumlah yang dibayarkan sudah sesuai dengan harga belum?
+  const value = utils.formatUnits(txReceipt.value.toString(), 18);
+  if (value !== web3PromptPrice.toString()) {
+    return res.status(200).json({ success: false });
+  }
+
+  // ✅ 2. Tujuannya benar tidak
+  if (!(to === web3AddressGnosis) || !(to === web3AddressPolygon)) {
     return res.status(200).json({ success: false });
   }
 
@@ -122,7 +133,17 @@ export default async function handler(
     where: { transactionHash },
   });
 
+  // ✅ 1. transactionHash dipake berapa kali apakah 1? jika lebih maka error
   if (webhookByTransaction) {
+    return res.status(200).json({ success: false });
+  }
+
+  // ✅ 4. Wallet gnosis (chainId 100) dan polygon (chainId 137)
+  if (chainId === 100 && !(to === web3AddressGnosis)) {
+    return res.status(200).json({ success: false });
+  }
+
+  if (chainId === 137 && !(to === web3AddressPolygon)) {
     return res.status(200).json({ success: false });
   }
 

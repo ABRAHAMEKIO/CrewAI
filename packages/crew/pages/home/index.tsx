@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
 import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/Wrap';
@@ -15,12 +15,15 @@ import BottomSlideOver from '../../components/BottomSlideOver';
 import ModalPrompt from '../../components/ModalPrompt';
 import HorizontalSlider from '../../components/HorizontalSlider';
 
+const promptClient = new PromptClient();
+
 function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
+  const [randomNumber] = useState(Math.floor(Math.random() * 25));
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [dataPrompt, setDataPrompt] = useState({
     rows: [],
-    page: 0,
+    page: randomNumber,
   });
   const [current, setCurrent] = useState<PromptAttributes>({});
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
@@ -37,47 +40,19 @@ function Index({ socketId }: { socketId: string }) {
     }
   });
 
-  useEffect(() => {
-    const promptClient1 = new PromptClient();
-    // fetch data
-    const dataFetch = async () => {
+  const limit = 20;
+  const dataFetch = useCallback(
+    async (page: number) => {
+      const params = new URLSearchParams(window.location.search);
+      let v = null;
+      if (params.has('v')) {
+        v = params.get('v');
+      }
       const promptPaginationResponse:
         | PaginationSuccessResponse
-        | ErrorResponse = await promptClient1.pagination({ page: 0 });
-
-      if (
-        'error' in promptPaginationResponse &&
-        promptPaginationResponse.error
-      ) {
-        // setError(true);
-        // setErrorMessage(promptPaginationResponse.error);
-        // setLoading(false);
-      } else {
-        // setLoading(true);
-      }
-      if (
-        'prompt' in promptPaginationResponse &&
-        promptPaginationResponse.prompt
-      ) {
-        setDataPrompt(() => ({
-          rows: promptPaginationResponse.prompt.rows,
-          page: 0,
-        }));
-        setCurrent(promptPaginationResponse.prompt.rows[0]);
-      }
-    };
-
-    dataFetch().then((r) => r);
-  }, []);
-
-  useEffect(() => {
-    const promptClient2 = new PromptClient();
-    const limit = 20;
-    const dataFetch = async (page: number) => {
-      const promptPaginationResponse:
-        | PaginationSuccessResponse
-        | ErrorResponse = await promptClient2.pagination({
+        | ErrorResponse = await promptClient.pagination({
         page,
+        v,
       });
 
       if (
@@ -107,7 +82,15 @@ function Index({ socketId }: { socketId: string }) {
           page: promptPaginationResponse.page,
         }));
       }
-    };
+    },
+    [setDataPrompt]
+  );
+
+  useEffect(() => {
+    dataFetch(randomNumber).then(() => true);
+  }, [dataFetch, randomNumber]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -122,7 +105,8 @@ function Index({ socketId }: { socketId: string }) {
             }
             const len = dataPrompt.rows.length;
             if (len - parseInt(dataIndex, 10) === 5) {
-              const page = Math.ceil(len / limit);
+              const rows = Math.ceil(len / limit);
+              const page = randomNumber + rows;
               if (page > dataPrompt.page) {
                 dataFetch(page).then(() => true);
               }
@@ -131,14 +115,14 @@ function Index({ socketId }: { socketId: string }) {
         });
       },
       {
-        threshold: 0.3,
+        threshold: 0.6,
       }
     );
 
     scrollRef.current.querySelectorAll('.snap-start').forEach((snap) => {
       observer.observe(snap);
     });
-  }, [dataPrompt.page, dataPrompt.rows]);
+  }, [dataFetch, dataPrompt.page, dataPrompt.rows, randomNumber]);
 
   return (
     <LoadingContext.Consumer>
@@ -165,6 +149,7 @@ function Index({ socketId }: { socketId: string }) {
                     {dataPrompt.rows.map((item, index) => {
                       return (
                         <div
+                          id={item.id}
                           className="snap-start pt-[112px] sm:pt-[136px]"
                           key={item.id}
                           data-id={item.id}

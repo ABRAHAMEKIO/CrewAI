@@ -1,9 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNetwork, useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { PromptAttributes } from '../db/models/prompt';
-// import { ShareButtonIcon } from './Icons';
+import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import { server, web3PromptPrice } from '../config';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -51,6 +54,9 @@ function HorizontalSlider({
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
 
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
@@ -65,7 +71,62 @@ function HorizontalSlider({
     if (item?.id.toString() === newPrompt?.parentId.toString()) {
       setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
+    const timeOut = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('parent')) {
+        const interval = setInterval(() => {
+          const element = document.getElementById(
+            params.get('parent').toString()
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            if (params.has('child')) {
+              const child = document.getElementById(
+                `horizontal-${params.get('child')}`
+              );
+              if (child) {
+                child.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+            clearInterval(interval);
+            clearTimeout(timeOut);
+          }
+        }, 100);
+      }
+    }, 2000);
   }, [newPrompt, item]);
+
+  const findElement = () => {
+    const querySearch = window.location.search;
+
+    const params = new URLSearchParams(querySearch);
+    let paramElement = null;
+    if (params.has('v')) {
+      paramElement = params.get('v').toString();
+    }
+
+    if (paramElement) {
+      let timeOut;
+      const interval = setInterval(() => {
+        const element = document.getElementById(`horizontal-${paramElement}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          clearInterval(interval);
+          if (timeOut !== undefined) {
+            clearTimeout(timeOut);
+          }
+        }
+      }, 200);
+      timeOut = setTimeout(() => {
+        clearInterval(interval);
+        clearTimeout(timeOut);
+      }, 4000);
+    }
+  };
+
+  useEffect(() => {
+    findElement();
+  }, []);
 
   // handle horizontal slider
   useEffect(() => {
@@ -142,12 +203,12 @@ function HorizontalSlider({
               return null;
             });
             if (x) {
-              // window.history.replaceState(
-              //   null,
-              //   `Hologram - ${x.prompt}`,
-              //   `?prompt_id=${x.id}`
-              // );
               setCurrent(x);
+              window.history.replaceState(
+                null,
+                `Hologram - ${x.prompt}`,
+                `?v=${x.id}`
+              );
             }
           }
         });
@@ -220,53 +281,54 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    if (loading) return;
-    setLoading(true);
-    const transaction = await sendTransaction('0.01');
-    // eslint-disable-next-line no-console
-    console.log({ transaction });
-    if (transaction) {
-      if ('hash' in transaction) {
-        const promptClient = new PromptClient();
-        const response = await promptClient.generate({
-          promptId: item.id,
-          msg: current.prompt,
-          socketId,
-          transactionHash: transaction.hash.toString(),
-        });
+    if (!address) {
+      openConnectModal();
+    } else {
+      if (loading) return;
+      setLoading(true);
+      const transaction = await sendTransaction(web3PromptPrice);
+      // eslint-disable-next-line no-console
+      console.log({ transaction });
+      if (transaction) {
+        if ('hash' in transaction) {
+          const promptClient = new PromptClient();
+          const response = await promptClient.generate({
+            promptId: item.id,
+            msg: current.prompt,
+            socketId,
+            transactionHash: transaction.hash.toString(),
+          });
 
-        if ('success' in response && response.success) {
-          return;
-        }
-        if ('success' in response && !response.success) {
-          setLoading(false);
-          // eslint-disable-next-line no-alert
-          window.alert('Generate Fail');
-          return;
+          if ('success' in response && response.success) {
+            return;
+          }
+          if ('success' in response && !response.success) {
+            setLoading(false);
+            // eslint-disable-next-line no-alert
+            window.alert('Generate Fail');
+            return;
+          }
         }
       }
-    }
 
-    setLoading(false);
-    navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-    // eslint-disable-next-line no-alert
-    window.alert('Transaction Fail');
+      setLoading(false);
+      navNewPromptContext?.setIndicatorNewPromptDisplay(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
+    }
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   const handleShareButton = () => {
+    const param = `?v=${current.id}`;
     if (navigator.share) {
-      navigator
-        .share({
-          title: 'Hologram AI',
-          url: window.location.href,
-        })
-        .then(() => {
-          // eslint-disable-next-line no-console
-          console.log('Thanks for sharing!');
-        })
-        // eslint-disable-next-line no-console
-        .catch(console.error);
+      navigator.share({
+        title: 'Hologram AI',
+        url: `${server}/${param}`,
+      });
+    } else {
+      navigator.clipboard.writeText(`${server}/${param}`);
+      // eslint-disable-next-line no-alert
+      window.alert('Link copied!');
     }
   };
 
@@ -306,6 +368,7 @@ function HorizontalSlider({
                 className="snap-start flex items-center"
                 key={myItem.id}
                 data-id={myItem.id}
+                id={`horizontal-${myItem.id}`}
               >
                 <div
                   className="flex items-center rounded-2xl justify-center"
@@ -349,7 +412,7 @@ function HorizontalSlider({
           </div>
           <div className="mt-4">
             <div className="grid grid-cols-12 block sm:hidden">
-              <div className="col-span-12">
+              <div className="col-span-10">
                 <button
                   onClick={() => setOpenBottomSlideOver(current, true)}
                   type="button"
@@ -365,19 +428,19 @@ function HorizontalSlider({
                   </p>
                 </button>
               </div>
-              {/* <div className="col-span-2"> */}
-              {/*  <button */}
-              {/*    type="button" */}
-              {/*    onClick={handleShareButton} */}
-              {/*    className="float-right" */}
-              {/*  > */}
-              {/*    <ShareButtonIcon fill="white" /> */}
-              {/*  </button> */}
-              {/* </div> */}
+              <div className="col-span-2">
+                <button
+                  type="button"
+                  onClick={handleShareButton}
+                  className="float-right"
+                >
+                  <ShareButtonIcon fill="white" />
+                </button>
+              </div>
             </div>
             <div className="hidden sm:block sm:mt-4">
               <div className="grid grid-cols-12">
-                <div className="col-span-12">
+                <div className="col-span-10">
                   <button
                     onClick={() => setOpenModalPrompt(current, true)}
                     type="button"
@@ -393,22 +456,30 @@ function HorizontalSlider({
                     </p>
                   </button>
                 </div>
-                {/* <div className="col-span-2"> */}
-                {/*  <button */}
-                {/*    type="button" */}
-                {/*    onClick={handleShareButton} */}
-                {/*    className="float-right" */}
-                {/*  > */}
-                {/*    <ShareButtonIcon fill="white" /> */}
-                {/*  </button> */}
-                {/* </div> */}
+                <div className="col-span-2">
+                  <button
+                    type="button"
+                    onClick={handleShareButton}
+                    className="float-right"
+                  >
+                    <ShareButtonIcon fill="white" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
           <div className="mt-4 sm:mt-6">
             {[
               {
-                name: 'Generate ($0.01 xDai)',
+                name: `Generate (${web3PromptPrice}${
+                  chain
+                    ? `${
+                        !chain.unsupported
+                          ? ` ${chain.nativeCurrency.symbol}`
+                          : ''
+                      }`
+                    : ''
+                })`,
                 bgDark: false,
                 onClick: () => handleSubmit(),
               },
