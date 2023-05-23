@@ -2,11 +2,11 @@
 import React, { useContext, Fragment, useEffect } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { LoadingIcon } from './Icons';
-import LoadingContext from '../context/loading-context';
-import PromptContext from '../context/prompt-context';
-import NavNewPromptContext from '../context/nav-new-prompt-context';
-import { classNames } from '../helpers/component';
-import { PromptAttributes } from '../db/models/prompt';
+import LoadingContext from '../../context/loading-context';
+import PromptContext from '../../context/prompt-context';
+import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import { classNames } from '../../helpers/component';
+import { PromptAttributes } from '../../db/models/prompt';
 
 // import { PromptAttributes } from '../db/models/prompt';
 

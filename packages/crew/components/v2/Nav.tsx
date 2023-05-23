@@ -1,18 +1,10 @@
-import React, { Fragment } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import LoadingContext from '../context/loading-context';
-import { LoadingIcon } from './Icons';
-import Section from './Section';
-import ConnectWallet from './ConnectWallet';
-import NavNewPrompt from './NavNewPrompt';
-import { server } from '../config';
+import React from 'react';
+import { Disclosure } from '@headlessui/react';
+import Section from '../v1/Section';
+import ConnectWallet from '../v1/ConnectWallet';
+import NavNewPrompt from '../v1/NavNewPrompt';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
-
-const nivigationRight = [
-  // { name: 'Create', href: '#', current: true, bgDark: false },
-  { name: 'Connect Wallet', href: '#', current: true, bgDark: true },
-];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -40,12 +32,9 @@ function Nav({ className }: { className?: string }) {
               )}
               <div className="flex flex-1 items-center justify-between sm:items-stretch">
                 <div className="flex flex-shrink-0 items-center space-x-4">
-                  <a
-                    className="font-bold text-base sm:text-xl not-italic"
-                    href={server}
-                  >
+                  <h1 className="font-bold text-base sm:text-xl not-italic">
                     Hologram
-                  </a>
+                  </h1>
                 </div>
                 {showFeature && (
                   <div className="sm:ml-6 flex items-center w-full justify-center">
@@ -64,36 +53,7 @@ function Nav({ className }: { className?: string }) {
                   </div>
                 )}
               </div>
-
-              <div className="flex items-center sm:static sm:inset-auto w-fit">
-                <div className="flex space-x-4">
-                  <ConnectWallet />
-                </div>
-              </div>
-
-              {showFeature && (
-                <div className="lex items-center sm:static sm:inset-auto w-fit">
-                  <div className="flex space-x-4">
-                    {nivigationRight.map((item) => {
-                      return (
-                        <Disclosure.Button
-                          key="connect-wallet"
-                          className={classNames(
-                            item.bgDark
-                              ? 'bg-gray-900 text-white'
-                              : 'bg-white text-black ',
-                            'border rounded-lg px-[1.5rem] text-sm font-medium h-[2.5rem] sm:h-12 min-w-[117px]'
-                          )}
-                        >
-                          {item.name}
-                        </Disclosure.Button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Profile dropdown */}
-                </div>
-              )}
+              <ConnectWallet />
             </div>
           </Section>
 

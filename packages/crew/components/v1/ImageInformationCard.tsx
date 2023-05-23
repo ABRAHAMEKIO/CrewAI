@@ -10,7 +10,7 @@ function ImageInformationCard() {
           <Text size={15} weight="semibold" color="$gray700">
             Group ID
           </Text>
-          <Link href="/">
+          <Link href="/packages/crew/pages">
             <Text size={18} weight="semibold" color="secondary">
               qwertyuiop
             </Text>
