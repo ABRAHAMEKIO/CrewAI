@@ -5,6 +5,7 @@ import { LoadingIcon } from './Icons';
 import Section from './Section';
 import ConnectWallet from './ConnectWallet';
 import NavNewPrompt from './NavNewPrompt';
+import { server } from '../config';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -39,9 +40,12 @@ function Nav({ className }: { className?: string }) {
               )}
               <div className="flex flex-1 items-center justify-between sm:items-stretch">
                 <div className="flex flex-shrink-0 items-center space-x-4">
-                  <h1 className="font-bold text-base sm:text-xl not-italic">
+                  <a
+                    className="font-bold text-base sm:text-xl not-italic"
+                    href={server}
+                  >
                     Hologram
-                  </h1>
+                  </a>
                 </div>
                 {showFeature && (
                   <div className="sm:ml-6 flex items-center w-full justify-center">
