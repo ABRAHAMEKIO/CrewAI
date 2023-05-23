@@ -3,7 +3,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import {
   CrossIcon,
   FacebookIcon,
-  InstagramIcon,
   TelegramIcon,
   TickIcon,
   TwitterIcon,
@@ -94,19 +93,55 @@ function ShareModal({
                     </p>
                     <div className="col-span-6 flex items-center">
                       <div className="inline mx-auto w-full">
-                        <button type="button" className="inline-block m-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.open(
+                              `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+                              '_blank'
+                            );
+                          }}
+                          className="inline-block m-2"
+                        >
                           <FacebookIcon fill="white" />
                         </button>
-                        <button type="button" className="inline-block m-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.open(
+                              `https://twitter.com/intent/tweet?text=Hologram%20${url}`,
+                              '_blank'
+                            );
+                          }}
+                          className="inline-block m-2"
+                        >
                           <TwitterIcon fill="white" />
                         </button>
-                        <button type="button" className="inline-block m-2">
-                          <InstagramIcon fill="white" />
-                        </button>
-                        <button type="button" className="inline-block m-2">
+                        {/* <button type="button" className="inline-block m-2"> */}
+                        {/*  <InstagramIcon fill="white" /> */}
+                        {/* </button> */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.open(
+                              `https://t.me/share/url?url=${url}&text=Hologram`,
+                              '_blank'
+                            );
+                          }}
+                          className="inline-block m-2"
+                        >
                           <TelegramIcon fill="white" />
                         </button>
-                        <button type="button" className="inline-block m-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.open(
+                              `whatsapp://send?text=Hologram%20${url}`,
+                              '_blank'
+                            );
+                          }}
+                          className="inline-block m-2"
+                        >
                           <WhatsappIcon fill="white" />
                         </button>
                       </div>
