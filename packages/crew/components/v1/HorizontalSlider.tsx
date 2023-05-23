@@ -318,18 +318,11 @@ function HorizontalSlider({
     }
   }
 
-  const handleShareButton = () => {
+  const handleShareButton = async () => {
     const param = `?v=${current.id}`;
-    if (navigator.share) {
-      navigator.share({
-        title: 'Hologram AI',
-        url: `${server}/${param}`,
-      });
-    } else {
-      navigator.clipboard.writeText(`${server}/${param}`);
-      // eslint-disable-next-line no-alert
-      window.alert('Link copied!');
-    }
+    await navigator.clipboard.writeText(`${server}/${param}`);
+    // eslint-disable-next-line no-alert
+    window.alert('Link copied!');
   };
 
   function scrollToPrompt(promptId) {
