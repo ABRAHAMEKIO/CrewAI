@@ -7,6 +7,8 @@ import PromptClient from '../../domain/prompt/promptClient';
 import sendTransaction from '../../helpers/sendTransaction';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
 import { server, web3PromptPrice } from '../../config';
+import ShareModal from './ShareModal';
+import ShareSlideOver from './ShareSlideOver';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -53,6 +55,9 @@ function HorizontalSlider({
   const [current, setCurrent] = useState<PromptAttributes>(item);
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
+  const [openShareModal, setOpenShareModal] = useState(false);
+  const [openShareSlideOver, setOpenShareSlideOver] = useState(false);
+  const [shareUrl, setShareUrl] = useState(null);
 
   const { chain } = useNetwork();
   const { address } = useAccount();
@@ -319,10 +324,13 @@ function HorizontalSlider({
   }
 
   const handleShareButton = async () => {
-    const param = `?v=${current.id}`;
-    await navigator.clipboard.writeText(`${server}/${param}`);
-    // eslint-disable-next-line no-alert
-    window.alert('Link copied!');
+    setShareUrl(`${server}/?v=${current.id}`);
+    setOpenShareModal(true);
+  };
+
+  const handleShareButtonSlideOver = async () => {
+    setShareUrl(`${server}/?v=${current.id}`);
+    setOpenShareSlideOver(true);
   };
 
   function scrollToPrompt(promptId) {
@@ -424,7 +432,7 @@ function HorizontalSlider({
               <div className="col-span-2">
                 <button
                   type="button"
-                  onClick={handleShareButton}
+                  onClick={handleShareButtonSlideOver}
                   className="float-right"
                 >
                   <ShareButtonIcon fill="white" />
@@ -503,6 +511,16 @@ function HorizontalSlider({
           <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden mt-4" />
         </div>
       </div>
+      <ShareModal
+        modalOpen={openShareModal}
+        modalClose={() => setOpenShareModal(false)}
+        url={shareUrl}
+      />
+      <ShareSlideOver
+        modalOpen={openShareSlideOver}
+        modalClose={() => setOpenShareSlideOver(false)}
+        url={shareUrl}
+      />
     </div>
   );
 }
