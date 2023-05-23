@@ -1,8 +1,8 @@
 import React from 'react';
 import { Container } from '@nextui-org/react';
-import Layout from '../../components/Layout';
-import NavigationBar from '../../components/NavigationBar';
-import FormLogin from '../../components/Login';
+import Layout from '../../components/v1/Layout';
+import NavigationBar from '../../components/v1/NavigationBar';
+import FormLogin from '../../components/v1/Login';
 import { server } from '../../config';
 
 function Login() {

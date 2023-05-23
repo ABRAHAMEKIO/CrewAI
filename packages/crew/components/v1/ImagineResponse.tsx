@@ -4,9 +4,9 @@ import MidjourneyClient, {
   IsNaughtySuccessResponse,
   SuccessResponse,
   WebhookSuccessResponse,
-} from '../domain/midjourney/midjourneyClient';
-import { errorBeep } from '../domain/sounds/beep';
-import { server } from '../config';
+} from '../../domain/midjourney/midjourneyClient';
+import { errorBeep } from '../../domain/sounds/beep';
+import { server } from '../../config';
 
 export const ImageResponseContext = createContext(undefined);
 

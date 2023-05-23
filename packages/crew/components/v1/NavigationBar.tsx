@@ -2,7 +2,7 @@ import { Button, Dropdown, Link, Navbar, Text } from '@nextui-org/react';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import icons from './Icons';
-import { server } from '../config';
+import { server } from '../../config';
 
 const navItems = [
   {
@@ -100,7 +100,7 @@ function NavigationBar() {
       <Navbar.Brand>
         <PlaceholderLogo />
         <Text b color="inherit">
-          <Link href="/">CrewAI</Link>
+          <Link href="/packages/crew/pages">CrewAI</Link>
         </Text>
       </Navbar.Brand>
       <Navbar.Content hideIn="xs">
