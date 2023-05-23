@@ -1,8 +1,8 @@
 import React from 'react';
 import ContentEditable from 'react-contenteditable';
 import styles from './SmartTextArea.module.css';
-import OpenAIClient from '../domain/openai/openAIClient';
-import useRefCallback from '../hooks/UseRefCallback';
+import OpenAIClient from '../../domain/openai/openAIClient';
+import useRefCallback from '../../hooks/UseRefCallback';
 
 function SmartTextArea(props: {
   onContentChange: (value: string) => void;

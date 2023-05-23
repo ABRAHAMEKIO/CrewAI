@@ -1,8 +1,8 @@
 import React from 'react';
 import { Disclosure } from '@headlessui/react';
-import Section from '../Section';
-import ConnectWallet from '../ConnectWallet';
-import NavNewPrompt from '../NavNewPrompt';
+import Section from '../v1/Section';
+import ConnectWallet from '../v1/ConnectWallet';
+import NavNewPrompt from '../v1/NavNewPrompt';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 

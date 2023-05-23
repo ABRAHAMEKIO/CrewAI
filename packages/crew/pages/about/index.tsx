@@ -1,8 +1,8 @@
 import React from 'react';
 import { Container, Grid, Spacer, Text } from '@nextui-org/react';
 import Image from 'next/image';
-import Layout from '../../components/Layout';
-import NavigationBar from '../../components/NavigationBar';
+import Layout from '../../components/v1/Layout';
+import NavigationBar from '../../components/v1/NavigationBar';
 
 function Index() {
   const teams = [

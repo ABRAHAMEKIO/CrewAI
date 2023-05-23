@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Container, Grid, Row, Dropdown, Spacer } from '@nextui-org/react';
-import Tag from '../../components/Tag';
-import DetailImageModal from '../../components/DetailImageModal';
-import Layout from '../../components/Layout';
-import NavigationBar from '../../components/NavigationBar';
-import GalleryItemCard from '../../components/GalleryItemCard';
+import Tag from '../../components/v1/Tag';
+import DetailImageModal from '../../components/v1/DetailImageModal';
+import Layout from '../../components/v1/Layout';
+import NavigationBar from '../../components/v1/NavigationBar';
+import GalleryItemCard from '../../components/v1/GalleryItemCard';
 import Group, { GroupAttributes } from '../../db/models/group';
 
 export const getServerSideProps: () => Promise<{

@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
-import LoadingContext from '../context/loading-context';
+import LoadingContext from '../../context/loading-context';
 import { LoadingIcon } from './Icons';
 import Section from './Section';
 import ConnectWallet from './ConnectWallet';
 import NavNewPrompt from './NavNewPrompt';
-import { server } from '../config';
+import { server } from '../../config';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 

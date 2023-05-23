@@ -3,11 +3,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import { useNetwork, useAccount } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { CrossIcon } from './Icons';
-import { PromptAttributes } from '../db/models/prompt';
-import PromptClient from '../domain/prompt/promptClient';
-import sendTransaction from '../helpers/sendTransaction';
-import NavNewPromptContext from '../context/nav-new-prompt-context';
-import { web3PromptPrice } from '../config';
+import { PromptAttributes } from '../../db/models/prompt';
+import PromptClient from '../../domain/prompt/promptClient';
+import sendTransaction from '../../helpers/sendTransaction';
+import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import { web3PromptPrice } from '../../config';
 
 function ModalPrompt({
   loading,
