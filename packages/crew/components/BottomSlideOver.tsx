@@ -147,9 +147,9 @@ function BottomSlideOver({
                           ? `${
                               !chain.unsupported
                                 ? ` ${chain.nativeCurrency.symbol}`
-                                : ''
+                                : 'xDAI'
                             }`
-                          : ''}
+                          : ' xDAI'}
                         )
                       </button>
                     </div>

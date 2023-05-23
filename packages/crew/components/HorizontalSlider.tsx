@@ -469,9 +469,9 @@ function HorizontalSlider({
                     ? `${
                         !chain.unsupported
                           ? ` ${chain.nativeCurrency.symbol}`
-                          : ''
+                          : 'xDAI'
                       }`
-                    : ''
+                    : ' xDAI'
                 })`,
                 bgDark: false,
                 onClick: () => handleSubmit(),

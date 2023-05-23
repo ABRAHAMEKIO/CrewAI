@@ -159,9 +159,9 @@ function ModalPrompt({
                         ? `${
                             !chain.unsupported
                               ? ` ${chain.nativeCurrency.symbol}`
-                              : ''
+                              : 'xDAI'
                           }`
-                        : ''}
+                        : ' xDAI'}
                       )
                     </button>
                   </div>
