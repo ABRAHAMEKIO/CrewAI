@@ -52,6 +52,7 @@ function BottomSlideOver({
           msg: text,
           socketId,
           transactionHash: transaction.hash.toString(),
+          chainId: transaction.chainId,
         });
 
         modalClose();

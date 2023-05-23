@@ -1,9 +1,9 @@
 import { ethers, utils } from 'ethers';
 import { TransactionResponse } from '@ethersproject/abstract-provider';
 import Replicate from 'replicate';
-import { formatUnits } from '@ethersproject/units/src.ts';
 import {
-  rpcGatewayFmKey,
+  rpcGatewayFmKeyGnosis,
+  rpcGatewayFmKeyPolygon,
   web3PromptPrice,
   web3AddressGnosis,
   web3AddressPolygon,
@@ -11,8 +11,6 @@ import {
 import Prompt, { ModelType, PromptAttributes } from '../../../db/models/prompt';
 import Webhook, { WebhookStep } from '../../../db/models/webhook';
 import MidjourneyClient from '../../../domain/midjourney/midjourneyClient';
-
-const provider = new ethers.providers.JsonRpcProvider(rpcGatewayFmKey);
 
 export interface SuccessResponse {
   success: boolean;
@@ -108,23 +106,40 @@ export default async function handler(
   res
 ): Promise<SuccessResponse | FailedResponse> {
   const {
-    body: { transactionHash, promptId, msg, socketId }, // '0x916ab96e5fb29e836ffcfc52fc95b6d1f35a761c92e0c6b33d6364d79d4f4c80'
+    body: { transactionHash, promptId, msg, socketId, chainId }, // '0x916ab96e5fb29e836ffcfc52fc95b6d1f35a761c92e0c6b33d6364d79d4f4c80'
   } = req;
 
   const prompt = await Prompt.findByPk(promptId);
 
   const { modelType } = prompt;
 
-  const txReceipt = await provider.getTransaction(transactionHash);
-  const { to, from, chainId } = txReceipt;
+  const provider = new ethers.providers.JsonRpcProvider(
+    chainId === 100 ? rpcGatewayFmKeyGnosis : rpcGatewayFmKeyPolygon
+  );
 
-  // ✅ 3. Jumlah yang dibayarkan sudah sesuai dengan harga belum?
-  const value = utils.formatUnits(txReceipt.value.toString(), 18);
+  const tx = await provider.getTransaction(transactionHash);
+  const txReceipt = await provider.getTransactionReceipt(transactionHash);
+
+  // check transaction hash is valid with rpc
+  if (!tx || !txReceipt) {
+    return res.status(200).json({ success: false });
+  }
+
+  const { to, from } = tx;
+  const { status } = txReceipt;
+
+  // Check status transaction
+  if (status !== 1) {
+    return res.status(200).json({ success: false });
+  }
+
+  // Jumlah yang dibayarkan sudah sesuai dengan harga belum?
+  const value = utils.formatUnits(tx.value.toString(), 18);
   if (value !== web3PromptPrice.toString()) {
     return res.status(200).json({ success: false });
   }
 
-  // ✅ 2. Tujuannya benar tidak
+  // Tujuannya benar tidak
   if (!(to === web3AddressGnosis) || !(to === web3AddressPolygon)) {
     return res.status(200).json({ success: false });
   }
@@ -133,12 +148,12 @@ export default async function handler(
     where: { transactionHash },
   });
 
-  // ✅ 1. transactionHash dipake berapa kali apakah 1? jika lebih maka error
+  // transactionHash dipake berapa kali apakah 1? jika lebih maka error
   if (webhookByTransaction) {
     return res.status(200).json({ success: false });
   }
 
-  // ✅ 4. Wallet gnosis (chainId 100) dan polygon (chainId 137)
+  // Wallet gnosis (chainId 100) dan polygon (chainId 137)
   if (chainId === 100 && !(to === web3AddressGnosis)) {
     return res.status(200).json({ success: false });
   }
@@ -183,6 +198,6 @@ export default async function handler(
   // lalu simpan status seperti di webhook
   return res.status(200).json({
     success: true,
-    receipt: txReceipt,
+    receipt: tx,
   });
 }

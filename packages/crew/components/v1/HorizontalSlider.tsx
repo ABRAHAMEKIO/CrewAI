@@ -297,6 +297,7 @@ function HorizontalSlider({
             msg: current.prompt,
             socketId,
             transactionHash: transaction.hash.toString(),
+            chainId: transaction.chainId,
           });
 
           if ('success' in response && response.success) {
