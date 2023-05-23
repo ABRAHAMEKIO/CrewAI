@@ -43,10 +43,16 @@ function Index({ socketId }: { socketId: string }) {
   const limit = 20;
   const dataFetch = useCallback(
     async (page: number) => {
+      const params = new URLSearchParams(window.location.search);
+      let v = null;
+      if (params.has('v')) {
+        v = params.get('v');
+      }
       const promptPaginationResponse:
         | PaginationSuccessResponse
         | ErrorResponse = await promptClient.pagination({
         page,
+        v,
       });
 
       if (
@@ -143,6 +149,7 @@ function Index({ socketId }: { socketId: string }) {
                     {dataPrompt.rows.map((item, index) => {
                       return (
                         <div
+                          id={item.id}
                           className="snap-start pt-[112px] sm:pt-[136px]"
                           key={item.id}
                           data-id={item.id}
