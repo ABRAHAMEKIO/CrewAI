@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNetwork, useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { PromptAttributes } from '../db/models/prompt';
 import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
-import { server } from '../config';
+import { server, web3PromptPrice } from '../config';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -52,6 +54,9 @@ function HorizontalSlider({
   const [currentSlide, setCurrentSlide] = useState(1);
   const [totalSlide, setTotalSlide] = useState(1);
 
+  const { chain } = useNetwork();
+  const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
@@ -66,6 +71,29 @@ function HorizontalSlider({
     if (item?.id.toString() === newPrompt?.parentId.toString()) {
       setAllItem((prevItem) => [...prevItem, newPrompt]);
     }
+    const timeOut = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('parent')) {
+        const interval = setInterval(() => {
+          const element = document.getElementById(
+            params.get('parent').toString()
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            if (params.has('child')) {
+              const child = document.getElementById(
+                `horizontal-${params.get('child')}`
+              );
+              if (child) {
+                child.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+            clearInterval(interval);
+            clearTimeout(timeOut);
+          }
+        }, 100);
+      }
+    }, 2000);
   }, [newPrompt, item]);
 
   const findElement = () => {
@@ -253,37 +281,41 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    if (loading) return;
-    setLoading(true);
-    const transaction = await sendTransaction('0.01');
-    // eslint-disable-next-line no-console
-    console.log({ transaction });
-    if (transaction) {
-      if ('hash' in transaction) {
-        const promptClient = new PromptClient();
-        const response = await promptClient.generate({
-          promptId: item.id,
-          msg: current.prompt,
-          socketId,
-          transactionHash: transaction.hash.toString(),
-        });
+    if (!address) {
+      openConnectModal();
+    } else {
+      if (loading) return;
+      setLoading(true);
+      const transaction = await sendTransaction(web3PromptPrice);
+      // eslint-disable-next-line no-console
+      console.log({ transaction });
+      if (transaction) {
+        if ('hash' in transaction) {
+          const promptClient = new PromptClient();
+          const response = await promptClient.generate({
+            promptId: item.id,
+            msg: current.prompt,
+            socketId,
+            transactionHash: transaction.hash.toString(),
+          });
 
-        if ('success' in response && response.success) {
-          return;
-        }
-        if ('success' in response && !response.success) {
-          setLoading(false);
-          // eslint-disable-next-line no-alert
-          window.alert('Generate Fail');
-          return;
+          if ('success' in response && response.success) {
+            return;
+          }
+          if ('success' in response && !response.success) {
+            setLoading(false);
+            // eslint-disable-next-line no-alert
+            window.alert('Generate Fail');
+            return;
+          }
         }
       }
-    }
 
-    setLoading(false);
-    navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-    // eslint-disable-next-line no-alert
-    window.alert('Transaction Fail');
+      setLoading(false);
+      navNewPromptContext?.setIndicatorNewPromptDisplay(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Transaction Fail');
+    }
   }
 
   const handleShareButton = () => {
@@ -439,7 +471,15 @@ function HorizontalSlider({
           <div className="mt-4 sm:mt-6">
             {[
               {
-                name: 'Generate ($0.01 xDai)',
+                name: `Generate (${web3PromptPrice}${
+                  chain
+                    ? `${
+                        !chain.unsupported
+                          ? ` ${chain.nativeCurrency.symbol}`
+                          : ''
+                      }`
+                    : ''
+                })`,
                 bgDark: false,
                 onClick: () => handleSubmit(),
               },
