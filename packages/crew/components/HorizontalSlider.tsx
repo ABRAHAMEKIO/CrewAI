@@ -6,6 +6,7 @@ import { ShareButtonIcon } from './Icons';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import { web3PromptPrice } from '../config';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -253,7 +254,7 @@ function HorizontalSlider({
     } else {
       if (loading) return;
       setLoading(true);
-      const transaction = await sendTransaction('0.01');
+      const transaction = await sendTransaction(web3PromptPrice);
       // eslint-disable-next-line no-console
       console.log({ transaction });
       if (transaction) {
@@ -441,7 +442,7 @@ function HorizontalSlider({
           <div className="mt-4 sm:mt-6">
             {[
               {
-                name: `Generate (0.01${
+                name: `Generate (${web3PromptPrice}${
                   chain
                     ? `${
                         !chain.unsupported

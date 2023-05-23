@@ -7,6 +7,7 @@ import { PromptAttributes } from '../db/models/prompt';
 import PromptClient from '../domain/prompt/promptClient';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import { web3PromptPrice } from '../config';
 
 function ModalPrompt({
   loading,
@@ -42,7 +43,7 @@ function ModalPrompt({
     } else {
       if (loading) return;
       setLoading(true);
-      const transaction = await sendTransaction('0.01');
+      const transaction = await sendTransaction(web3PromptPrice);
       // eslint-disable-next-line no-console
       console.log({ transaction });
       if (transaction) {
@@ -153,7 +154,7 @@ function ModalPrompt({
                       )}
                       onClick={() => handleSubmit()}
                     >
-                      Generate (0.01
+                      Generate ({web3PromptPrice}{' '}
                       {chain
                         ? `${
                             !chain.unsupported

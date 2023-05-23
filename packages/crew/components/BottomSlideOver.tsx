@@ -7,6 +7,7 @@ import PromptClient from '../domain/prompt/promptClient';
 import { PromptAttributes } from '../db/models/prompt';
 import sendTransaction from '../helpers/sendTransaction';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import { web3PromptPrice } from '../config';
 
 function BottomSlideOver({
   loading,
@@ -41,7 +42,7 @@ function BottomSlideOver({
     } else {
       if (loading) return;
       setLoading(true);
-      const transaction = await sendTransaction('0.01');
+      const transaction = await sendTransaction(web3PromptPrice);
       // eslint-disable-next-line no-console
       console.log({ transaction });
       if (transaction) {
@@ -141,7 +142,7 @@ function BottomSlideOver({
                         )}
                         onClick={() => handleSubmit()}
                       >
-                        Generate (0.01
+                        Generate ({web3PromptPrice}{' '}
                         {chain
                           ? `${
                               !chain.unsupported

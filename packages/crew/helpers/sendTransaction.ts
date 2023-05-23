@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { web3AddressGnosis, web3AddressPolygon } from '../config';
 
 async function sendTransaction(sendTokenAmount: string) {
   try {
@@ -7,10 +8,7 @@ async function sendTransaction(sendTokenAmount: string) {
     const network = (await provider.getNetwork()).name;
 
     const tx = await signer.sendTransaction({
-      to:
-        network === 'matic'
-          ? '0x2ab35CA8EFEbD8663B709160ACAcb160692dBfB1'
-          : '0xd54E6A61332657eCac42146f226e44C6166C86bE',
+      to: network === 'matic' ? web3AddressPolygon : web3AddressGnosis,
       value: ethers.utils.parseUnits(sendTokenAmount, 'ether').toHexString(),
     });
 
