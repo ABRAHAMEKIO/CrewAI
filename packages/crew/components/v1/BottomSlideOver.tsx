@@ -1,7 +1,8 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { useNetwork, useAccount } from 'wagmi';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useNetwork } from 'wagmi';
+import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit';
+import { useSession } from 'next-auth/react';
 import { CrossIcon } from './Icons';
 import PromptClient from '../../domain/prompt/promptClient';
 import { PromptAttributes } from '../../db/models/prompt';
@@ -28,8 +29,10 @@ function BottomSlideOver({
 }) {
   const [text, setText] = useState<string>('');
   const { chain } = useNetwork();
-  const { address } = useAccount();
+  const { status } = useSession();
   const { openConnectModal } = useConnectModal();
+  const { openChainModal } = useChainModal();
+
   const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
@@ -37,8 +40,10 @@ function BottomSlideOver({
   }, [prompt]);
 
   async function handleSubmit(): Promise<void> {
-    if (!address) {
+    if (!(status === 'authenticated')) {
       openConnectModal();
+    } else if (chain.unsupported) {
+      openChainModal();
     } else {
       if (loading) return;
       setLoading(true);
@@ -52,6 +57,7 @@ function BottomSlideOver({
           msg: text,
           socketId,
           transactionHash: transaction.hash.toString(),
+          chainId: transaction.chainId,
         });
 
         modalClose();
@@ -145,11 +151,11 @@ function BottomSlideOver({
                         Generate ({web3PromptPrice}{' '}
                         {chain
                           ? `${
-                              !chain.unsupported
+                              !chain.unsupported && status === 'authenticated'
                                 ? ` ${chain.nativeCurrency.symbol}`
-                                : ''
+                                : ' xDai'
                             }`
-                          : ''}
+                          : ' xDai'}
                         )
                       </button>
                     </div>

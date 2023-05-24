@@ -13,7 +13,8 @@ export const awsBucket = process.env.AWS_BUCKET;
 export const awsRegion = process.env.AWS_REGION;
 export const mixPanelId = process.env.NEXT_PUBLIC_MIXPANEL_ID;
 export const magicLinkPk = process.env.NEXT_PUBLIC_MAGIC_LINK_PK;
-export const rpcGatewayFmKey = process.env.RPC_GATEWAY_FM_URL;
+export const rpcGatewayFmKeyGnosis = process.env.RPC_GATEWAY_FM_URL_GNOSIS;
+export const rpcGatewayFmKeyPolygon = process.env.RPC_GATEWAY_FM_URL_POLYGON;
 export const web3PromptPrice = process.env.WEB3_PROMPT_PRICE || '0.01';
 export const web3AddressGnosis =
   process.env.WEB3_ADDRESS_GNOSIS ||
