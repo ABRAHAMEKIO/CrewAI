@@ -1,11 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ethers } from 'ethers';
+import { useNetwork, useAccount } from 'wagmi';
 
 function ConnectWallet() {
+  const { isConnected } = useAccount();
+  const { chain } = useNetwork();
+  useEffect(() => {
+    if (isConnected && !(chain?.id === 100 || chain?.id === 137)) {
+      window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: ethers.utils.hexValue(100),
+            rpcUrls: ['https://rpc.gnosischain.com'],
+            chainName: 'Gnosis',
+            nativeCurrency: {
+              name: 'xDai',
+              symbol: 'xDai',
+              decimals: 18,
+            },
+            blockExplorerUrls: ['https://gnosisscan.io'],
+          },
+        ],
+      });
+    }
+  });
+
   return (
     <ConnectButton.Custom>
       {({
         account,
+        // eslint-disable-next-line no-shadow
         chain,
         openAccountModal,
         openChainModal,
@@ -46,7 +72,6 @@ function ConnectWallet() {
               }
 
               if (chain.unsupported) {
-                openChainModal();
                 return (
                   <button
                     onClick={openChainModal}
