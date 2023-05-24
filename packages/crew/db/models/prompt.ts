@@ -132,8 +132,8 @@ Prompt.init(
       type: DataTypes.TEXT,
     },
     imageUrlIsUnique: {
-      allowNull: true,
       type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     parentId: {
       allowNull: true,
