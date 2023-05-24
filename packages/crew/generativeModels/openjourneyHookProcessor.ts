@@ -4,6 +4,8 @@ import Prompt from '../db/models/prompt';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import { imageUploadByUrl } from '../domain/image/upload';
+import PromptSeeder, { DeploymentStatus } from '../db/models/promptseeder';
+import seederPromptHelper from '../helpers/seederPromptHelper';
 
 class OpenHookProcessor implements HookProcessor {
   private readonly io: any;
@@ -53,9 +55,48 @@ class OpenHookProcessor implements HookProcessor {
             prompt,
           } as WebhookSuccessResponse);
       }
+    } else {
+      await this.processFromSeeder(webhookReq);
     }
 
     return webhookTable;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async processFromSeeder(webhookReq: {
+    id: string;
+    output: string[];
+    input: { prompt: string };
+  }): Promise<PromptSeeder> {
+    const seeder = await PromptSeeder.findOne({
+      where: { replicatemeGenId: webhookReq.id },
+    });
+
+    if (seeder) {
+      let imageUrl = webhookReq.output[0];
+      const s3Data = await imageUploadByUrl(imageUrl);
+
+      if ('Location' in s3Data) {
+        imageUrl = s3Data.Location;
+      }
+      await Prompt.create({
+        id: seeder.id,
+        prompt: seeder.prompt,
+        extendedPrompt: seeder.extendedPrompt,
+        parentId: null,
+        objectName: seeder.objectName,
+        creatorAddress: seeder.creatorAddress,
+        imageUrl,
+        modelType: 'openjourney',
+      });
+
+      await seeder.update({ deploymentStatus: DeploymentStatus.published });
+      await seeder.save();
+
+      await seederPromptHelper.nextSeeder();
+    }
+
+    return seeder;
   }
 }
 

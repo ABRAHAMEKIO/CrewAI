@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import nextConnect from 'next-connect';
 import { Op } from 'sequelize';
-import Prompt from '../../../db/models/prompt';
+import Prompt, { ModelType } from '../../../db/models/prompt';
 
 // ref: https://www.npmjs.com/package/next-connect
 interface ExtendedRequest {
@@ -27,6 +27,7 @@ apiRoute.get(async (req, res) => {
   const { page, v } = req.query;
 
   let firstRowParentId = null;
+
   async function isNotNullParent() {
     if (v) {
       const findParent = await Prompt.findOne({
