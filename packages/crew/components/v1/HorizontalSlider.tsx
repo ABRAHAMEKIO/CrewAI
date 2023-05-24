@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNetwork, useAccount } from 'wagmi';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useNetwork } from 'wagmi';
+import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit';
+import { useSession } from 'next-auth/react';
 import { PromptAttributes } from '../../db/models/prompt';
 import { ShareButtonIcon } from './Icons';
 import PromptClient from '../../domain/prompt/promptClient';
@@ -60,8 +61,10 @@ function HorizontalSlider({
   const [shareUrl, setShareUrl] = useState(null);
 
   const { chain } = useNetwork();
-  const { address } = useAccount();
+  const { status } = useSession();
   const { openConnectModal } = useConnectModal();
+  const { openChainModal } = useChainModal();
+
   const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
@@ -286,8 +289,10 @@ function HorizontalSlider({
   );
 
   async function handleSubmit() {
-    if (!address) {
+    if (!(status === 'authenticated')) {
       openConnectModal();
+    } else if (chain.unsupported) {
+      openChainModal();
     } else {
       if (loading) return;
       setLoading(true);
@@ -302,6 +307,7 @@ function HorizontalSlider({
             msg: current.prompt,
             socketId,
             transactionHash: transaction.hash.toString(),
+            chainId: transaction.chainId,
           });
 
           if ('success' in response && response.success) {
@@ -475,11 +481,11 @@ function HorizontalSlider({
                 name: `Generate (${web3PromptPrice}${
                   chain
                     ? `${
-                        !chain.unsupported
+                        !chain.unsupported && status === 'authenticated'
                           ? ` ${chain.nativeCurrency.symbol}`
-                          : ''
+                          : ' xDai'
                       }`
-                    : ''
+                    : ' xDai'
                 })`,
                 bgDark: false,
                 onClick: () => handleSubmit(),

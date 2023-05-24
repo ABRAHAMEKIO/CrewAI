@@ -64,14 +64,16 @@ export default class PromptClient {
     msg: string;
     socketId: string;
     transactionHash: string;
+    chainId: number;
   }): Promise<SuccessResponse | IsNaughtySuccessResponse> {
-    const { promptId, msg, socketId, transactionHash } = props;
+    const { promptId, msg, socketId, transactionHash, chainId } = props;
 
     const data = {
       transactionHash,
       promptId,
       msg,
       socketId,
+      chainId,
     };
 
     const config = this.getConfig(data, 'api/prompt/generate', 'POST', '');
