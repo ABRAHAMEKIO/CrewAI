@@ -127,6 +127,14 @@ apiRoute.post(upload.single('file'), async (req, res) => {
 });
 
 apiRoute.get(async (req, res) => {
+  const secret = req?.query?.secret;
+  try {
+    if (atob(secret) !== SECRET)
+      return res.status(401).json({ message: 'Not authorized' });
+  } catch (e) {
+    return res.status(400).json({ message: 'Invalid secret format' });
+  }
+
   await seederPromptHelper.nextSeeder();
   return res.status(200).json({
     file: req.file,
