@@ -21,6 +21,8 @@ export const web3AddressGnosis =
 export const web3AddressPolygon =
   process.env.WEB3_ADDRESS_POLYGON ||
   '0x2ab35CA8EFEbD8663B709160ACAcb160692dBfB1';
+export const openjourneyPredictionsVersion =
+  '9936c2001faa2194a261c01381f90e65261879985476014a0a37a334593a05eb';
 
 // disabled for now because lots of bugs
 export const isAutocompleteEnabled = false;

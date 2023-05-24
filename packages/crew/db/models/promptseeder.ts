@@ -15,7 +15,6 @@ export const ModelType = {
 export const DeploymentStatus = {
   created: 'created',
   generating: 'generating',
-  uploading: 'uploading',
   fail: 'fail',
   published: 'published',
 };
@@ -38,6 +37,7 @@ export interface PromptSeederAttributes {
   updatedAt?: Date;
   modelType?: string | null;
   deploymentStatus?: string | null;
+  replicatemeGenId?: string | null;
 }
 
 export type PromptSeederInput = Optional<PromptSeederAttributes, 'id'>;
@@ -78,6 +78,8 @@ class PromptSeeder
   public modelType!: string;
 
   public deploymentStatus!: string;
+
+  public replicatemeGenId: string;
 }
 
 PromptSeeder.init(
@@ -137,6 +139,10 @@ PromptSeeder.init(
       type: DataTypes.STRING,
     },
     deploymentStatus: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
+    replicatemeGenId: {
       allowNull: true,
       type: DataTypes.STRING,
     },

@@ -3,9 +3,12 @@ import multer from 'multer';
 
 import nextConnect from 'next-connect';
 import { NextApiResponse } from 'next';
+import Replicate from 'replicate';
 import PromptSeeder, {
   DeploymentStatus,
 } from '../../../db/models/promptseeder';
+import { openjourneyPredictionsVersion } from '../../../config';
+import { ModelType } from '../../../db/models/prompt';
 
 const col =
   'content_id,creator_address,object_name,object_name_is_unique,prompt,show_prompt_fee,maximum_mint,mint_fee,image_url,ipfs_url,image_url_is_unique,extended_prompt';
@@ -82,6 +85,7 @@ async function csvToJson(filePath: string): Promise<CsvJson[]> {
 }
 
 const SECRET = process.env.WEBHOOK_THENEXTLEG_SECRET;
+const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
 
 apiRoute.post(upload.single('file'), async (req, res) => {
   const secret = req?.query?.secret;
@@ -95,7 +99,7 @@ apiRoute.post(upload.single('file'), async (req, res) => {
   const json = await csvToJson(req.file.path);
   const payloads = json.map((j) => ({
     id: parseInt(j.content_id, 10),
-    prompt: j.prompt,
+    prompt: `mdjrny-v4 ${j.prompt}`,
     imageUrl: j.image_url,
     creatorAddress: j.creator_address,
     objectName: j.object_name,
@@ -105,14 +109,35 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     mintFee: parseFloat(j.mint_fee) || null,
     ipfsUrl: j.ipfs_url,
     imageUrlIsUnique: j.image_url_is_unique === 'TRUE',
-    extendedPrompt: j.prompt,
-    modelType: j.model_type,
+    extendedPrompt: `mdjrny-v4 ${j.prompt}`,
+    modelType: ModelType.openJourney,
     deploymentStatus: DeploymentStatus.created,
   }));
 
   const insert = await PromptSeeder.bulkCreate(payloads, {
     ignoreDuplicates: true,
   });
+
+  const replicate = new Replicate({
+    auth: process.env.REPLICATE_API_TOKEN,
+  });
+
+  const nextSeeder = await PromptSeeder.findOne({
+    where: { deploymentStatus: DeploymentStatus.created },
+  });
+
+  const prediction = await replicate.predictions.create({
+    version: openjourneyPredictionsVersion,
+    input: { prompt: nextSeeder.prompt },
+    webhook: WEBHOOK_OVERRIDE,
+    webhook_events_filter: ['completed'],
+  });
+
+  await nextSeeder.update({
+    replicatemeGenId: prediction.id,
+    deploymentStatus: DeploymentStatus.generating,
+  });
+  await nextSeeder.save();
 
   return res.status(200).json({
     file: req.file,

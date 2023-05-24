@@ -4,12 +4,19 @@ import Prompt from '../db/models/prompt';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import { imageUploadByUrl } from '../domain/image/upload';
+import PromptSeeder, { DeploymentStatus } from '../db/models/promptseeder';
+import { openjourneyPredictionsVersion } from '../config';
+
+const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
 
 class OpenHookProcessor implements HookProcessor {
   private readonly io: any;
 
-  constructor(io: any) {
+  private readonly replicate: any;
+
+  constructor(io: any, replicate: any) {
     this.io = io;
+    this.replicate = replicate;
   }
 
   async process(webhookReq: {
@@ -53,9 +60,65 @@ class OpenHookProcessor implements HookProcessor {
             prompt,
           } as WebhookSuccessResponse);
       }
+    } else {
+      await this.processFromSeeder(webhookReq);
     }
 
     return webhookTable;
+  }
+
+  async processFromSeeder(webhookReq: {
+    id: string;
+    output: string[];
+    input: { prompt: string };
+  }): Promise<PromptSeeder> {
+    const seeder = await PromptSeeder.findOne({
+      where: { replicatemeGenId: webhookReq.id },
+    });
+
+    if (seeder) {
+      let imageUrl = webhookReq.output[0];
+      const s3Data = await imageUploadByUrl(imageUrl);
+
+      if ('Location' in s3Data) {
+        imageUrl = s3Data.Location;
+      }
+      await Prompt.create({
+        id: seeder.id,
+        prompt: seeder.prompt,
+        extendedPrompt: seeder.extendedPrompt,
+        parentId: null,
+        objectName: seeder.objectName,
+        creatorAddress: seeder.creatorAddress,
+        imageUrl,
+        modelType: 'openjourney',
+      });
+
+      await seeder.update({ deploymentStatus: DeploymentStatus.published });
+      await seeder.save();
+
+      const nextSeeder = await PromptSeeder.findOne({
+        where: { deploymentStatus: DeploymentStatus.created },
+      });
+
+      if (nextSeeder) {
+        const prediction = await this.replicate.predictions.create({
+          version: openjourneyPredictionsVersion,
+          input: { prompt: seeder.prompt },
+          webhook: WEBHOOK_OVERRIDE,
+          webhook_events_filter: ['completed'],
+        });
+
+        await nextSeeder.update({
+          replicatemeGenId: prediction.id,
+          deploymentStatus: DeploymentStatus.generating,
+        });
+
+        await nextSeeder.save();
+      }
+    }
+
+    return seeder;
   }
 }
 
