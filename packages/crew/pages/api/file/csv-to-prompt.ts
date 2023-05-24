@@ -109,7 +109,7 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     maximumMint: parseFloat(j.maximum_mint) || null,
     mintFee: parseFloat(j.mint_fee) || null,
     ipfsUrl: j.ipfs_url,
-    imageUrlIsUnique: j.image_url_is_unique === 'TRUE',
+    imageUrlIsUnique: true,
     extendedPrompt: `mdjrny-v4 ${j.prompt}`,
     modelType: ModelType.openJourney,
     deploymentStatus: DeploymentStatus.created,
