@@ -3,16 +3,11 @@ import multer from 'multer';
 
 import nextConnect from 'next-connect';
 import { NextApiResponse } from 'next';
-import Replicate from 'replicate';
 import PromptSeeder, {
   DeploymentStatus,
 } from '../../../db/models/promptseeder';
-import { openjourneyPredictionsVersion } from '../../../config';
 import { ModelType } from '../../../db/models/prompt';
 import seederPromptHelper from '../../../helpers/seederPromptHelper';
-
-const col =
-  'content_id,creator_address,object_name,object_name_is_unique,prompt,show_prompt_fee,maximum_mint,mint_fee,image_url,ipfs_url,image_url_is_unique,extended_prompt';
 
 // ref: https://www.npmjs.com/package/next-connect
 interface ExtendedRequest {
@@ -86,7 +81,6 @@ async function csvToJson(filePath: string): Promise<CsvJson[]> {
 }
 
 const SECRET = process.env.WEBHOOK_THENEXTLEG_SECRET;
-const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
 
 apiRoute.post(upload.single('file'), async (req, res) => {
   const secret = req?.query?.secret;
@@ -115,13 +109,12 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     deploymentStatus: DeploymentStatus.created,
   }));
 
-  const insert = await PromptSeeder.bulkCreate(payloads, {
-    ignoreDuplicates: true,
-  });
-
-  const replicate = new Replicate({
-    auth: process.env.REPLICATE_API_TOKEN,
-  });
+  let insert = [];
+  if (payloads.length) {
+    insert = await PromptSeeder.bulkCreate(payloads, {
+      ignoreDuplicates: true,
+    });
+  }
 
   await seederPromptHelper.nextSeeder();
 
@@ -129,10 +122,6 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     file: req.file,
     insert,
   });
-});
-
-apiRoute.get(async (req, res) => {
-  return true;
 });
 
 export default apiRoute;
