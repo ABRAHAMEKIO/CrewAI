@@ -91,6 +91,8 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     return res.status(400).json({ message: 'Invalid secret format' });
   }
 
+  return res.status(299).json({ message: 'Only for localhost' });
+
   const json = await csvToJson(req.file.path);
   const payloads = json.map((j) => ({
     id: parseInt(j.content_id, 10),
@@ -116,11 +118,26 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     });
   }
 
-  await seederPromptHelper.nextSeeder();
+  // await seederPromptHelper.nextSeeder();
 
   return res.status(200).json({
     file: req.file,
     insert,
+  });
+});
+
+apiRoute.get(async (req, res) => {
+  const secret = req?.query?.secret;
+  try {
+    if (atob(secret) !== SECRET)
+      return res.status(401).json({ message: 'Not authorized' });
+  } catch (e) {
+    return res.status(400).json({ message: 'Invalid secret format' });
+  }
+
+  await seederPromptHelper.nextSeeder();
+  return res.status(200).json({
+    file: req.file,
   });
 });
 
