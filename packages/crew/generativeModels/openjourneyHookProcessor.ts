@@ -5,18 +5,13 @@ import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import { imageUploadByUrl } from '../domain/image/upload';
 import PromptSeeder, { DeploymentStatus } from '../db/models/promptseeder';
-import { openjourneyPredictionsVersion } from '../config';
-
-const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
+import seederPromptHelper from '../helpers/seederPromptHelper';
 
 class OpenHookProcessor implements HookProcessor {
   private readonly io: any;
 
-  private readonly replicate: any;
-
-  constructor(io: any, replicate: any) {
+  constructor(io: any) {
     this.io = io;
-    this.replicate = replicate;
   }
 
   async process(webhookReq: {
@@ -67,6 +62,7 @@ class OpenHookProcessor implements HookProcessor {
     return webhookTable;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async processFromSeeder(webhookReq: {
     id: string;
     output: string[];
@@ -97,25 +93,7 @@ class OpenHookProcessor implements HookProcessor {
       await seeder.update({ deploymentStatus: DeploymentStatus.published });
       await seeder.save();
 
-      const nextSeeder = await PromptSeeder.findOne({
-        where: { deploymentStatus: DeploymentStatus.created },
-      });
-
-      if (nextSeeder) {
-        const prediction = await this.replicate.predictions.create({
-          version: openjourneyPredictionsVersion,
-          input: { prompt: seeder.prompt },
-          webhook: WEBHOOK_OVERRIDE,
-          webhook_events_filter: ['completed'],
-        });
-
-        await nextSeeder.update({
-          replicatemeGenId: prediction.id,
-          deploymentStatus: DeploymentStatus.generating,
-        });
-
-        await nextSeeder.save();
-      }
+      await seederPromptHelper.nextSeeder();
     }
 
     return seeder;

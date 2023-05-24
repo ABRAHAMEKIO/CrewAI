@@ -6,7 +6,6 @@ export interface HookProcessor {
     webhookReq:
       | { buttonMessageId: string; ref: string }
       | { id: string; output: string[]; input: { prompt: string } },
-    io?: any,
-    replicate?: any
+    io?: any
   ): Promise<Webhook | PromptSeeder>;
 }

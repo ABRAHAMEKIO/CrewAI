@@ -9,6 +9,7 @@ import PromptSeeder, {
 } from '../../../db/models/promptseeder';
 import { openjourneyPredictionsVersion } from '../../../config';
 import { ModelType } from '../../../db/models/prompt';
+import seederPromptHelper from '../../../helpers/seederPromptHelper';
 
 const col =
   'content_id,creator_address,object_name,object_name_is_unique,prompt,show_prompt_fee,maximum_mint,mint_fee,image_url,ipfs_url,image_url_is_unique,extended_prompt';
@@ -122,22 +123,7 @@ apiRoute.post(upload.single('file'), async (req, res) => {
     auth: process.env.REPLICATE_API_TOKEN,
   });
 
-  const nextSeeder = await PromptSeeder.findOne({
-    where: { deploymentStatus: DeploymentStatus.created },
-  });
-
-  const prediction = await replicate.predictions.create({
-    version: openjourneyPredictionsVersion,
-    input: { prompt: nextSeeder.prompt },
-    webhook: WEBHOOK_OVERRIDE,
-    webhook_events_filter: ['completed'],
-  });
-
-  await nextSeeder.update({
-    replicatemeGenId: prediction.id,
-    deploymentStatus: DeploymentStatus.generating,
-  });
-  await nextSeeder.save();
+  await seederPromptHelper.nextSeeder();
 
   return res.status(200).json({
     file: req.file,
