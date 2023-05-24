@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button, Grid, Input, Spacer, Text } from '@nextui-org/react';
 import React, { useState } from 'react';
 import { Header1 } from './Heading';
-import { magicLinkPk } from '../config';
+import { magicLinkPk } from '../../config';
 
 let magic;
 if (typeof window !== 'undefined') {

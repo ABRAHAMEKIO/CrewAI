@@ -8,9 +8,9 @@ import {
   Input,
 } from '@nextui-org/react';
 import axios from 'axios';
-import { Header1 } from '../../components/Heading';
-import Layout from '../../components/Layout';
-import NavigationBar from '../../components/NavigationBar';
+import { Header1 } from '../../components/v1/Heading';
+import Layout from '../../components/v1/Layout';
+import NavigationBar from '../../components/v1/NavigationBar';
 import { server } from '../../config';
 
 /* eslint-disable react/prop-types */

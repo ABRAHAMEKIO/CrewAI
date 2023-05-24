@@ -17,7 +17,7 @@ import icons from './Icons';
 import GroupClient, {
   SuccessResponse,
   ErrorResponse,
-} from '../domain/group/groupClient';
+} from '../../domain/group/groupClient';
 
 function CreateGroupModal(props: {
   modalOpen: boolean;

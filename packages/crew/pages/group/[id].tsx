@@ -14,13 +14,13 @@ import {
   PressEvent,
 } from '@nextui-org/react';
 import { useRouter } from 'next/router';
-import Layout from '../../components/Layout';
-import NavigationBar from '../../components/NavigationBar';
-import { Header1, Header2 } from '../../components/Heading';
-import ParametersFromPrompt from '../../components/ParametersFromPrompt';
-import icons from '../../components/Icons';
-import InputMasterKeyModal from '../../components/InputMasterKeyModal';
-import FileUpload from '../../components/FileUpload';
+import Layout from '../../components/v1/Layout';
+import NavigationBar from '../../components/v1/NavigationBar';
+import { Header1, Header2 } from '../../components/v1/Heading';
+import ParametersFromPrompt from '../../components/v1/ParametersFromPrompt';
+import icons from '../../components/v1/Icons';
+import InputMasterKeyModal from '../../components/v1/InputMasterKeyModal';
+import FileUpload from '../../components/v1/FileUpload';
 import GroupClient, {
   SuccessResponse,
   ErrorResponse,

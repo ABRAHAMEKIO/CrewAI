@@ -1,9 +1,9 @@
 import React from 'react';
 
-import Home from './home-v2/index';
+import Homepage from '../home/index';
 
 function Index({ socketId }: { socketId: string }) {
-  return <Home socketId={socketId} />;
+  return <Homepage socketId={socketId} />;
 }
 
 export default Index;
