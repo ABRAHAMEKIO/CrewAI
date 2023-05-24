@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNetwork, useAccount } from 'wagmi';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit';
 import { PromptAttributes } from '../../db/models/prompt';
 import { ShareButtonIcon } from './Icons';
 import PromptClient from '../../domain/prompt/promptClient';
@@ -57,6 +57,7 @@ function HorizontalSlider({
   const { chain } = useNetwork();
   const { address } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const { openChainModal } = useChainModal();
   const navNewPromptContext = useContext(NavNewPromptContext);
 
   useEffect(() => {
@@ -283,6 +284,8 @@ function HorizontalSlider({
   async function handleSubmit() {
     if (!address) {
       openConnectModal();
+    } else if (chain.unsupported) {
+      openChainModal();
     } else {
       if (loading) return;
       setLoading(true);
@@ -470,7 +473,7 @@ function HorizontalSlider({
                     ? `${
                         !chain.unsupported
                           ? ` ${chain.nativeCurrency.symbol}`
-                          : 'xDai'
+                          : ' xDai'
                       }`
                     : ' xDai'
                 })`,
