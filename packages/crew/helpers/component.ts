@@ -3,11 +3,11 @@ export function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export function displayUrl(url) {
+export function displayUrl(url, length) {
   if (url) {
     const cleanUrl = url.replace(/^(https?|http):\/\//, '');
-    if (cleanUrl && cleanUrl.length > 32) {
-      return `${cleanUrl.substring(0, 32)}...`;
+    if (cleanUrl && cleanUrl.length > length) {
+      return `${cleanUrl.substring(0, length)}...`;
     }
     return cleanUrl;
   }

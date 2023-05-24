@@ -109,7 +109,7 @@ function ShareModal({
                           type="button"
                           onClick={() => {
                             window.open(
-                              `https://twitter.com/intent/tweet?text=Hologram%20${url}`,
+                              `https://twitter.com/intent/tweet?text=Hey%20I%20found%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`,
                               '_blank'
                             );
                           }}
@@ -124,7 +124,7 @@ function ShareModal({
                           type="button"
                           onClick={() => {
                             window.open(
-                              `https://t.me/share/url?url=${url}&text=Hologram`,
+                              `https://t.me/share/url?url=${url}&text=Hey%20I%20found%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20`,
                               '_blank'
                             );
                           }}
@@ -136,7 +136,7 @@ function ShareModal({
                           type="button"
                           onClick={() => {
                             window.open(
-                              `whatsapp://send?text=Hologram%20${url}`,
+                              `https://wa.me/?text=Hey%20I%20found%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`,
                               '_blank'
                             );
                           }}
@@ -154,7 +154,7 @@ function ShareModal({
                         className="relative h-[48px] rounded-lg border border-solid border-[#EBEBEB] bg-white w-full text-black-150 mx-3 py-1 px-4 leading-tight focus:outline-none"
                         type="text"
                         readOnly
-                        defaultValue={displayUrl(url)}
+                        defaultValue={displayUrl(url, 32)}
                       />
                       <button
                         type="button"
