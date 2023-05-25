@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
-import Head from 'next/head';
-import { useSSR } from '@nextui-org/react';
 import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/v1/Wrap';
 import Nav from '../../components/v1/Nav';
@@ -16,24 +14,10 @@ import PromptClient, {
 import BottomSlideOver from '../../components/v1/BottomSlideOver';
 import ModalPrompt from '../../components/v1/ModalPrompt';
 import HorizontalSlider from '../../components/v1/HorizontalSlider';
-import { server } from '../../config';
 
 const promptClient = new PromptClient();
 
-interface MetaTags {
-  id: number;
-  title: string;
-  description: string;
-  imageUrl: string;
-}
-
-function Index({
-  socketId,
-  metaTags,
-}: {
-  socketId: string;
-  metaTags: MetaTags;
-}) {
+function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
   const [randomNumber] = useState(Math.floor(Math.random() * 25));
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -46,7 +30,6 @@ function Index({
   const [modalData, setModalData] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
-  const { isBrowser } = useSSR();
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -216,31 +199,6 @@ function Index({
             modalOpen={openModalPrompt}
             modalClose={() => setOpenModalPrompt(false)}
           />
-
-          {!isBrowser && Object.keys(metaTags).length > 0 && (
-            <Head>
-              {/* Primary Meta Tags */}
-              <meta name="title" content={metaTags.title} />
-              <meta name="description" content={metaTags.description} />
-
-              {/* Open Graph / Facebook */}
-              <meta property="og:type" content="website" />
-              <meta property="og:url" content={`${server}/?v=${metaTags.id}`} />
-              <meta property="og:title" content={metaTags.title} />
-              <meta property="og:description" content={metaTags.description} />
-              <meta property="og:image" content={metaTags.imageUrl} />
-
-              {/* Twitter */}
-              <meta name="twitter:card" content="summary" />
-              <meta
-                name="twitter:url"
-                content={`${server}/?v=${metaTags.id}`}
-              />
-              <meta name="twitter:title" content={metaTags.title} />
-              <meta name="twitter:description" content={metaTags.description} />
-              <meta name="twitter:image" content={metaTags.imageUrl} />
-            </Head>
-          )}
         </Wrap>
       )}
     </LoadingContext.Consumer>
