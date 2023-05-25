@@ -31,7 +31,7 @@ apiRoute.get(async (req, res) => {
   async function isNotNullParent() {
     if (v) {
       const findParent = await Prompt.findOne({
-        where: { id: v },
+        where: { id: v, modelType: ModelType.openJourney },
       });
       if (findParent) {
         if (findParent.parentId) {
@@ -49,6 +49,7 @@ apiRoute.get(async (req, res) => {
   const offset = parseInt(page, 10) * limit;
 
   const where = {
+    modelType: ModelType.openJourney,
     imageUrlIsUnique: true,
     parentId: null,
     id: { [Op.ne]: null },
@@ -62,10 +63,7 @@ apiRoute.get(async (req, res) => {
     distinct: true,
     include: [{ model: Prompt, as: 'SubPrompts' }],
     where,
-    order: [
-      ['modelType', 'DESC'],
-      ['SubPrompts', 'createdAt', 'ASC'],
-    ],
+    order: [['SubPrompts', 'createdAt', 'ASC']],
     offset,
     limit,
   });
@@ -74,6 +72,7 @@ apiRoute.get(async (req, res) => {
     const firstRow = await Prompt.findOne({
       include: [{ model: Prompt, as: 'SubPrompts' }],
       where: {
+        modelType: ModelType.openJourney,
         imageUrlIsUnique: true,
         id: firstRowParentId,
       },
