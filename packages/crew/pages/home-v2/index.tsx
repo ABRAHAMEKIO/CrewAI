@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
 import Head from 'next/head';
+import { useSSR } from '@nextui-org/react';
 import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/v1/Wrap';
 import Nav from '../../components/v1/Nav';
@@ -45,6 +46,7 @@ function Index({
   const [modalData, setModalData] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
+  const { isBrowser } = useSSR();
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -215,7 +217,7 @@ function Index({
             modalClose={() => setOpenModalPrompt(false)}
           />
 
-          {Object.keys(metaTags).length > 0 && (
+          {isBrowser && Object.keys(metaTags).length > 0 && (
             <Head>
               {/* Primary Meta Tags */}
               <meta name="title" content={metaTags.title} />
