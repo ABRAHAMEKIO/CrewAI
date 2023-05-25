@@ -52,6 +52,7 @@ apiRoute.get(async (req, res) => {
     imageUrlIsUnique: true,
     parentId: null,
     id: { [Op.ne]: null },
+    modelType: ModelType.openJourney,
   };
 
   if (firstRowParentId) {
@@ -74,6 +75,7 @@ apiRoute.get(async (req, res) => {
     const firstRow = await Prompt.findOne({
       include: [{ model: Prompt, as: 'SubPrompts' }],
       where: {
+        modelType: ModelType.openJourney,
         imageUrlIsUnique: true,
         id: firstRowParentId,
       },
