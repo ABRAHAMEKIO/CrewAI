@@ -31,7 +31,7 @@ apiRoute.get(async (req, res) => {
   async function isNotNullParent() {
     if (v) {
       const findParent = await Prompt.findOne({
-        where: { id: v },
+        where: { id: v, modelType: ModelType.openJourney },
       });
       if (findParent) {
         if (findParent.parentId) {
@@ -49,10 +49,10 @@ apiRoute.get(async (req, res) => {
   const offset = parseInt(page, 10) * limit;
 
   const where = {
+    modelType: ModelType.openJourney,
     imageUrlIsUnique: true,
     parentId: null,
     id: { [Op.ne]: null },
-    modelType: ModelType.openJourney,
   };
 
   if (firstRowParentId) {
