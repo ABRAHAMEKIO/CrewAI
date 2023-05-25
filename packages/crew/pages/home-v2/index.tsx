@@ -217,7 +217,7 @@ function Index({
             modalClose={() => setOpenModalPrompt(false)}
           />
 
-          {isBrowser && Object.keys(metaTags).length > 0 && (
+          {!isBrowser && Object.keys(metaTags).length > 0 && (
             <Head>
               {/* Primary Meta Tags */}
               <meta name="title" content={metaTags.title} />
