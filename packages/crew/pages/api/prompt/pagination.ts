@@ -63,10 +63,7 @@ apiRoute.get(async (req, res) => {
     distinct: true,
     include: [{ model: Prompt, as: 'SubPrompts' }],
     where,
-    order: [
-      ['modelType', 'DESC'],
-      ['SubPrompts', 'createdAt', 'ASC'],
-    ],
+    order: [['SubPrompts', 'createdAt', 'ASC']],
     offset,
     limit,
   });
