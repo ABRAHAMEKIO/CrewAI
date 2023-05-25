@@ -1,13 +1,17 @@
 import React, { useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
-import { useNetwork, useAccount } from 'wagmi';
+import { useNetwork } from 'wagmi';
+import { useSession } from 'next-auth/react';
 
 function ConnectWallet() {
-  const { isConnected } = useAccount();
+  const { status } = useSession();
   const { chain } = useNetwork();
   useEffect(() => {
-    if (isConnected && !(chain?.id === 100 || chain?.id === 137)) {
+    if (
+      status === 'authenticated' &&
+      !(chain?.id === 100 || chain?.id === 137)
+    ) {
       window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [
