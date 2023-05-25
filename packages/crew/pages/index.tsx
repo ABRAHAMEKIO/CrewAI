@@ -21,6 +21,13 @@ function Index({
 }
 
 export async function getServerSideProps({ query }) {
+  if (!query.v) {
+    return {
+      props: {
+        metaTags: {},
+      },
+    };
+  }
   try {
     const fetchUser = await fetch(`${server}/api/prompt/find?v=${query.v}`);
     const { metaTags } = await fetchUser.json();
