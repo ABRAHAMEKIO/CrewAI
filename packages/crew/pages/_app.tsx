@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AppProps } from 'next/app';
+import App, { AppContext, AppInitialProps, AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
 import type { Session } from 'next-auth';
@@ -58,12 +58,23 @@ const getSiweMessageOptions: GetSiweMessageOptions = () => ({
   statement: 'You are going to connect your wallet and signed in to Hologram.',
 });
 
+type AppOwnProps = {
+  metaTags: {
+    id: number;
+    title: string;
+    description: string;
+    imageUrl: string;
+  };
+};
+
 function CustomApp({
   Component,
   pageProps,
+  metaTags,
 }: AppProps<{
   session: Session;
-}>) {
+}> &
+  AppOwnProps) {
   const [socketId, setSocketId] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -123,6 +134,35 @@ function CustomApp({
                   httpEquiv="ScreenOrientation"
                   content="autoRotate:disabled"
                 />
+                {/* Primary Meta Tags */}
+                <meta name="title" content={metaTags.title} />
+                <meta name="description" content={metaTags.description} />
+
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="website" />
+                <meta
+                  property="og:url"
+                  content={`${server}/?v=${metaTags.id}`}
+                />
+                <meta property="og:title" content={metaTags.title} />
+                <meta
+                  property="og:description"
+                  content={metaTags.description}
+                />
+                <meta property="og:image" content={metaTags.imageUrl} />
+
+                {/* Twitter */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta
+                  name="twitter:url"
+                  content={`${server}/?v=${metaTags.id}`}
+                />
+                <meta name="twitter:title" content={metaTags.title} />
+                <meta
+                  name="twitter:description"
+                  content={metaTags.description}
+                />
+                <meta name="twitter:image" content={metaTags.imageUrl} />
               </Head>
               <main className="app">
                 <PromptContext.Provider value={newPrompt}>
@@ -149,5 +189,22 @@ function CustomApp({
     </MixpanelProvider>
   );
 }
+
+CustomApp.getInitialProps = async (
+  context: AppContext
+): Promise<AppOwnProps & AppInitialProps> => {
+  const ctx = await App.getInitialProps(context);
+  return {
+    ...ctx,
+    metaTags: {
+      id: -15,
+      title: 'painting',
+      description:
+        'mdjrny-v4 style a highly detailed matte painting of a man on a hill watching a rocket launch in the distance by studio ghibli, makoto shinkai, by artgerm, by wlop, by greg rutkowski, volumetric lighting, octane render, 4 k resolution, trending on artstation, masterpiece',
+      imageUrl:
+        'https://cdn.discordapp.com/attachments/1102867395204370464/1105227916163424306/DavidmWilliams123_A_tranquil_Zen_garden_with_raked_sand_careful_60f1e132-e652-4c2e-ba08-1c3dbebbe143.png',
+    },
+  };
+};
 
 export default CustomApp;
