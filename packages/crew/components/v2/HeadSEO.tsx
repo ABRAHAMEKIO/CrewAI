@@ -12,29 +12,36 @@ interface MetaTags {
 function HeadSEO(metaTags: MetaTags) {
   const { id, title, description, imageUrl } = metaTags;
   return (
-    <div>
-      {Object.keys(metaTags).length > 0 && (
-        <Head>
-          {/* Primary Meta Tags */}
-          <meta name="title" content={title} />
-          <meta name="description" content={description} />
-
-          {/* Open Graph / Facebook */}
-          <meta property="og:type" content="website" />
+    <Head>
+      {id && (
+        <>
           <meta property="og:url" content={`${server}/?v=${id}`} />
-          <meta property="og:title" content={title} />
-          <meta property="og:description" content={description} />
-          <meta property="og:image" content={imageUrl} />
-
-          {/* Twitter */}
-          <meta name="twitter:card" content="summary" />
           <meta name="twitter:url" content={`${server}/?v=${id}`} />
-          <meta name="twitter:title" content={title} />
-          <meta name="twitter:description" content={description} />
-          <meta name="twitter:image" content={imageUrl} />
-        </Head>
+        </>
       )}
-    </div>
+      {title && (
+        <>
+          <meta name="title" content={title} />
+          <meta property="og:title" content={title} />
+          <meta name="twitter:title" content={title} />
+        </>
+      )}
+      {description && (
+        <>
+          <meta name="description" content={description} />
+          <meta property="og:description" content={description} />
+          <meta name="twitter:description" content={description} />
+        </>
+      )}
+      {imageUrl && (
+        <>
+          <meta property="og:image" content={imageUrl} />
+          <meta name="twitter:image" content={imageUrl} />
+          <meta property="og:type" content="website" />
+          <meta name="twitter:card" content="summary" />
+        </>
+      )}
+    </Head>
   );
 }
 

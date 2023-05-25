@@ -4,7 +4,7 @@ import { server } from '../config';
 import HeadSEO from '../components/v2/HeadSEO';
 
 function Index({ socketId, metaTags }: { socketId: string; metaTags: any }) {
-  return (
+  return metaTags ? (
     <>
       <HeadSEO
         id={metaTags.id}
@@ -14,7 +14,7 @@ function Index({ socketId, metaTags }: { socketId: string; metaTags: any }) {
       />
       <Home socketId={socketId} />
     </>
-  );
+  ) : null;
 }
 
 export async function getServerSideProps({ query }) {
