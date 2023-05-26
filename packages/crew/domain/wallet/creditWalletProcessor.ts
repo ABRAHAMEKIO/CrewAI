@@ -1,4 +1,3 @@
-import Redis from 'ioredis';
 import RedisCommander from 'ioredis/built/utils/RedisCommander';
 import User from '../../db/models/user';
 import { WalletProcessor } from './walletProcessor';
@@ -17,13 +16,15 @@ class CreditWalletProcessor implements WalletProcessor {
     this.user = user;
   }
 
-  async release(credit: number): Promise<number> {
-    return this.redis.incrby(this.key, credit);
+  async topUp(amount: number): Promise<number> {
+    const result = await this.redis.incrby(this.key, amount);
+    await this.updateUserCredit();
+    return result;
   }
 
   async use(credit: number): Promise<boolean> {
     if ((await this.redis.decrby(this.key, credit)) <= -1) {
-      await this.release(credit);
+      await this.topUp(credit);
       await this.updateUserCredit();
       return false;
     }
@@ -36,11 +37,7 @@ class CreditWalletProcessor implements WalletProcessor {
     return parseInt(balance, 10);
   }
 
-  async topUp(len: number): Promise<number> {
-    return this.redis.incrby(this.key, len);
-  }
-
-  private async updateUserCredit() {
+  private async updateUserCredit(): Promise<void> {
     const balance = await this.balance();
     await this.user.update({ credit: balance });
     await this.user.save();
