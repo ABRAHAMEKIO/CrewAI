@@ -18,6 +18,7 @@ function BottomSlideOver({
   socketId,
   modalClose,
   parentId,
+  setOpenErrorModal,
 }: {
   loading: boolean;
   setLoading: (bool: boolean) => void;
@@ -26,6 +27,7 @@ function BottomSlideOver({
   modalOpen: boolean;
   socketId: string;
   modalClose: () => void;
+  setOpenErrorModal: (title: string, message: string, bool: boolean) => void;
 }) {
   const [text, setText] = useState<string>('');
   const { chain } = useNetwork();
@@ -67,17 +69,24 @@ function BottomSlideOver({
 
         if ('success' in response && !response.success) {
           setLoading(false);
-          // eslint-disable-next-line no-alert
-          window.alert('Generate Fail');
+          setOpenErrorModal(
+            'Generate Failed',
+            'Sorry, generate image couldn’t be processed',
+            true
+          );
           return;
         }
       }
 
       modalClose();
       setLoading(false);
+      setOpenErrorModal(
+        'Transaction Failed',
+        'Sorry, this payment couldn’t be processed',
+        true
+      );
+
       navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
     }
   }
 

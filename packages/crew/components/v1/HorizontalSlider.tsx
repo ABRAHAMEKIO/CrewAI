@@ -31,6 +31,7 @@ function HorizontalSlider({
   newPrompt,
   socketId,
   setBackgroundImageUrl,
+  setOpenErrorModal,
 }: {
   loading: boolean;
   setLoading: (bool: boolean) => void;
@@ -40,6 +41,7 @@ function HorizontalSlider({
   newPrompt?: PromptAttributes;
   socketId: string;
   setBackgroundImageUrl: (imageUrl: string) => void;
+  setOpenErrorModal: (title: string, message: string, bool: boolean) => void;
 }) {
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
@@ -292,17 +294,24 @@ function HorizontalSlider({
           }
           if ('success' in response && !response.success) {
             setLoading(false);
-            // eslint-disable-next-line no-alert
-            window.alert('Generate Fail');
+            setOpenErrorModal(
+              'Generate Failed',
+              'Sorry, generate image couldn’t be processed',
+              true
+            );
             return;
           }
         }
       }
 
       setLoading(false);
+      setOpenErrorModal(
+        'Transaction Failed',
+        'Sorry, this payment couldn’t be processed',
+        true
+      );
+
       navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
     }
   }
 
