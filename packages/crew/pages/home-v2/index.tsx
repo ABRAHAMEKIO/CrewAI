@@ -13,7 +13,7 @@ import PromptClient, {
 } from '../../domain/prompt/promptClient';
 import BottomSlideOver from '../../components/v1/BottomSlideOver';
 import ModalPrompt from '../../components/v1/ModalPrompt';
-import HorizontalSliderV2 from '../../components/v2/HorizontalSlider';
+import HorizontalSlider from '../../components/v2/HorizontalSlider';
 
 const promptClient = new PromptClient();
 
@@ -155,7 +155,7 @@ function Index({ socketId }: { socketId: string }) {
                           data-id={item.id}
                           data-index={index}
                         >
-                          <HorizontalSliderV2
+                          <HorizontalSlider
                             loading={loading}
                             setLoading={setLoading}
                             socketId={socketId}

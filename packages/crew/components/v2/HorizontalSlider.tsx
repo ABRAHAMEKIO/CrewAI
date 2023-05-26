@@ -3,17 +3,13 @@ import { useNetwork } from 'wagmi';
 import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit';
 import { useSession } from 'next-auth/react';
 import { PromptAttributes } from '../../db/models/prompt';
-import { ShareButtonIcon } from '../v1/Icons';
+import { CreditIcon, ShareButtonIcon } from '../v1/Icons';
 import PromptClient from '../../domain/prompt/promptClient';
-import sendTransaction from '../../helpers/sendTransaction';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
-import { server, web3PromptPrice } from '../../config';
+import { server } from '../../config';
 import ShareModal from '../v1/ShareModal';
 import ShareSlideOver from '../v1/ShareSlideOver';
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
+import { classNames } from '../../helpers/component';
 
 // eslint-disable-next-line no-shadow
 enum ImageOrientation {
@@ -59,6 +55,8 @@ function HorizontalSlider({
   const [openShareModal, setOpenShareModal] = useState(false);
   const [openShareSlideOver, setOpenShareSlideOver] = useState(false);
   const [shareUrl, setShareUrl] = useState(null);
+  const [windowSize, setWindowSize] = useState([null, null]);
+  const [creditCount, setCreditCount] = useState(0);
 
   const { chain } = useNetwork();
   const { status } = useSession();
@@ -67,12 +65,115 @@ function HorizontalSlider({
 
   const navNewPromptContext = useContext(NavNewPromptContext);
 
+  const getStyle = () => {
+    const arr = [
+      ref1Size[0],
+      ref1Size[1],
+      ref2Size[0],
+      ref2Size[1],
+      ref3ImageSize[0],
+      ref3ImageSize[1],
+      windowSize[0],
+      windowSize[1],
+    ].filter(Boolean);
+    const minSize = Math.min(...arr);
+    const heightSize = {
+      height: ref1Size[1],
+    };
+    const widthSize = {
+      width: ref1Size[0],
+    };
+
+    const whichSize = (input) => (input ? heightSize : widthSize);
+
+    if (imageOrientation === ImageOrientation.square) {
+      return {
+        width: minSize,
+      };
+    }
+
+    if (imageOrientation === ImageOrientation.portrait) {
+      return whichSize(ref3ImageSize[0] < ref1Size[0]);
+    }
+
+    if (imageOrientation === ImageOrientation.landscape) {
+      return whichSize(ref3ImageSize[0] > ref1Size[0]);
+    }
+
+    return heightSize;
+  };
+
+  async function handleSubmit() {
+    if (!(status === 'authenticated')) {
+      console.log('BELUM LOGIN! GUNAKAN status untuk pengecekan session');
+    }
+
+    if (loading) return;
+    setLoading(true);
+    // eslint-disable-next-line no-console
+    const promptClient = new PromptClient();
+    const response = await promptClient.generateV2({
+      promptId: item.id,
+      msg: current.prompt,
+      socketId,
+    });
+
+    if ('success' in response && response.success) {
+      return;
+    }
+    if ('success' in response && !response.success) {
+      setLoading(false);
+      // eslint-disable-next-line no-alert
+      window.alert('Generate Fail');
+      return;
+    }
+
+    setLoading(false);
+    navNewPromptContext?.setIndicatorNewPromptDisplay(false);
+    // eslint-disable-next-line no-alert
+    window.alert('Transaction Fail');
+  }
+
+  const handleShareButton = async () => {
+    setShareUrl(`${server}/?v=${current.id}`);
+    setOpenShareModal(true);
+  };
+
+  const handleShareButtonSlideOver = async () => {
+    setShareUrl(`${server}/?v=${current.id}`);
+    setOpenShareSlideOver(true);
+  };
+
+  function scrollToPrompt(promptId) {
+    // console.log(ref2.current.childElementCount);
+    ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
+
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
   }, [current.imageUrl, setBackgroundImageUrl]);
 
   useEffect(() => {
     setAllItem([item, ...item.SubPrompts]);
+    const getMeta = (url, cb) => {
+      const img = new Image();
+      img.onload = () => cb(null, img);
+      img.onerror = (err) => cb(err);
+      img.src = url;
+    };
+    getMeta(item.imageUrl, (err, img) => {
+      if (img) {
+        if (img.naturalWidth > img.naturalHeight) {
+          setImageOrientation(ImageOrientation.landscape);
+        } else if (img.naturalWidth === img.naturalHeight) {
+          setImageOrientation(ImageOrientation.square);
+        } else {
+          setImageOrientation(ImageOrientation.portrait);
+        }
+      }
+    });
   }, [item]);
 
   useEffect(() => {
@@ -81,35 +182,34 @@ function HorizontalSlider({
     }
   }, [newPrompt, item]);
 
-  const findElement = () => {
-    const querySearch = window.location.search;
-
-    const params = new URLSearchParams(querySearch);
-    let paramElement = null;
-    if (params.has('v')) {
-      paramElement = params.get('v').toString();
-    }
-
-    if (paramElement) {
-      let timeOut;
-      const interval = setInterval(() => {
-        const element = document.getElementById(`horizontal-${paramElement}`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-          clearInterval(interval);
-          if (timeOut !== undefined) {
-            clearTimeout(timeOut);
-          }
-        }
-      }, 200);
-      timeOut = setTimeout(() => {
-        clearInterval(interval);
-        clearTimeout(timeOut);
-      }, 4000);
-    }
-  };
-
   useEffect(() => {
+    const findElement = () => {
+      const querySearch = window.location.search;
+
+      const params = new URLSearchParams(querySearch);
+      let paramElement = null;
+      if (params.has('v')) {
+        paramElement = params.get('v').toString();
+      }
+
+      if (paramElement) {
+        let timeOut;
+        const interval = setInterval(() => {
+          const element = document.getElementById(`horizontal-${paramElement}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            clearInterval(interval);
+            if (timeOut !== undefined) {
+              clearTimeout(timeOut);
+            }
+          }
+        }, 200);
+        timeOut = setTimeout(() => {
+          clearInterval(interval);
+          clearTimeout(timeOut);
+        }, 4000);
+      }
+    };
     findElement();
   }, []);
 
@@ -153,27 +253,6 @@ function HorizontalSlider({
   }, [ref1, ref2, ref3Image]);
 
   useEffect(() => {
-    const getMeta = (url, cb) => {
-      const img = new Image();
-      img.onload = () => cb(null, img);
-      img.onerror = (err) => cb(err);
-      img.src = url;
-    };
-
-    getMeta(item.imageUrl, (err, img) => {
-      if (img) {
-        if (img.naturalWidth > img.naturalHeight) {
-          setImageOrientation(ImageOrientation.landscape);
-        } else if (img.naturalWidth === img.naturalHeight) {
-          setImageOrientation(ImageOrientation.square);
-        } else {
-          setImageOrientation(ImageOrientation.portrait);
-        }
-      }
-    });
-  }, [item]);
-
-  useEffect(() => {
     setTotalSlide(allItem.length);
     const observer = new IntersectionObserver(
       (entries) => {
@@ -208,46 +287,6 @@ function HorizontalSlider({
     });
   }, [allItem]);
 
-  const [windowSize, setWindowSize] = useState([null, null]);
-
-  const getStyle = () => {
-    const arr = [
-      ref1Size[0],
-      ref1Size[1],
-      ref2Size[0],
-      ref2Size[1],
-      ref3ImageSize[0],
-      ref3ImageSize[1],
-      windowSize[0],
-      windowSize[1],
-    ].filter(Boolean);
-    const minSize = Math.min(...arr);
-    const heightSize = {
-      height: ref1Size[1],
-    };
-    const widthSize = {
-      width: ref1Size[0],
-    };
-
-    const whichSize = (input) => (input ? heightSize : widthSize);
-
-    if (imageOrientation === ImageOrientation.square) {
-      return {
-        width: minSize,
-      };
-    }
-
-    if (imageOrientation === ImageOrientation.portrait) {
-      return whichSize(ref3ImageSize[0] < ref1Size[0]);
-    }
-
-    if (imageOrientation === ImageOrientation.landscape) {
-      return whichSize(ref3ImageSize[0] > ref1Size[0]);
-    }
-
-    return heightSize;
-  };
-
   useEffect(
     function mount() {
       function onResize() {
@@ -264,64 +303,6 @@ function HorizontalSlider({
     },
     [setWindowSize]
   );
-
-  async function handleSubmit() {
-    if (!(status === 'authenticated')) {
-      openConnectModal();
-    } else if (chain.unsupported) {
-      openChainModal();
-    } else {
-      if (loading) return;
-      setLoading(true);
-      const transaction = await sendTransaction(web3PromptPrice);
-      // eslint-disable-next-line no-console
-      console.log({ transaction });
-      if (transaction) {
-        if ('hash' in transaction) {
-          const promptClient = new PromptClient();
-          const response = await promptClient.generate({
-            promptId: item.id,
-            msg: current.prompt,
-            socketId,
-            transactionHash: transaction.hash.toString(),
-            chainId: transaction.chainId,
-          });
-
-          if ('success' in response && response.success) {
-            return;
-          }
-          if ('success' in response && !response.success) {
-            setLoading(false);
-            // eslint-disable-next-line no-alert
-            window.alert('Generate Fail');
-            return;
-          }
-        }
-      }
-
-      setLoading(false);
-      navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
-    }
-  }
-
-  const handleShareButton = async () => {
-    setShareUrl(`${server}/?v=${current.id}`);
-    setOpenShareModal(true);
-  };
-
-  const handleShareButtonSlideOver = async () => {
-    setShareUrl(`${server}/?v=${current.id}`);
-    setOpenShareSlideOver(true);
-  };
-
-  function scrollToPrompt(promptId) {
-    // console.log(ref2.current.childElementCount);
-    ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
-      behavior: 'smooth',
-    });
-  }
 
   useEffect(() => {
     if (
@@ -453,43 +434,25 @@ function HorizontalSlider({
             </div>
           </div>
           <div className="mt-4 sm:mt-6">
-            {[
-              {
-                name: `Generate (${web3PromptPrice}${
-                  chain
-                    ? `${
-                        !chain.unsupported && status === 'authenticated'
-                          ? ` ${chain.nativeCurrency.symbol}`
-                          : ' xDai'
-                      }`
-                    : ' xDai'
-                })`,
-                bgDark: false,
-                onClick: () => handleSubmit(),
-              },
-            ].map((it) => {
-              return (
-                <button
-                  disabled={loading}
-                  onClick={it.onClick}
-                  type="button"
-                  key={it.name}
-                  className={classNames(
-                    loading
-                      ? 'text-white bg-gray-150'
-                      : classNames(
-                          it.bgDark
-                            ? 'text-white bg-black'
-                            : 'text-white bg-primer',
-                          ''
-                        ),
-                    'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px]'
-                  )}
-                >
-                  {it.name}
-                </button>
-              );
-            })}
+            <button
+              disabled={loading}
+              onClick={() => handleSubmit()}
+              type="button"
+              className={classNames(
+                loading ? 'text-white bg-gray-150' : 'text-white bg-primer',
+                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] flex justify-center items-center'
+              )}
+            >
+              <div className="flex justify-center items-center space-x-[8px]">
+                {creditCount > 0 && (
+                  <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
+                    <CreditIcon />{' '}
+                    <span className="text-black text-xs">{creditCount}</span>
+                  </span>
+                )}
+                <span>Generate Now</span>
+              </div>
+            </button>
           </div>
           <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden mt-4" />
         </div>
