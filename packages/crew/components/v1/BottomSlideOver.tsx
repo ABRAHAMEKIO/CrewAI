@@ -120,16 +120,11 @@ function BottomSlideOver({
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-offset-0"
                             onClick={() => modalClose()}
                           >
                             <span className="sr-only">Close panel</span>
-                            <button
-                              type="button"
-                              className="h-6 w-6 flex items-center justify-center"
-                            >
-                              <CrossIcon fill="#959595" size={14} />
-                            </button>
+                            <CrossIcon fill="#959595" size={14} />
                           </button>
                         </div>
                       </div>
