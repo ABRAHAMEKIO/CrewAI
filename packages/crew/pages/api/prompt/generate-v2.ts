@@ -1,9 +1,11 @@
 // eslint-disable-next-line max-classes-per-file
 import Replicate from 'replicate';
 import Prompt, { ModelType, PromptAttributes } from '../../../db/models/prompt';
+import User from '../../../db/models/user';
 import Webhook, { WebhookStep } from '../../../db/models/webhook';
-import { openjourneyPredictionsVersion } from '../../../config';
+import { creditFee, openjourneyPredictionsVersion } from '../../../config';
 import MidjourneyClient from '../../../domain/midjourney/midjourneyClient';
+import WalletFactory from '../../../domain/wallet/walletFactory';
 
 const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
 
@@ -112,9 +114,17 @@ export default async function handler(
   const {
     body: { promptId, msg, socketId }, // '0x916ab96e5fb29e836ffcfc52fc95b6d1f35a761c92e0c6b33d6364d79d4f4c80'
   } = req;
+  const user = await User.findByPk('867308140828983297');
+  const wallet = WalletFactory.resolver(user);
+  const usage = await wallet.use(creditFee);
+
+  if (!usage) {
+    return res.status(422).json({ usage, message: 'Limit exceeded' });
+  }
+
   const prompt = await Prompt.findByPk(promptId);
   // @TODO creatorAddress di isi dengan change using Users.issuer
-  const creatorAddress = 'hologram';
+  const creatorAddress = user.issuer;
 
   const { modelType } = prompt;
 
