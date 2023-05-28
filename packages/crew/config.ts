@@ -1,4 +1,4 @@
-const dev = process.env.NODE_ENV !== 'production';
+export const dev = process.env.NODE_ENV !== 'production';
 
 // TODO: make it environment variable (2  :))
 export const server = dev
