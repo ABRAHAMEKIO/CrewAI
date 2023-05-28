@@ -123,7 +123,9 @@ export default async function handler(
 
   // check transaction hash is valid with rpc
   if (!tx || !txReceipt) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Transaction receipt not found' });
   }
 
   const { to, from } = tx;
@@ -131,18 +133,25 @@ export default async function handler(
 
   // Check status transaction
   if (status !== 1) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Status transaction is not confirmed' });
   }
 
   // Jumlah yang dibayarkan sudah sesuai dengan harga belum?
   const value = utils.formatUnits(tx.value.toString(), 18);
+  console.log({ value, tx, web3PromptPrice });
   if (value !== web3PromptPrice.toString()) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Payment amount not matched' });
   }
 
   // Tujuannya benar tidak
   if (!(to === web3AddressGnosis) || !(to === web3AddressPolygon)) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Recipient address not valid' });
   }
 
   const webhookByTransaction = await Webhook.findOne({
@@ -151,16 +160,22 @@ export default async function handler(
 
   // transactionHash dipake berapa kali apakah 1? jika lebih maka error
   if (webhookByTransaction) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Transaction hash used multiple time' });
   }
 
   // Wallet gnosis (chainId 100) dan polygon (chainId 137)
   if (chainId === 100 && !(to === web3AddressGnosis)) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Invalid chain id' });
   }
 
   if (chainId === 137 && !(to === web3AddressPolygon)) {
-    return res.status(200).json({ success: false });
+    return res
+      .status(200)
+      .json({ success: false, message: 'Invalid chain id' });
   }
 
   console.log('modelType: ', modelType, modelType === ModelType.midJourney);
