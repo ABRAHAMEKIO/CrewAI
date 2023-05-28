@@ -147,13 +147,6 @@ export default async function handler(
       .json({ success: false, message: 'Payment amount not matched' });
   }
 
-  // Tujuannya benar tidak
-  if (!(to === web3AddressGnosis) || !(to === web3AddressPolygon)) {
-    return res
-      .status(200)
-      .json({ success: false, message: 'Recipient address not valid' });
-  }
-
   const webhookByTransaction = await Webhook.findOne({
     where: { transactionHash },
   });
