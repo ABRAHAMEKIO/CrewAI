@@ -46,7 +46,7 @@ User.init(
       type: DataTypes.BIGINT,
     },
     username: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.STRING,
     },
     email: {
