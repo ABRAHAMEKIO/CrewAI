@@ -11,9 +11,9 @@ import PromptClient, {
   PaginationSuccessResponse,
   ErrorResponse,
 } from '../../domain/prompt/promptClient';
-import BottomSlideOver from '../../components/v1/BottomSlideOver';
-import ModalPrompt from '../../components/v1/ModalPrompt';
-import HorizontalSlider from '../../components/v1/HorizontalSlider';
+import BottomSlideOver from '../../components/v2/BottomSlideOver';
+import ModalPrompt from '../../components/v2/ModalPrompt';
+import HorizontalSlider from '../../components/v2/HorizontalSlider';
 
 const promptClient = new PromptClient();
 

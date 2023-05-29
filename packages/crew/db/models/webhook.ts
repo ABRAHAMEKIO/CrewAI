@@ -23,6 +23,7 @@ export enum WebhookStep {
   create = 'CREATE',
   hook = 'HOOK',
   hookButton = 'HOOK_BUTTON',
+  fail = 'FAIL',
 }
 
 export type WebhookInput = Optional<WebhookAttributes, 'id'>;

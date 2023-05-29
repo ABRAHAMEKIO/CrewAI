@@ -59,6 +59,7 @@ export default class PromptClient {
     return response.data;
   }
 
+  // generate using wallet
   async generate(props: {
     promptId: number;
     msg: string;
@@ -77,6 +78,29 @@ export default class PromptClient {
     };
 
     const config = this.getConfig(data, 'api/prompt/generate', 'POST', '');
+
+    const response = await axios.request<
+      SuccessResponse | IsNaughtySuccessResponse
+    >(config);
+
+    return response.data;
+  }
+
+  // generate using credit
+  async generateV2(props: {
+    promptId: number;
+    msg: string;
+    socketId: string;
+  }): Promise<SuccessResponse | IsNaughtySuccessResponse> {
+    const { promptId, msg, socketId } = props;
+
+    const data = {
+      promptId,
+      msg,
+      socketId,
+    };
+
+    const config = this.getConfig(data, 'api/prompt/generate-v2', 'POST', '');
 
     const response = await axios.request<
       SuccessResponse | IsNaughtySuccessResponse

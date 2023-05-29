@@ -9,6 +9,7 @@ interface UserAttributes {
   occupation?: string | null;
   usage?: string | null;
   issuer?: string | null;
+  credit?: number | null;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -31,6 +32,8 @@ class User extends Model<UserAttributes, UserInput> implements UserAttributes {
   public usage!: string;
 
   public issuer!: string;
+
+  public credit!: number;
 
   public readonly createdAt!: Date;
 
@@ -68,6 +71,11 @@ User.init(
     issuer: {
       allowNull: true,
       type: DataTypes.STRING,
+    },
+    credit: {
+      allowNull: true,
+      defaultValue: 0,
+      type: DataTypes.BIGINT,
     },
   },
   {

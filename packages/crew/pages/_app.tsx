@@ -72,6 +72,11 @@ function CustomApp({
   const [loading, setLoading] = useState<boolean>(false);
 
   const [newPrompt, setNewPrompt] = useState<PromptAttributes>(null);
+
+  const [promptId, setPromptId] = useState<number>(null);
+  const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
+    useState<boolean>(false);
+
   useEffect(() => {
     fetch(`${server}/api/socket`)
       .then(() => {
@@ -89,7 +94,15 @@ function CustomApp({
             // eslint-disable-next-line no-console
             console.info(val);
             setLoading(false);
-            setNewPrompt(val.prompt);
+
+            if ('prompt' in val) {
+              setNewPrompt(val.prompt);
+            } else {
+              // @TODO implement flow fail generate
+              // eslint-disable-next-line no-alert
+              window.alert('GENERATE FAIL');
+              setIndicatorNewPromptDisplay(false);
+            }
           }
         );
       })
@@ -97,11 +110,7 @@ function CustomApp({
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, []);
-
-  const [promptId, setPromptId] = useState<number>(null);
-  const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
-    useState<boolean>(null);
+  }, [setIndicatorNewPromptDisplay]);
 
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const NavNewPromptContextValue = {
