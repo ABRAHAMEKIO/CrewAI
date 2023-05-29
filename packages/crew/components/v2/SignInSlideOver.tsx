@@ -7,7 +7,7 @@ import { CrossIcon } from '../v1/Icons';
 const magic =
   typeof window !== 'undefined' &&
   new Magic(process.env.NEXT_PUBLIC_MAGIC_LINK_PK);
-function BottomSlideOver({
+function SignInSlideOver({
   modalOpen,
   modalClose,
 }: {
@@ -15,19 +15,27 @@ function BottomSlideOver({
   modalClose: () => void;
 }) {
   const [emailModal, setEmailModal] = useState(null);
-  const { data: session } = useSession();
 
   async function handleSubmit(): Promise<void> {
     if (!magic) throw new Error(`magic not defined`);
 
-    // login with Magic
-    const didToken = await magic.auth.loginWithMagicLink({ email: emailModal });
+    try {
+      const didToken = await magic.auth.loginWithMagicLink({
+        email: emailModal,
+      });
 
-    // sign in with NextAuth
-    await signIn('magic', {
-      didToken,
-      redirect: false,
-    });
+      if (didToken) {
+        const signin = await signIn('magic', {
+          didToken,
+          redirect: false,
+        });
+        if (!signin.error) {
+          modalClose();
+        }
+      }
+    } catch (e) {
+      modalClose();
+    }
   }
 
   const onChange = (event) => {
@@ -112,4 +120,4 @@ function BottomSlideOver({
   );
 }
 
-export default BottomSlideOver;
+export default SignInSlideOver;

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
 import SignInSlideOver from './SignInSlideOver';
 import SignInModal from './SignInModal';
+import LogoutSlideOver from './LogoutSlideOver';
+import LogoutModal from './LogoutModal';
 
 function SignInButton() {
   const [openSignInSlideOver, setOpenSignInSlideOver] = useState(false);
   const [openSignInModal, setOpenSignInModal] = useState(false);
-  const { data: session } = useSession();
+  const [openLogoutSlideOver, setOpenLogoutSlideOver] = useState(false);
+  const [openLogoutModal, setOpenLogoutModal] = useState(false);
+  const { data: session, status } = useSession();
   const [isSignin, setIsSignin] = useState(false);
-  const [userSession, setUserSession] = useState(null);
 
   async function handleClickSlideOver() {
     setOpenSignInSlideOver(true);
@@ -20,11 +22,18 @@ function SignInButton() {
   }
 
   useEffect(() => {
-    if (session) {
-      setUserSession(session);
+    if (status === 'authenticated') {
       setIsSignin(true);
     }
-  }, [session]);
+  }, [status]);
+
+  async function handleLogoutSlideOver() {
+    setOpenLogoutSlideOver(true);
+  }
+
+  async function handleLogoutModal() {
+    setOpenLogoutModal(true);
+  }
 
   return (
     <>
@@ -50,11 +59,30 @@ function SignInButton() {
           </div>
         </>
       ) : (
-        <Image
-          className="w-10 h-10 rounded-full"
-          src={userSession?.session?.user?.image}
-          alt="Rounded avatar"
-        />
+        <>
+          <div className="block sm:hidden">
+            <button
+              type="button"
+              onClick={handleLogoutSlideOver}
+              className="relative w-10 h-10 rounded-full bg-gray-130 text-center"
+            >
+              <div className="align-middle text-base text-gray-170 font-bold">
+                {session?.user?.email.charAt(0).toUpperCase()}
+              </div>
+            </button>
+          </div>
+          <div className="hidden sm:block">
+            <button
+              type="button"
+              onClick={handleLogoutModal}
+              className="relative w-10 h-10 rounded-full bg-gray-130 text-center"
+            >
+              <div className="align-middle text-base text-gray-170 font-bold">
+                {session?.user?.email.charAt(0).toUpperCase()}
+              </div>
+            </button>
+          </div>
+        </>
       )}
 
       <SignInSlideOver
@@ -64,6 +92,14 @@ function SignInButton() {
       <SignInModal
         modalOpen={openSignInModal}
         modalClose={() => setOpenSignInModal(false)}
+      />
+      <LogoutSlideOver
+        modalOpen={openLogoutSlideOver}
+        modalClose={() => setOpenLogoutSlideOver(false)}
+      />
+      <LogoutModal
+        modalOpen={openLogoutModal}
+        modalClose={() => setOpenLogoutModal(false)}
       />
     </>
   );
