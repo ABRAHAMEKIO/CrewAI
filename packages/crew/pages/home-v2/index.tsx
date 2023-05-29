@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
 import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/v1/Wrap';
-import Nav from '../../components/v1/Nav';
+import Nav from '../../components/v2/Nav';
 import Section from '../../components/v1/Section';
 import { PromptAttributes } from '../../db/models/prompt';
 import PromptContext from '../../context/prompt-context';
