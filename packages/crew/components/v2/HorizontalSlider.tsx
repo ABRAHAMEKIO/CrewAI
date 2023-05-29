@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNetwork } from 'wagmi';
-import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit';
 import { useSession } from 'next-auth/react';
 import { PromptAttributes } from '../../db/models/prompt';
 import { CreditIcon, ShareButtonIcon } from '../v1/Icons';
 import PromptClient from '../../domain/prompt/promptClient';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
-import { server } from '../../config';
+import { server, creditFee } from '../../config';
 import ShareModal from '../v1/ShareModal';
 import ShareSlideOver from '../v1/ShareSlideOver';
 import { classNames } from '../../helpers/component';
@@ -56,7 +54,6 @@ function HorizontalSlider({
   const [openShareSlideOver, setOpenShareSlideOver] = useState(false);
   const [shareUrl, setShareUrl] = useState(null);
   const [windowSize, setWindowSize] = useState([null, null]);
-  const creditCount = 1;
 
   const { status } = useSession();
 
@@ -102,7 +99,8 @@ function HorizontalSlider({
 
   async function handleSubmit() {
     if (!(status === 'authenticated')) {
-      console.log('BELUM LOGIN! GUNAKAN status untuk pengecekan session');
+      // eslint-disable-next-line no-alert
+      window.alert('Login require!');
     }
 
     if (loading) return;
@@ -440,10 +438,10 @@ function HorizontalSlider({
               )}
             >
               <div className="flex justify-center items-center space-x-[8px]">
-                {creditCount > 0 && (
+                {creditFee > 0 && (
                   <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
                     <CreditIcon />{' '}
-                    <span className="text-black text-xs">{creditCount}</span>
+                    <span className="text-black text-xs">{creditFee}</span>
                   </span>
                 )}
                 <span>Generate Now</span>
