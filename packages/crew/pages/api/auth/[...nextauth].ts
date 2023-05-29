@@ -37,6 +37,18 @@ export const authOptions = {
                 email: user.email,
               };
             }
+
+            const newUser = await User.create({
+              issuer: metadata.issuer,
+              email: metadata.email,
+            });
+
+            if (newUser) {
+              return {
+                id: newUser.id.toString(),
+                email: newUser.email,
+              };
+            }
           }
           return null;
         } catch (e) {
