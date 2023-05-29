@@ -33,8 +33,6 @@ function Index({ socketId }: { socketId: string }) {
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
-      /* eslint-disable no-console */
-      console.log('mixpanel is being called');
       // Check that a token was provided (useful if you have environments without Mixpanel)
       mixpanel.track('home_page_view');
     }

@@ -3,7 +3,20 @@ import Home from './home-v2/index';
 import { server } from '../config';
 import HeadSEO from '../components/v2/HeadSEO';
 
-function Index({ socketId, metaTags }: { socketId: string; metaTags: any }) {
+type MetaTags = {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+};
+
+function Index({
+  socketId,
+  metaTags,
+}: {
+  socketId: string;
+  metaTags: MetaTags;
+}) {
   return (
     <>
       <HeadSEO

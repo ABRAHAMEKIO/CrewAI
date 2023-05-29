@@ -21,10 +21,12 @@ RUN --mount=type=secret,id=NEXT_PUBLIC_MIXPANEL_ID \
     --mount=type=secret,id=NX_DATABASE_URL \
     --mount=type=secret,id=MAGIC_LINK_SECRET_KEY \
     --mount=type=secret,id=NEXT_PUBLIC_MAGIC_LINK_PK \
+    --mount=type=secret,id=SENTRY_AUTH_TOKEN \
     NEXT_PUBLIC_MIXPANEL_ID="$(cat /run/secrets/NEXT_PUBLIC_MIXPANEL_ID)" \
     NX_DATABASE_URL="$(cat /run/secrets/NX_DATABASE_URL)" \
     MAGIC_LINK_SECRET_KEY="$(cat /run/secrets/MAGIC_LINK_SECRET_KEY)" \
     NEXT_PUBLIC_MAGIC_LINK_PK="$(cat /run/secrets/NEXT_PUBLIC_MAGIC_LINK_PK)" \
+    SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)" \
     npx nx build crew
 
 # If using npm comment out above and use below instead

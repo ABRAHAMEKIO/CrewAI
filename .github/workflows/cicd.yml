@@ -42,10 +42,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: env DOCKER_BUILDKIT=1 flyctl deploy --remote-only -c packages/crew/fly.toml --dockerfile packages/crew/Dockerfile --build-secret NEXT_PUBLIC_MIXPANEL_ID=$NEXT_PUBLIC_MIXPANEL_ID --build-secret NX_DATABASE_URL=$NX_DATABASE_URL --build-secret MAGIC_LINK_SECRET_KEY=$MAGIC_LINK_SECRET_KEY --build-secret NEXT_PUBLIC_MAGIC_LINK_PK=$NEXT_PUBLIC_MAGIC_LINK_PK
+      - run: env DOCKER_BUILDKIT=1 flyctl deploy --remote-only -c packages/crew/fly.toml --dockerfile packages/crew/Dockerfile --build-secret NEXT_PUBLIC_MIXPANEL_ID=$NEXT_PUBLIC_MIXPANEL_ID --build-secret NX_DATABASE_URL=$NX_DATABASE_URL --build-secret MAGIC_LINK_SECRET_KEY=$MAGIC_LINK_SECRET_KEY --build-secret NEXT_PUBLIC_MAGIC_LINK_PK=$NEXT_PUBLIC_MAGIC_LINK_PK --build-secret SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           NEXT_PUBLIC_MIXPANEL_ID: ${{ secrets.NEXT_PUBLIC_MIXPANEL_ID }}
           NX_DATABASE_URL: ${{ secrets.NX_DATABASE_URL }}
           MAGIC_LINK_SECRET_KEY: ${{ secrets.MAGIC_LINK_SECRET_KEY }}
           NEXT_PUBLIC_MAGIC_LINK_PK: ${{ secrets.NEXT_PUBLIC_MAGIC_LINK_PK }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

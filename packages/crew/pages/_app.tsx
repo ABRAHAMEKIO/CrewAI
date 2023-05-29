@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React, { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -19,7 +20,7 @@ import './styles.css';
 import 'tailwindcss/tailwind.css';
 import { MixpanelProvider } from 'react-mixpanel-browser';
 import io from 'socket.io-client';
-import { mixPanelId, server, wsServer } from '../config';
+import { dev, mixPanelId, server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
 import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
@@ -58,6 +59,9 @@ const getSiweMessageOptions: GetSiweMessageOptions = () => ({
   statement: 'You are going to connect your wallet and signed in to Hologram.',
 });
 
+const ConditionalWrapper = ({ condition, wrapper, children }) =>
+  condition ? wrapper(children) : children;
+
 function CustomApp({
   Component,
   pageProps,
@@ -75,9 +79,7 @@ function CustomApp({
 
         socket.on(MidjourneyCommand.Connected.toString(), () => {
           // eslint-disable-next-line no-console
-          console.info('connected');
-          // eslint-disable-next-line no-console
-          console.info(`${socket.id}`);
+          console.info('Connected to the hologram verse 🌌');
           setSocketId(socket.id);
         });
 
@@ -110,7 +112,17 @@ function CustomApp({
   };
 
   return (
-    <MixpanelProvider token={mixPanelId || ''}>
+    /*
+     * We want to avoid as much as possible conditional wrapper because it is unstable.
+     * However, for this case, because it is the root of everything and rarely change during load,
+     * we only want to wrap with Mixpanel if it is in production.
+     */
+    <ConditionalWrapper
+      condition={!dev}
+      wrapper={(children) => (
+        <MixpanelProvider token={mixPanelId || ''}>{children}</MixpanelProvider>
+      )}
+    >
       <WagmiConfig config={wagmiConfig}>
         <SessionProvider session={pageProps.session} refetchInterval={0}>
           <RainbowKitSiweNextAuthProvider
@@ -146,7 +158,7 @@ function CustomApp({
           </RainbowKitSiweNextAuthProvider>
         </SessionProvider>
       </WagmiConfig>
-    </MixpanelProvider>
+    </ConditionalWrapper>
   );
 }
 
