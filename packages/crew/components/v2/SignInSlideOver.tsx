@@ -1,8 +1,10 @@
 import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Magic } from 'magic-sdk';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { CrossIcon } from '../v1/Icons';
+import { classNames } from '../../helpers/component';
+import { isValidEmail } from '../../helpers/form';
 
 const magic =
   typeof window !== 'undefined' &&
@@ -16,32 +18,39 @@ function SignInSlideOver({
 }) {
   const [emailModal, setEmailModal] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   async function handleSubmit(): Promise<void> {
     setIsLoading(true);
+    setError(null);
     if (!magic) throw new Error(`magic not defined`);
-
-    try {
-      const didToken = await magic.auth.loginWithMagicLink({
-        email: emailModal,
-      });
-
-      if (didToken) {
-        const signin = await signIn('magic', {
-          didToken,
-          redirect: false,
+    if (isValidEmail(emailModal)) {
+      try {
+        const didToken = await magic.auth.loginWithMagicLink({
+          email: emailModal,
         });
-        if (!signin.error) {
-          setIsLoading(false);
-          modalClose();
+
+        if (didToken) {
+          const signin = await signIn('magic', {
+            didToken,
+            redirect: false,
+          });
+          if (!signin.error) {
+            setIsLoading(false);
+            modalClose();
+          }
         }
+      } catch (e) {
+        setIsLoading(false);
       }
-    } catch (e) {
-      setIsLoading(false);
+    } else {
+      setError('Email is invalid');
     }
   }
 
   const onChange = (event) => {
+    setIsLoading(false);
+    setError(false);
     const { value } = event.target;
     setEmailModal(value);
   };
@@ -58,7 +67,12 @@ function SignInSlideOver({
         <div className="fixed inset-0" />
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-0 pt-[calc(100vh-274px)]">
+            <div
+              className={classNames(
+                error ? 'pt-[calc(100vh-298px)]' : 'pt-[calc(100vh-274px)]',
+                'pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-0'
+              )}
+            >
               <Transition.Child
                 as={Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -104,6 +118,9 @@ function SignInSlideOver({
                           placeholder="email@example.com"
                           onChange={onChange}
                         />
+                        {error && (
+                          <span className="text-sm text-red-500">{error}</span>
+                        )}
                         <button
                           type="submit"
                           disabled={isLoading}
