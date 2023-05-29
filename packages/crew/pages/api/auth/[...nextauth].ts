@@ -109,6 +109,7 @@ export default async function auth(req: any, res: any) {
     providers,
     session: {
       strategy: 'jwt',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     secret: process.env.NEXTAUTH_SECRET,
     /* eslint-disable @typescript-eslint/no-explicit-any */
