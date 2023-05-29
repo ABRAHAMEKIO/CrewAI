@@ -54,13 +54,14 @@ function LogoutModal({
                 <div className="flex h-full flex-col overflow-hidden bg-white space-y-4">
                   <div className="">
                     <div className="flex items-start justify-between">
-                      <Dialog.Title
+                      <button
+                        type="button"
                         className="text-base font-normal text-black-190 flex items-center justify-center"
                         onClick={() => handleLogout()}
                       >
                         <LogoutIcon fill="none" />
                         <span className="ml-[19px] align-top"> Log Out</span>
-                      </Dialog.Title>
+                      </button>
                       <div className="ml-3 flex h-7 items-center">
                         <button
                           type="button"
