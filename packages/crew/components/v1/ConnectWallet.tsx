@@ -6,11 +6,11 @@ import { useSession } from 'next-auth/react';
 
 function ConnectWallet() {
   const { status } = useSession();
-  const { chain } = useNetwork();
+  const { chain: selectedChain } = useNetwork();
   useEffect(() => {
     if (
       status === 'authenticated' &&
-      !(chain?.id === 100 || chain?.id === 137)
+      !(selectedChain?.id === 100 || selectedChain?.id === 137)
     ) {
       window.ethereum.request({
         method: 'wallet_addEthereumChain',
