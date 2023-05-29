@@ -22,50 +22,6 @@ enum ImageOrientation {
   square,
 }
 
-function getStyle(
-  windowSize,
-  ref1Size,
-  ref2Size,
-  ref3ImageSize,
-  imageOrientation
-) {
-  const arr = [
-    ref1Size[0],
-    ref1Size[1],
-    ref2Size[0],
-    ref2Size[1],
-    ref3ImageSize[0],
-    ref3ImageSize[1],
-    windowSize[0],
-    windowSize[1],
-  ].filter(Boolean);
-  const minSize = Math.min(...arr);
-  const heightSize = {
-    height: ref1Size[1],
-  };
-  const widthSize = {
-    width: ref1Size[0],
-  };
-
-  const whichSize = (input) => (input ? heightSize : widthSize);
-
-  if (imageOrientation === ImageOrientation.square) {
-    return {
-      width: minSize,
-    };
-  }
-
-  if (imageOrientation === ImageOrientation.portrait) {
-    return whichSize(ref3ImageSize[0] < ref1Size[0]);
-  }
-
-  if (imageOrientation === ImageOrientation.landscape) {
-    return whichSize(ref3ImageSize[0] > ref1Size[0]);
-  }
-
-  return heightSize;
-}
-
 function HorizontalSlider({
   loading,
   setLoading,
@@ -103,8 +59,6 @@ function HorizontalSlider({
   const [openShareModal, setOpenShareModal] = useState(false);
   const [openShareSlideOver, setOpenShareSlideOver] = useState(false);
   const [shareUrl, setShareUrl] = useState(null);
-  const [imageStyle, setImageStyle] = useState({});
-  const [windowSize, setWindowSize] = useState([null, null]);
 
   const { chain } = useNetwork();
   const { status } = useSession();
@@ -159,8 +113,10 @@ function HorizontalSlider({
     findElement();
   }, []);
 
-  function updateRef1Size() {
+  // handle horizontal slider
+  useEffect(() => {
     setRef1Size([ref1.current.clientWidth, ref1.current.clientHeight]);
+
     const inter = setInterval(() => {
       setRef1Size((prev) => {
         if (prev[0]) {
@@ -169,10 +125,9 @@ function HorizontalSlider({
         return [ref1.current.clientWidth, ref1.current.clientHeight];
       });
     }, 1000);
-  }
 
-  function updateRef2Size() {
     setRef2Size([ref1.current.clientWidth, ref1.current.clientHeight]);
+
     const inter2 = setInterval(() => {
       setRef2Size((prev) => {
         if (prev[0]) {
@@ -181,13 +136,12 @@ function HorizontalSlider({
         return [ref2.current.clientWidth, ref2.current.clientHeight];
       });
     }, 1000);
-  }
 
-  function updateRef3ImageSize() {
     setRef3ImageSize([
       ref3Image?.current?.clientWidth || 0,
       ref3Image?.current?.clientHeight || 0,
     ]);
+
     const inter3 = setInterval(() => {
       setRef3ImageSize((prev) => {
         if (prev[0]) {
@@ -196,17 +150,7 @@ function HorizontalSlider({
         return [ref3Image.current.clientWidth, ref3Image.current.clientHeight];
       });
     }, 1000);
-  }
-
-  // handle horizontal slider
-  useEffect(() => {
-    updateRef1Size();
-    updateRef2Size();
-    updateRef3ImageSize();
-    setImageStyle(
-      getStyle(windowSize, ref1Size, ref2Size, ref3Image, imageOrientation)
-    );
-  }, [imageOrientation, ref1, ref1Size, ref2, ref2Size, ref3Image, windowSize]);
+  }, [ref1, ref2, ref3Image]);
 
   useEffect(() => {
     const getMeta = (url, cb) => {
@@ -264,16 +208,50 @@ function HorizontalSlider({
     });
   }, [allItem]);
 
+  const [windowSize, setWindowSize] = useState([null, null]);
+
+  const getStyle = () => {
+    const arr = [
+      ref1Size[0],
+      ref1Size[1],
+      ref2Size[0],
+      ref2Size[1],
+      ref3ImageSize[0],
+      ref3ImageSize[1],
+      windowSize[0],
+      windowSize[1],
+    ].filter(Boolean);
+    const minSize = Math.min(...arr);
+    const heightSize = {
+      height: ref1Size[1],
+    };
+    const widthSize = {
+      width: ref1Size[0],
+    };
+
+    const whichSize = (input) => (input ? heightSize : widthSize);
+
+    if (imageOrientation === ImageOrientation.square) {
+      return {
+        width: minSize,
+      };
+    }
+
+    if (imageOrientation === ImageOrientation.portrait) {
+      return whichSize(ref3ImageSize[0] < ref1Size[0]);
+    }
+
+    if (imageOrientation === ImageOrientation.landscape) {
+      return whichSize(ref3ImageSize[0] > ref1Size[0]);
+    }
+
+    return heightSize;
+  };
+
   useEffect(
     function mount() {
       function onResize() {
         setWindowSize([window.innerWidth, window.innerHeight]);
-        updateRef1Size();
-        updateRef2Size();
-        updateRef3ImageSize();
-        setImageStyle(
-          getStyle(windowSize, ref1Size, ref2Size, ref3Image, imageOrientation)
-        );
       }
 
       onResize();
@@ -284,7 +262,7 @@ function HorizontalSlider({
         window.removeEventListener('resize', onResize);
       };
     },
-    [imageOrientation, ref1Size, ref2Size, setWindowSize, windowSize]
+    [setWindowSize]
   );
 
   async function handleSubmit() {
@@ -376,7 +354,7 @@ function HorizontalSlider({
               >
                 <div
                   className="flex items-center rounded-2xl justify-center"
-                  style={imageStyle}
+                  style={getStyle()}
                 >
                   {/* mencoba biin objec contain untuk mulitple gambar varian version ratio */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -385,7 +363,7 @@ function HorizontalSlider({
                     src={myItem.imageUrl}
                     alt={myItem.imageUrl}
                     ref={ref3Image}
-                    style={imageStyle}
+                    style={getStyle()}
                   />
                 </div>
               </div>
