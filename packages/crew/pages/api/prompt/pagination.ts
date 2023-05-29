@@ -45,7 +45,7 @@ apiRoute.get(async (req, res) => {
 
   await isNotNullParent();
 
-  const limit = 2;
+  const limit = 20;
   const offset = parseInt(page, 10) * limit;
 
   const where = {

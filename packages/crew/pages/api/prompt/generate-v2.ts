@@ -1,11 +1,14 @@
 // eslint-disable-next-line max-classes-per-file
 import Replicate from 'replicate';
+import { getServerSession } from 'next-auth/next';
+import { Op } from 'sequelize';
 import Prompt, { ModelType, PromptAttributes } from '../../../db/models/prompt';
 import User from '../../../db/models/user';
 import Webhook, { WebhookStep } from '../../../db/models/webhook';
 import { creditFee, openjourneyPredictionsVersion } from '../../../config';
 import MidjourneyClient from '../../../domain/midjourney/midjourneyClient';
 import WalletFactory from '../../../domain/wallet/walletFactory';
+import { authOptions } from '../auth/[...nextauth]';
 
 const WEBHOOK_OVERRIDE: string = process.env.WEBHOOK_OVERRIDE_THENEXTLEG;
 
@@ -114,10 +117,22 @@ export default async function handler(
   const {
     body: { promptId, msg, socketId }, // '0x916ab96e5fb29e836ffcfc52fc95b6d1f35a761c92e0c6b33d6364d79d4f4c80'
   } = req;
-  const user = await User.findByPk('867308140828983297');
+  const session = await getServerSession(req, res, authOptions);
+  // @todo need refactor
+  if (!session) {
+    res.send({
+      error:
+        'You must be signed in to view the protected content on this page.',
+    });
+  }
+
+  const user = await User.findOne({
+    where: {
+      email: { [Op.iLike]: session.user.email },
+    },
+  });
   const wallet = WalletFactory.resolver(user);
   const usage = await wallet.use(creditFee);
-
   if (!usage) {
     return res.status(422).json({ usage, message: 'Limit exceeded' });
   }

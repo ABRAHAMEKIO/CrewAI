@@ -56,12 +56,9 @@ function HorizontalSlider({
   const [openShareSlideOver, setOpenShareSlideOver] = useState(false);
   const [shareUrl, setShareUrl] = useState(null);
   const [windowSize, setWindowSize] = useState([null, null]);
-  const [creditCount, setCreditCount] = useState(0);
+  const creditCount = 1;
 
-  const { chain } = useNetwork();
   const { status } = useSession();
-  const { openConnectModal } = useConnectModal();
-  const { openChainModal } = useChainModal();
 
   const navNewPromptContext = useContext(NavNewPromptContext);
 
