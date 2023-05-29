@@ -9,7 +9,7 @@ const s3 = new AWS.S3({
 
 export async function imageUploadByUrl(
   url: string
-): Promise<ManagedUpload | ManagedUpload.SendData> {
+): Promise<ManagedUpload.SendData> {
   const { pathname } = new URL(url);
   const Key = pathname.replace(/\//gi, '_');
 

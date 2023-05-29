@@ -129,7 +129,6 @@ function HorizontalSlider({
     }
 
     setLoading(false);
-    navNewPromptContext?.setIndicatorNewPromptDisplay(false);
     // eslint-disable-next-line no-alert
     window.alert('Transaction Fail');
   }

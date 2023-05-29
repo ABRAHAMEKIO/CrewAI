@@ -99,7 +99,7 @@ class GenerateByOj implements GenerateProcessor {
 
 class GenerateFactory {
   static traverseProcessor(modelType: string): GenerateProcessor {
-    if (modelType === ModelType.openJourney) {
+    if (modelType === ModelType.midJourney) {
       return new GenerateByMj();
     }
 
@@ -136,7 +136,10 @@ export default async function handler(
     creatorAddress,
   });
 
+  const balance = await wallet.balance();
+
   return res.status(200).json({
-    success: false,
+    success: true,
+    balance,
   });
 }

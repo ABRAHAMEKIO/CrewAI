@@ -6,6 +6,9 @@ import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import { imageUploadByUrl } from '../domain/image/upload';
 import PromptSeeder, { DeploymentStatus } from '../db/models/promptseeder';
 import seederPromptHelper from '../helpers/seederPromptHelper';
+import User from '../db/models/user';
+import WalletFactory from '../domain/wallet/walletFactory';
+import { creditFee } from '../config';
 
 class OpenHookProcessor implements HookProcessor {
   private readonly io: any;
@@ -19,47 +22,72 @@ class OpenHookProcessor implements HookProcessor {
     output: string[];
     input: { prompt: string };
   }): Promise<Webhook> {
-    const webhookTable = await Webhook.findOne({
-      where: { replicatemeGenId: webhookReq.id },
-    });
-    if (webhookTable) {
-      await webhookTable.update({ step: WebhookStep.hookButton });
-      await webhookTable.save();
+    try {
+      const webhookTable = await Webhook.findOne({
+        where: { replicatemeGenId: webhookReq.id },
+      });
+      if (webhookTable) {
+        await webhookTable.update({ step: WebhookStep.hookButton });
+        await webhookTable.save();
 
-      const parentPrompt = await Prompt.findByPk(webhookTable.promptId);
+        const parentPrompt = await Prompt.findByPk(webhookTable.promptId);
 
-      let imageUrl = webhookReq.output[0];
-      const s3Data = await imageUploadByUrl(imageUrl);
+        let imageUrl = webhookReq.output[0];
+        const s3Data = await imageUploadByUrl(imageUrl);
 
-      if ('Location' in s3Data) {
-        imageUrl = s3Data.Location;
+        if ('Location' in s3Data) {
+          imageUrl = s3Data.Location;
+        }
+
+        const prompt = await Prompt.create({
+          prompt: webhookTable.prompt || webhookReq.input?.prompt, // so we don't need the body.content and letter we can use for regenerate
+          extendedPrompt:
+            webhookTable.extendedPrompt || webhookReq.input?.prompt,
+          imageUrl,
+          parentId: webhookTable.promptId,
+          objectName: parentPrompt ? parentPrompt?.objectName : null,
+          creatorAddress: webhookTable?.creatorAddress,
+          modelType: 'openjourney',
+        });
+
+        if (this.io) {
+          // eslint-disable-next-line no-console
+          console.log(`Sending to the socketId: ${webhookTable.socketId}`);
+          this.io
+            .to(webhookTable.socketId)
+            .emit(MidjourneyCommand.ModelResults.toString(), {
+              ...webhookReq,
+              prompt,
+            } as WebhookSuccessResponse);
+        }
+      } else {
+        await this.processFromSeeder(webhookReq);
       }
 
-      const prompt = await Prompt.create({
-        prompt: webhookTable.prompt || webhookReq.input?.prompt, // so we don't need the body.content and letter we can use for regenerate
-        extendedPrompt: webhookTable.extendedPrompt || webhookReq.input?.prompt,
-        imageUrl,
-        parentId: webhookTable.promptId,
-        objectName: parentPrompt ? parentPrompt?.objectName : null,
-        creatorAddress: webhookTable?.creatorAddress,
-        modelType: 'openjourney',
+      return webhookTable;
+    } catch (e) {
+      const webhookTable = await Webhook.findOne({
+        where: { replicatemeGenId: webhookReq.id },
       });
+      if (webhookTable) {
+        await webhookTable.update({ step: WebhookStep.fail });
+        await webhookTable.save();
 
-      if (this.io) {
-        // eslint-disable-next-line no-console
-        console.log(`Sending to the socketId: ${webhookTable.socketId}`);
+        const user = await User.findOne({
+          where: { issuer: webhookTable.creatorAddress },
+        });
+        if (user) {
+          const wallet = WalletFactory.resolver(user);
+          await wallet.topUp(creditFee);
+        }
         this.io
           .to(webhookTable.socketId)
           .emit(MidjourneyCommand.ModelResults.toString(), {
             ...webhookReq,
-            prompt,
           } as WebhookSuccessResponse);
       }
-    } else {
-      await this.processFromSeeder(webhookReq);
+      return webhookTable;
     }
-
-    return webhookTable;
   }
 
   // eslint-disable-next-line class-methods-use-this
