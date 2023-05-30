@@ -695,33 +695,6 @@ export function TickIcon({ fill, width = 16, height = 12, ...props }) {
   );
 }
 
-export function FailIcon({ fill, width = 67, height = 67, ...props }) {
-  return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 67 67"
-      fill={fill}
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <circle cx="33.5" cy="33.5" r="33.5" fill="#F64747" />
-      <path
-        d="M44.25 23.2499L23.75 43.7499"
-        stroke="white"
-        strokeWidth="6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M44.25 43.7501L23.75 23.2501"
-        stroke="white"
-        strokeWidth="6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 export function CreditIcon({
   size = 16,
   randomKey = Math.abs(Math.random()).toString(),
@@ -830,6 +803,53 @@ export function LogoutIcon({ fill, width = 18, height = 12, ...props }) {
   );
 }
 
+export function FailIcon({ fill, width = 67, height = 67, ...props }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 67 67"
+      fill={fill}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <circle cx="33.5" cy="33.5" r="33.5" fill="#F64747" />
+      <path
+        d="M44.25 23.2499L23.75 43.7499"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M44.25 43.7501L23.75 23.2501"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function WarningIcon({ fill = '#F74747', size = 68, ...props }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 68 68"
+      fill={fill}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M34 67.3333C52.41 67.3333 67.3333 52.41 67.3333 34C67.3333 15.59 52.41 0.666626 34 0.666626C15.59 0.666626 0.666626 15.59 0.666626 34C0.666626 52.41 15.59 67.3333 34 67.3333ZM30.6666 20.6666C30.6666 19.7826 31.0178 18.9347 31.6429 18.3096C32.2681 17.6845 33.1159 17.3333 34 17.3333C34.884 17.3333 35.7319 17.6845 36.357 18.3096C36.9821 18.9347 37.3333 19.7826 37.3333 20.6666V34C37.3333 34.884 36.9821 35.7319 36.357 36.357C35.7319 36.9821 34.884 37.3333 34 37.3333C33.1159 37.3333 32.2681 36.9821 31.6429 36.357C31.0178 35.7319 30.6666 34.884 30.6666 34V20.6666ZM37.3333 47.3333C37.3333 48.2173 36.9821 49.0652 36.357 49.6903C35.7319 50.3154 34.884 50.6666 34 50.6666C33.1159 50.6666 32.2681 50.3154 31.6429 49.6903C31.0178 49.0652 30.6666 48.2173 30.6666 47.3333C30.6666 46.4492 31.0178 45.6014 31.6429 44.9763C32.2681 44.3511 33.1159 44 34 44C34.884 44 35.7319 44.3511 36.357 44.9763C36.9821 45.6014 37.3333 46.4492 37.3333 47.3333Z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
+
 // svg source: https://react-iconly.jrgarciadev.com/
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
@@ -858,9 +878,10 @@ const icons = {
   telegram: <TelegramIcon fill="white" />,
   facebook: <FacebookIcon fill="white" />,
   tick: <TickIcon fill="none" />,
-  fail: <FailIcon fill="none" />,
   credit: <CreditIcon size={16} />,
   logout: <LogoutIcon fill="none" />,
+  fail: <FailIcon fill="none" />,
+  warning: <WarningIcon fill="currentColor" />,
 };
 
 export default icons;

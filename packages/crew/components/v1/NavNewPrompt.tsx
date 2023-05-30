@@ -28,10 +28,7 @@ function NavNewPrompt() {
     if (loading) {
       setIndicatorNewPromptDisplay(true);
     }
-    if (newPrompt) {
-      setIndicatorNewPromptDisplay(true);
-    }
-  }, [loading, newPrompt, setIndicatorNewPromptDisplay]);
+  }, [loading, setIndicatorNewPromptDisplay]);
 
   const showFeature = false;
 
@@ -58,7 +55,7 @@ function NavNewPrompt() {
                   <span className="hidden text-xs font-bold">4</span>
                 </div>
               )}
-              {newPrompt && (
+              {newPrompt && !loading && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   className="h-10 w-10 rounded-full"

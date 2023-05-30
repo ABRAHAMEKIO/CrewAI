@@ -2,7 +2,10 @@ import { HookProcessor } from './hookProcessor';
 import Webhook, { WebhookStep } from '../db/models/webhook';
 import Prompt from '../db/models/prompt';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
-import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
+import {
+  IsNaughtySuccessResponse,
+  WebhookSuccessResponse,
+} from '../domain/midjourney/midjourneyClient';
 import { imageUploadByUrl } from '../domain/image/upload';
 import PromptSeeder, { DeploymentStatus } from '../db/models/promptseeder';
 import seederPromptHelper from '../helpers/seederPromptHelper';
@@ -83,8 +86,9 @@ class OpenHookProcessor implements HookProcessor {
         this.io
           .to(webhookTable.socketId)
           .emit(MidjourneyCommand.ModelResults.toString(), {
-            ...webhookReq,
-          } as WebhookSuccessResponse);
+            isNaughty: true,
+            phrase: e.message,
+          } as IsNaughtySuccessResponse);
       }
       return webhookTable;
     }

@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import React, { createContext } from 'react';
 
 interface ErrorModalContextInterface {
   modalOpen: boolean;
@@ -7,6 +7,8 @@ interface ErrorModalContextInterface {
   setTitle: (value) => void;
   message: string;
   setMessage: (value) => void;
+  icon: JSX.Element;
+  setIcon: (value) => void;
 }
 
 const ErrorModalContext = createContext<ErrorModalContextInterface>({
@@ -16,6 +18,8 @@ const ErrorModalContext = createContext<ErrorModalContextInterface>({
   setTitle: () => null,
   message: null,
   setMessage: () => null,
+  icon: null,
+  setIcon: () => null,
 });
 
 export default ErrorModalContext;

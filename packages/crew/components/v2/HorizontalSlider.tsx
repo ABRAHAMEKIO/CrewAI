@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { PromptAttributes } from '../../db/models/prompt';
-import { CreditIcon, ShareButtonIcon } from '../v1/Icons';
+import { CreditIcon, ShareButtonIcon, WarningIcon } from '../v1/Icons';
 import PromptClient from '../../domain/prompt/promptClient';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
 import { server, creditFee } from '../../config';
@@ -10,6 +10,7 @@ import ShareSlideOver from '../v1/ShareSlideOver';
 import { classNames } from '../../helpers/component';
 import SignInModal from './SignInModal';
 import SignInSlideOver from './SignInSlideOver';
+import ErrorModalContext from '../../context/error-modal-context';
 
 // eslint-disable-next-line no-shadow
 enum ImageOrientation {
@@ -58,6 +59,9 @@ function HorizontalSlider({
   const [windowSize, setWindowSize] = useState([null, null]);
   const [showSignInSlideOver, setShowSignInSlideOver] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const { setIndicatorNewPromptDisplay } = useContext(NavNewPromptContext);
+  const { setModalOpen, setTitle, setMessage, setIcon } =
+    useContext(ErrorModalContext);
 
   const { status } = useSession();
 
@@ -112,19 +116,19 @@ function HorizontalSlider({
       socketId,
     });
 
-    if ('success' in response && response.success) {
-      return;
-    }
-    if ('success' in response && !response.success) {
+    if ('isNaughty' in response && response.isNaughty) {
       setLoading(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Generate Fail');
-      return;
+      setIndicatorNewPromptDisplay(false);
+      setModalOpen(true);
+      setIcon(<WarningIcon />);
+      setTitle('Limit Reached');
+      setMessage(
+        <span>
+          You&apos;ve reached your limit of generating images. Share the results
+          in <b> Twitter</b> and keep generating image
+        </span>
+      );
     }
-
-    setLoading(false);
-    // eslint-disable-next-line no-alert
-    window.alert('Transaction Fail');
   }
 
   const handleShareButton = async () => {
@@ -170,8 +174,10 @@ function HorizontalSlider({
   }, [item]);
 
   useEffect(() => {
-    if (item?.id.toString() === newPrompt?.parentId.toString()) {
-      setAllItem((prevItem) => [...prevItem, newPrompt]);
+    if (newPrompt) {
+      if (item?.id.toString() === newPrompt?.parentId.toString()) {
+        setAllItem((prevItem) => [...prevItem, newPrompt]);
+      }
     }
   }, [newPrompt, item]);
 
