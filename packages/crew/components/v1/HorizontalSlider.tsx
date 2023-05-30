@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React, { useContext, useEffect, useState } from 'react';
 import { useNetwork } from 'wagmi';
 import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit';
@@ -16,7 +17,6 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-// eslint-disable-next-line no-shadow
 enum ImageOrientation {
   portrait,
   landscape,
@@ -270,14 +270,14 @@ function HorizontalSlider({
   async function handleSubmit() {
     if (!(status === 'authenticated')) {
       openConnectModal();
+    } else if (!chain) {
+      window.alert('You need to connect your Web3 wallet before continuing');
     } else if (chain.unsupported) {
       openChainModal();
     } else {
       if (loading) return;
       setLoading(true);
       const transaction = await sendTransaction(web3PromptPrice);
-      // eslint-disable-next-line no-console
-      console.log({ transaction });
       if (transaction) {
         if ('hash' in transaction) {
           const promptClient = new PromptClient();
@@ -328,7 +328,6 @@ function HorizontalSlider({
   };
 
   function scrollToPrompt(promptId) {
-    // console.log(ref2.current.childElementCount);
     ref2.current.querySelector(`[data-id="${promptId}"]`).scrollIntoView({
       behavior: 'smooth',
     });

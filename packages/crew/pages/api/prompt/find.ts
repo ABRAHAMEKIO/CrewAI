@@ -41,10 +41,11 @@ apiRoute.get(async (req, res) => {
         metaTags: {},
       });
     }
+  } else {
+    res.status(200).json({
+      metaTags: {},
+    });
   }
-  res.status(200).json({
-    metaTags: {},
-  });
 });
 
 export default apiRoute;

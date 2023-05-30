@@ -10,7 +10,9 @@
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@next/next/no-html-link-for-pages": ["error", "packages/crew/pages"]
+        "@next/next/no-html-link-for-pages": ["error", "packages/crew/pages"],
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": "error"
       }
     },
     {

@@ -50,8 +50,6 @@ function ModalPrompt({
       if (loading) return;
       setLoading(true);
       const transaction = await sendTransaction(web3PromptPrice);
-      // eslint-disable-next-line no-console
-      console.log({ transaction });
       if (transaction) {
         setLoading(true);
         const promptClient = new PromptClient();

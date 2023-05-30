@@ -1,4 +1,4 @@
-# 2ndLawAi
+# Hologram AI (prev. CrewAI)
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
@@ -27,3 +27,7 @@ Run `npx nx connect-to-nx-cloud` to enable [remote caching](https://nx.app) and 
 ## Further help
 
 Visit the [Nx Documentation](https://nx.dev) to learn more.
+
+# License
+
+All the code is open for audit, but commercials is prohibited and copyright is reserved for [@empeje](https://github.com/empeje).

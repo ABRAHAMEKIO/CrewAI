@@ -50,8 +50,6 @@ function BottomSlideOver({
       if (loading) return;
       setLoading(true);
       const transaction = await sendTransaction(web3PromptPrice);
-      // eslint-disable-next-line no-console
-      console.log({ transaction });
       if (transaction) {
         const promptClient = new PromptClient();
         const response = await promptClient.generate({
