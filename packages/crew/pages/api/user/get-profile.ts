@@ -1,34 +1,18 @@
-import { NextApiResponse } from 'next';
-import nextConnect from 'next-connect';
-import { Magic } from '@magic-sdk/admin';
+/* eslint-disable consistent-return */
+import { getServerSession } from 'next-auth/next';
 import User from '../../../db/models/user';
+import { authOptions } from '../auth/[...nextauth]';
 
-// ref: https://www.npmjs.com/package/next-connect
-interface ExtendedRequest {
-  method: string;
-  body: string;
-}
-
-const magic = new Magic(process.env.MAGIC_LINK_SECRET_KEY);
-
-const apiRoute = nextConnect<ExtendedRequest, NextApiResponse>({
-  onError(error, req, res) {
-    res
-      .status(501)
-      .json({ error: `Sorry something Happened! ${error.message}` });
-  },
-  onNoMatch(req, res) {
-    res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
-  },
-});
-
-apiRoute.post(async (req, res) => {
-  const { token } = JSON.parse(req.body);
-  if (token) {
+const getProfile = async (req, res) => {
+  if (req.method === 'POST') {
     try {
-      const metaData = await magic.users.getMetadataByToken(token);
+      const session = await getServerSession(req, res, authOptions);
+
+      if (!session) {
+        res.status(401).json({ message: 'You must be logged in.' });
+      }
       const user = await User.findOne({
-        where: { issuer: metaData.issuer },
+        where: { email: session.user.email },
       });
       if (user) {
         res.status(200).json({
@@ -45,8 +29,10 @@ apiRoute.post(async (req, res) => {
         .json({ error: `Sorry something Happened! ${error.message}` });
     }
   } else {
-    res.status(501).json({ error: `Missing token` });
+    return res
+      .status(405)
+      .json({ error: `Method '${req.method}' Not Allowed` });
   }
-});
+};
 
-export default apiRoute;
+export default getProfile;

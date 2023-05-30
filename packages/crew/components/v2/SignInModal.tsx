@@ -40,7 +40,6 @@ function SignInModal({
           if (!signin.error) {
             const fetchUser = await fetch(`${server}/api/user/get-profile`, {
               method: 'POST',
-              body: JSON.stringify({ token: didToken }),
             });
 
             const User = await fetchUser.json();
