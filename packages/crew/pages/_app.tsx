@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
@@ -26,6 +26,7 @@ import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import UserProfileContext from '../context/user-profile-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -76,6 +77,16 @@ function CustomApp({
   const [promptId, setPromptId] = useState<number>(null);
   const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
     useState<boolean>(false);
+
+  const [userProfile, setUserProfile] = useState({});
+  const update = (value) => setUserProfile(value);
+
+  const valueUserProfile = useMemo(() => {
+    return {
+      ...userProfile,
+      update,
+    };
+  }, [userProfile]);
 
   useEffect(() => {
     fetch(`${server}/api/socket`)
@@ -152,13 +163,15 @@ function CustomApp({
                     <NavNewPromptContext.Provider
                       value={NavNewPromptContextValue}
                     >
-                      {/* eslint-disable react/jsx-props-no-spreading */}
-                      <Component
-                        {...pageProps}
-                        socketId={socketId}
-                        newPrompt={newPrompt}
-                      />
-                      {/* set global socket id to component */}
+                      <UserProfileContext.Provider value={valueUserProfile}>
+                        {/* eslint-disable react/jsx-props-no-spreading */}
+                        <Component
+                          {...pageProps}
+                          socketId={socketId}
+                          newPrompt={newPrompt}
+                        />
+                        {/* set global socket id to component */}
+                      </UserProfileContext.Provider>
                     </NavNewPromptContext.Provider>
                   </LoadingContext.Provider>
                 </PromptContext.Provider>
