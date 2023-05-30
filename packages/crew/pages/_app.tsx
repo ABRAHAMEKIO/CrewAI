@@ -107,6 +107,7 @@ function CustomApp({
             setLoading(false);
 
             if ('prompt' in val) {
+              setIndicatorNewPromptDisplay(true);
               setNewPrompt(val.prompt);
             }
 
@@ -118,7 +119,6 @@ function CustomApp({
               setErrorMessage(
                 'Sorry, this generate failed. Credit will be returned'
               );
-              setIndicatorNewPromptDisplay(false);
             }
           }
         );

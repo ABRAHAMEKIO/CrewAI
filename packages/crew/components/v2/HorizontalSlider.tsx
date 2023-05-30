@@ -128,10 +128,6 @@ function HorizontalSlider({
           in <b> Twitter</b> and keep generating image
         </span>
       );
-      return;
-    }
-    if ('success' in response && response.success) {
-      setLoading(false);
     }
   }
 
@@ -178,8 +174,10 @@ function HorizontalSlider({
   }, [item]);
 
   useEffect(() => {
-    if (item?.id.toString() === newPrompt?.parentId.toString()) {
-      setAllItem((prevItem) => [...prevItem, newPrompt]);
+    if (newPrompt) {
+      if (item?.id.toString() === newPrompt?.parentId.toString()) {
+        setAllItem((prevItem) => [...prevItem, newPrompt]);
+      }
     }
   }, [newPrompt, item]);
 
