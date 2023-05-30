@@ -59,12 +59,9 @@ function LogoutSlideOver({
                             onClick={() => modalClose()}
                           >
                             <span className="sr-only">Close panel</span>
-                            <button
-                              type="button"
-                              className="h-6 w-6 flex items-center justify-center"
-                            >
+                            <div className="h-6 w-6 flex items-center justify-center">
                               <CrossIcon fill="#959595" size={14} />
-                            </button>
+                            </div>
                           </button>
                         </div>
                       </div>
