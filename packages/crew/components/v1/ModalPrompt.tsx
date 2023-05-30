@@ -8,6 +8,7 @@ import { PromptAttributes } from '../../db/models/prompt';
 import PromptClient from '../../domain/prompt/promptClient';
 import sendTransaction from '../../helpers/sendTransaction';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import ErrorModalContext from '../../context/error-modal-context';
 import { web3PromptPrice } from '../../config';
 
 function ModalPrompt({
@@ -34,6 +35,7 @@ function ModalPrompt({
   const { openChainModal } = useChainModal();
 
   const navNewPromptContext = useContext(NavNewPromptContext);
+  const errorModalContext = useContext(ErrorModalContext);
 
   useEffect(() => {
     setText(prompt.prompt);
@@ -66,17 +68,25 @@ function ModalPrompt({
 
         if ('success' in response && !response.success) {
           setLoading(false);
-          // eslint-disable-next-line no-alert
-          window.alert('Generate Fail');
+          errorModalContext?.setModalOpen(true);
+          errorModalContext?.setTitle('Generate Failed');
+          errorModalContext?.setMessage(
+            'Sorry, generate image couldn’t be processed'
+          );
           return;
         }
       }
 
       modalClose();
       setLoading(false);
+
+      errorModalContext?.setModalOpen(true);
+      errorModalContext?.setTitle('Transaction Failed');
+      errorModalContext?.setMessage(
+        'Sorry, this payment couldn’t be processed'
+      );
+
       navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
     }
   }
 

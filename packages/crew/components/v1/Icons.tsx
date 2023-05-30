@@ -695,6 +695,33 @@ export function TickIcon({ fill, width = 16, height = 12, ...props }) {
   );
 }
 
+export function FailIcon({ fill, width = 67, height = 67, ...props }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 67 67"
+      fill={fill}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <circle cx="33.5" cy="33.5" r="33.5" fill="#F64747" />
+      <path
+        d="M44.25 23.2499L23.75 43.7499"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M44.25 43.7501L23.75 23.2501"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function CreditIcon({
   size = 16,
   randomKey = Math.abs(Math.random()).toString(),
@@ -831,6 +858,7 @@ const icons = {
   telegram: <TelegramIcon fill="white" />,
   facebook: <FacebookIcon fill="white" />,
   tick: <TickIcon fill="none" />,
+  fail: <FailIcon fill="none" />,
   credit: <CreditIcon size={16} />,
   logout: <LogoutIcon fill="none" />,
 };
