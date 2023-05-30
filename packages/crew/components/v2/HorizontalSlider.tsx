@@ -426,55 +426,47 @@ function HorizontalSlider({
               </div>
             </div>
           </div>
-          <div className="mt-4 sm:mt-6 block sm:hidden">
-            <button
-              disabled={loading}
-              onClick={() =>
-                status !== 'authenticated'
-                  ? setShowSignInSlideOver(true)
-                  : handleSubmit()
-              }
-              type="button"
-              className={classNames(
-                loading ? 'text-white bg-gray-150' : 'text-white bg-primer',
-                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] flex justify-center items-center'
-              )}
-            >
-              <div className="flex justify-center items-center space-x-[8px]">
-                {creditFee > 0 && (
-                  <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
-                    <CreditIcon />{' '}
-                    <span className="text-black text-xs">{creditFee}</span>
-                  </span>
+          <div className="mt-4 sm:mt-6">
+            {[
+              // desktop
+              {
+                name: 'desktop',
+                className: 'hidden sm:block',
+                handleClick: () =>
+                  status !== 'authenticated'
+                    ? setShowSignInModal(true)
+                    : handleSubmit(),
+              },
+              // mobile
+              {
+                name: 'mobile',
+                className: 'block sm:hidden',
+                handleClick: () =>
+                  status !== 'authenticated'
+                    ? setShowSignInSlideOver(true)
+                    : handleSubmit(),
+              },
+            ].map((c) => (
+              <button
+                disabled={loading}
+                onClick={c.handleClick}
+                type="button"
+                className={classNames(
+                  loading ? 'text-white bg-gray-150' : 'text-white bg-primer',
+                  `${c.className} rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] flex justify-center items-center`
                 )}
-                <span>Generate Now</span>
-              </div>
-            </button>
-          </div>
-          <div className="mt-4 sm:mt-6 hidden sm:block">
-            <button
-              disabled={loading}
-              onClick={() =>
-                status !== 'authenticated'
-                  ? setShowSignInModal(true)
-                  : handleSubmit()
-              }
-              type="button"
-              className={classNames(
-                loading ? 'text-white bg-gray-150' : 'text-white bg-primer',
-                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] flex justify-center items-center'
-              )}
-            >
-              <div className="flex justify-center items-center space-x-[8px]">
-                {creditFee > 0 && (
-                  <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
-                    <CreditIcon />
-                    <span className="text-black text-xs">{creditFee}</span>
-                  </span>
-                )}
-                <span>Generate Now</span>
-              </div>
-            </button>
+              >
+                <div className="flex justify-center items-center space-x-[8px]">
+                  {creditFee > 0 && (
+                    <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
+                      <CreditIcon key={c.name} />{' '}
+                      <span className="text-black text-xs">{creditFee}</span>
+                    </span>
+                  )}
+                  <span>Generate Now</span>
+                </div>
+              </button>
+            ))}
           </div>
           <div className="border-b-4 rounded w-20 mx-auto opacity-50 sm:hidden mt-4" />
         </div>
