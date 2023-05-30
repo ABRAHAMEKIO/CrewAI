@@ -1,11 +1,13 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useSession } from 'next-auth/react';
-import { CreditIcon, CrossIcon } from '../v1/Icons';
+import { CreditIcon, CrossIcon, WarningIcon } from '../v1/Icons';
 import { PromptAttributes } from '../../db/models/prompt';
 import PromptClient from '../../domain/prompt/promptClient';
 import { creditFee } from '../../config';
 import SignInModal from './SignInModal';
+import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import ErrorModalContext from '../../context/error-modal-context';
 
 function ModalPrompt({
   loading,
@@ -28,6 +30,10 @@ function ModalPrompt({
   const { status } = useSession();
   const [showSignInModal, setShowSignInModal] = useState(false);
 
+  const { setIndicatorNewPromptDisplay } = useContext(NavNewPromptContext);
+  const { setModalOpen, setTitle, setMessage, setIcon } =
+    useContext(ErrorModalContext);
+
   useEffect(() => {
     setText(prompt.prompt);
   }, [prompt]);
@@ -46,14 +52,18 @@ function ModalPrompt({
       });
 
       modalClose();
-      if ('success' in response && response.success) {
-        return;
-      }
-
-      if ('success' in response && !response.success) {
+      if ('isNaughty' in response && response.isNaughty) {
         setLoading(false);
-        // eslint-disable-next-line no-alert
-        window.alert('Generate Fail');
+        setIndicatorNewPromptDisplay(false);
+        setModalOpen(true);
+        setIcon(<WarningIcon />);
+        setTitle('Limit Reached');
+        setMessage(
+          <span>
+            You&apos;ve reached your limit of generating images. Share the
+            results in <b> Twitter</b> and keep generating image
+          </span>
+        );
       }
     }
   }

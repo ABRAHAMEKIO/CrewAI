@@ -4,8 +4,10 @@ import { useSession } from 'next-auth/react';
 import PromptClient from '../../domain/prompt/promptClient';
 import { PromptAttributes } from '../../db/models/prompt';
 import { creditFee } from '../../config';
-import { CreditIcon, CrossIcon } from '../v1/Icons';
+import { CreditIcon, CrossIcon, WarningIcon } from '../v1/Icons';
 import SignInSlideOver from './SignInSlideOver';
+import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import ErrorModalContext from '../../context/error-modal-context';
 
 function BottomSlideOver({
   loading,
@@ -28,6 +30,10 @@ function BottomSlideOver({
   const { status } = useSession();
   const [showSignInSlideOver, setShowSignInSlideOver] = useState(false);
 
+  const { setIndicatorNewPromptDisplay } = useContext(NavNewPromptContext);
+  const { setModalOpen, setTitle, setMessage, setIcon } =
+    useContext(ErrorModalContext);
+
   useEffect(() => {
     setText(prompt.prompt);
   }, [prompt]);
@@ -46,14 +52,18 @@ function BottomSlideOver({
       });
 
       modalClose();
-      if ('success' in response && response.success) {
-        return;
-      }
-
-      if ('success' in response && !response.success) {
+      if ('isNaughty' in response && response.isNaughty) {
         setLoading(false);
-        // eslint-disable-next-line no-alert
-        window.alert('Generate Fail');
+        setIndicatorNewPromptDisplay(false);
+        setModalOpen(true);
+        setIcon(<WarningIcon />);
+        setTitle('Limit Reached');
+        setMessage(
+          <span>
+            You&apos;ve reached your limit of generating images. Share the
+            results in <b> Twitter</b> and keep generating image
+          </span>
+        );
       }
     }
   }

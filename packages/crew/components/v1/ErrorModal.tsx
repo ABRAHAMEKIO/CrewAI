@@ -15,6 +15,12 @@ function ErrorModal() {
     }
   }, [icon]);
 
+  useEffect(() => {
+    if (!modalOpen) {
+      setJsxIcon(<FailIcon fill="none" />);
+    }
+  }, [modalOpen]);
+
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
       <Dialog

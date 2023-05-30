@@ -121,7 +121,7 @@ function HorizontalSlider({
       setIndicatorNewPromptDisplay(false);
       setModalOpen(true);
       setIcon(<WarningIcon />);
-      setTitle('Limit Generate Image');
+      setTitle('Limit Reached');
       setMessage(
         <span>
           You&apos;ve reached your limit of generating images. Share the results
