@@ -14,6 +14,7 @@ import PromptClient, {
 import BottomSlideOver from '../../components/v1/BottomSlideOver';
 import ModalPrompt from '../../components/v1/ModalPrompt';
 import HorizontalSlider from '../../components/v1/HorizontalSlider';
+import ErrorModal from '../../components/v1/ErrorModal';
 
 const promptClient = new PromptClient();
 
@@ -197,6 +198,8 @@ function Index({ socketId }: { socketId: string }) {
             modalOpen={openModalPrompt}
             modalClose={() => setOpenModalPrompt(false)}
           />
+
+          <ErrorModal />
         </Wrap>
       )}
     </LoadingContext.Consumer>

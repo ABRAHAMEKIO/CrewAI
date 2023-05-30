@@ -803,6 +803,33 @@ export function LogoutIcon({ fill, width = 18, height = 12, ...props }) {
   );
 }
 
+export function FailIcon({ fill, width = 67, height = 67, ...props }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 67 67"
+      fill={fill}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <circle cx="33.5" cy="33.5" r="33.5" fill="#F64747" />
+      <path
+        d="M44.25 23.2499L23.75 43.7499"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M44.25 43.7501L23.75 23.2501"
+        stroke="white"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 // svg source: https://react-iconly.jrgarciadev.com/
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
@@ -833,6 +860,7 @@ const icons = {
   tick: <TickIcon fill="none" />,
   credit: <CreditIcon size={16} />,
   logout: <LogoutIcon fill="none" />,
+  fail: <FailIcon fill="none" />,
 };
 
 export default icons;
