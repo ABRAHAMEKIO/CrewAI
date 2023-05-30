@@ -8,6 +8,7 @@ import PromptClient from '../../domain/prompt/promptClient';
 import { PromptAttributes } from '../../db/models/prompt';
 import sendTransaction from '../../helpers/sendTransaction';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import ErrorModalContext from '../../context/error-modal-context';
 import { web3PromptPrice } from '../../config';
 
 function BottomSlideOver({
@@ -34,6 +35,7 @@ function BottomSlideOver({
   const { openChainModal } = useChainModal();
 
   const navNewPromptContext = useContext(NavNewPromptContext);
+  const errorModalContext = useContext(ErrorModalContext);
 
   useEffect(() => {
     setText(prompt.prompt);
@@ -65,17 +67,26 @@ function BottomSlideOver({
 
         if ('success' in response && !response.success) {
           setLoading(false);
-          // eslint-disable-next-line no-alert
-          window.alert('Generate Fail');
+
+          errorModalContext?.setModalOpen(true);
+          errorModalContext?.setTitle('Generate Failed');
+          errorModalContext?.setMessage(
+            'Sorry, generate image couldn’t be processed'
+          );
           return;
         }
       }
 
       modalClose();
       setLoading(false);
+
+      errorModalContext?.setModalOpen(true);
+      errorModalContext?.setTitle('Transaction Failed');
+      errorModalContext?.setMessage(
+        'Sorry, this payment couldn’t be processed'
+      );
+
       navNewPromptContext?.setIndicatorNewPromptDisplay(false);
-      // eslint-disable-next-line no-alert
-      window.alert('Transaction Fail');
     }
   }
 
@@ -109,16 +120,11 @@ function BottomSlideOver({
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-0 focus:ring-offset-0"
+                            className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-offset-0"
                             onClick={() => modalClose()}
                           >
                             <span className="sr-only">Close panel</span>
-                            <button
-                              type="button"
-                              className="h-6 w-6 flex items-center justify-center"
-                            >
-                              <CrossIcon fill="#959595" size={14} />
-                            </button>
+                            <CrossIcon fill="#959595" size={14} />
                           </button>
                         </div>
                       </div>

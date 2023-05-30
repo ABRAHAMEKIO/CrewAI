@@ -26,6 +26,7 @@ import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import ErrorModalContext from '../context/error-modal-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -111,6 +112,20 @@ function CustomApp({
     setIndicatorNewPromptDisplay,
   };
 
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
+  const [errorModaltitle, setRrrorModalTitle] = useState<string>(null);
+  const [errorModalMessage, setErrorMessage] = useState<string>(null);
+
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
+  const ErrorModalContextValue = {
+    modalOpen: errorModalOpen,
+    setModalOpen: setErrorModalOpen,
+    title: errorModaltitle,
+    setTitle: setRrrorModalTitle,
+    message: errorModalMessage,
+    setMessage: setErrorMessage,
+  };
+
   return (
     /*
      * We want to avoid as much as possible conditional wrapper because it is unstable.
@@ -143,13 +158,17 @@ function CustomApp({
                     <NavNewPromptContext.Provider
                       value={NavNewPromptContextValue}
                     >
-                      {/* eslint-disable react/jsx-props-no-spreading */}
-                      <Component
-                        {...pageProps}
-                        socketId={socketId}
-                        newPrompt={newPrompt}
-                      />
-                      {/* set global socket id to component */}
+                      <ErrorModalContext.Provider
+                        value={ErrorModalContextValue}
+                      >
+                        {/* eslint-disable react/jsx-props-no-spreading */}
+                        <Component
+                          {...pageProps}
+                          socketId={socketId}
+                          newPrompt={newPrompt}
+                        />
+                        {/* set global socket id to component */}
+                      </ErrorModalContext.Provider>
                     </NavNewPromptContext.Provider>
                   </LoadingContext.Provider>
                 </PromptContext.Provider>
