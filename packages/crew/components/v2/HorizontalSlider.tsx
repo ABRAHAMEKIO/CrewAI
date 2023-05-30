@@ -8,6 +8,8 @@ import { server, creditFee } from '../../config';
 import ShareModal from '../v1/ShareModal';
 import ShareSlideOver from '../v1/ShareSlideOver';
 import { classNames } from '../../helpers/component';
+import SignInModal from './SignInModal';
+import SignInSlideOver from './SignInSlideOver';
 
 // eslint-disable-next-line no-shadow
 enum ImageOrientation {
@@ -54,6 +56,8 @@ function HorizontalSlider({
   const [openShareSlideOver, setOpenShareSlideOver] = useState(false);
   const [shareUrl, setShareUrl] = useState(null);
   const [windowSize, setWindowSize] = useState([null, null]);
+  const [showSignInSlideOver, setShowSignInSlideOver] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
   const { status } = useSession();
 
@@ -98,11 +102,6 @@ function HorizontalSlider({
   };
 
   async function handleSubmit() {
-    if (!(status === 'authenticated')) {
-      // eslint-disable-next-line no-alert
-      window.alert('Login require!');
-    }
-
     if (loading) return;
     setLoading(true);
     // eslint-disable-next-line no-console
@@ -427,10 +426,14 @@ function HorizontalSlider({
               </div>
             </div>
           </div>
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-4 sm:mt-6 block sm:hidden">
             <button
               disabled={loading}
-              onClick={() => handleSubmit()}
+              onClick={() =>
+                status !== 'authenticated'
+                  ? setShowSignInSlideOver(true)
+                  : handleSubmit()
+              }
               type="button"
               className={classNames(
                 loading ? 'text-white bg-gray-150' : 'text-white bg-primer',
@@ -441,6 +444,31 @@ function HorizontalSlider({
                 {creditFee > 0 && (
                   <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
                     <CreditIcon />{' '}
+                    <span className="text-black text-xs">{creditFee}</span>
+                  </span>
+                )}
+                <span>Generate Now</span>
+              </div>
+            </button>
+          </div>
+          <div className="mt-4 sm:mt-6 hidden sm:block">
+            <button
+              disabled={loading}
+              onClick={() =>
+                status !== 'authenticated'
+                  ? setShowSignInModal(true)
+                  : handleSubmit()
+              }
+              type="button"
+              className={classNames(
+                loading ? 'text-white bg-gray-150' : 'text-white bg-primer',
+                'rounded-lg w-full text-base font-bold min-h-[48px] sm:h-[60px] min-w-[117px] flex justify-center items-center'
+              )}
+            >
+              <div className="flex justify-center items-center space-x-[8px]">
+                {creditFee > 0 && (
+                  <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
+                    <CreditIcon />
                     <span className="text-black text-xs">{creditFee}</span>
                   </span>
                 )}
@@ -460,6 +488,14 @@ function HorizontalSlider({
         modalOpen={openShareSlideOver}
         modalClose={() => setOpenShareSlideOver(false)}
         url={shareUrl}
+      />
+      <SignInModal
+        modalOpen={showSignInModal}
+        modalClose={() => setShowSignInModal(false)}
+      />
+      <SignInSlideOver
+        modalOpen={showSignInSlideOver}
+        modalClose={() => setShowSignInSlideOver(false)}
       />
     </div>
   );
