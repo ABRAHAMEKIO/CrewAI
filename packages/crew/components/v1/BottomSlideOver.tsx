@@ -124,7 +124,9 @@ function BottomSlideOver({
                             onClick={() => modalClose()}
                           >
                             <span className="sr-only">Close panel</span>
-                            <CrossIcon fill="#959595" size={14} />
+                            <div className="h-6 w-6 flex items-center justify-center">
+                              <CrossIcon fill="#959595" size={14} />
+                            </div>
                           </button>
                         </div>
                       </div>

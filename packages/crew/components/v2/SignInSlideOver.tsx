@@ -1,10 +1,12 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Magic } from 'magic-sdk';
 import { signIn } from 'next-auth/react';
 import { CrossIcon } from '../v1/Icons';
 import { classNames } from '../../helpers/component';
 import { isValidEmail } from '../../helpers/form';
+import { server } from '../../config';
+import UserProfileContext from '../../context/user-profile-context';
 
 const magic =
   typeof window !== 'undefined' &&
@@ -19,6 +21,7 @@ function SignInSlideOver({
   const [emailModal, setEmailModal] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const UserProfile = useContext(UserProfileContext);
 
   async function handleSubmit(): Promise<void> {
     setIsLoading(true);
@@ -36,6 +39,15 @@ function SignInSlideOver({
             redirect: false,
           });
           if (!signin.error) {
+            const fetchUser = await fetch(`${server}/api/user/get-profile`, {
+              method: 'POST',
+              body: JSON.stringify({ token: didToken }),
+            });
+
+            const User = await fetchUser.json();
+            if (User) {
+              UserProfile.update(User.user); // eslint-disable-line
+            }
             setIsLoading(false);
             modalClose();
           }

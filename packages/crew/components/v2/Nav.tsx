@@ -3,6 +3,7 @@ import { Disclosure } from '@headlessui/react';
 import Section from '../v1/Section';
 import NavNewPrompt from '../v1/NavNewPrompt';
 import SignInButton from './SignInButton';
+import CreditNav from './CreditNav';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -53,6 +54,7 @@ function Nav({ className }: { className?: string }) {
                   </div>
                 )}
               </div>
+              <CreditNav />
               <SignInButton />
             </div>
           </Section>
