@@ -448,6 +448,7 @@ function HorizontalSlider({
               },
             ].map((c) => (
               <button
+                key={c.name}
                 disabled={loading}
                 onClick={c.handleClick}
                 type="button"
