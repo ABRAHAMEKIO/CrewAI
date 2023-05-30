@@ -4,6 +4,9 @@ import { getCsrfToken } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 import { Magic } from '@magic-sdk/admin';
 import User from '../../../db/models/user';
+import WalletFactory from '../../../domain/wallet/walletFactory';
+
+const creditFee = 3;
 
 export const authOptions = {
   // Configure one or more authentication providers
@@ -44,6 +47,8 @@ export const authOptions = {
             });
 
             if (newUser) {
+              const wallet = WalletFactory.resolver(newUser);
+              await wallet.topUp(creditFee);
               return {
                 id: newUser.id.toString(),
                 email: newUser.email,
