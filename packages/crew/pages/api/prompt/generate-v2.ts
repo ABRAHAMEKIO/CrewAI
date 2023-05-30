@@ -134,7 +134,10 @@ export default async function handler(
   const wallet = WalletFactory.resolver(user);
   const usage = await wallet.use(creditFee);
   if (!usage) {
-    return res.status(422).json({ usage, message: 'Limit exceeded' });
+    return res.status(200).json({
+      isNaughty: true,
+      phrase: 'limit exceeded',
+    });
   }
 
   const prompt = await Prompt.findByPk(promptId);

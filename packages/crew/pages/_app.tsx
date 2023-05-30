@@ -121,18 +121,21 @@ function CustomApp({
     setIndicatorNewPromptDisplay,
   };
 
-  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
-  const [errorModaltitle, setRrrorModalTitle] = useState<string>(null);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(true);
+  const [errorModalTitle, setErrorModalTitle] = useState<string>(null);
   const [errorModalMessage, setErrorMessage] = useState<string>(null);
+  const [errorModalIcon, setErrorModalIcon] = useState<JSX.Element>(null);
 
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const ErrorModalContextValue = {
     modalOpen: errorModalOpen,
     setModalOpen: setErrorModalOpen,
-    title: errorModaltitle,
-    setTitle: setRrrorModalTitle,
+    title: errorModalTitle,
+    setTitle: setErrorModalTitle,
     message: errorModalMessage,
     setMessage: setErrorMessage,
+    icon: errorModalIcon,
+    setIcon: setErrorModalIcon,
   };
 
   return (
