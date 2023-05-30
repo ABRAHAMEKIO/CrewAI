@@ -7,6 +7,7 @@ import { ShareButtonIcon } from './Icons';
 import PromptClient from '../../domain/prompt/promptClient';
 import sendTransaction from '../../helpers/sendTransaction';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import ErrorModalContext from '../../context/error-modal-context';
 import { server, web3PromptPrice } from '../../config';
 import ShareModal from './ShareModal';
 import ShareSlideOver from './ShareSlideOver';
@@ -31,7 +32,6 @@ function HorizontalSlider({
   newPrompt,
   socketId,
   setBackgroundImageUrl,
-  setOpenErrorModal,
 }: {
   loading: boolean;
   setLoading: (bool: boolean) => void;
@@ -41,7 +41,6 @@ function HorizontalSlider({
   newPrompt?: PromptAttributes;
   socketId: string;
   setBackgroundImageUrl: (imageUrl: string) => void;
-  setOpenErrorModal: (title: string, message: string, bool: boolean) => void;
 }) {
   const [ref1Size, setRef1Size] = useState([0, 0]);
   const [ref2Size, setRef2Size] = useState([0, 0]);
@@ -68,6 +67,7 @@ function HorizontalSlider({
   const { openChainModal } = useChainModal();
 
   const navNewPromptContext = useContext(NavNewPromptContext);
+  const errorModalContext = useContext(ErrorModalContext);
 
   useEffect(() => {
     setBackgroundImageUrl(current.imageUrl);
@@ -294,10 +294,11 @@ function HorizontalSlider({
           }
           if ('success' in response && !response.success) {
             setLoading(false);
-            setOpenErrorModal(
-              'Generate Failed',
-              'Sorry, generate image couldn’t be processed',
-              true
+
+            errorModalContext?.setModalOpen(true);
+            errorModalContext?.setTitle('Generate Failed');
+            errorModalContext?.setMessage(
+              'Sorry, generate image couldn’t be processed'
             );
             return;
           }
@@ -305,10 +306,11 @@ function HorizontalSlider({
       }
 
       setLoading(false);
-      setOpenErrorModal(
-        'Transaction Failed',
-        'Sorry, this payment couldn’t be processed',
-        true
+
+      errorModalContext?.setModalOpen(true);
+      errorModalContext?.setTitle('Transaction Failed');
+      errorModalContext?.setMessage(
+        'Sorry, this payment couldn’t be processed'
       );
 
       navNewPromptContext?.setIndicatorNewPromptDisplay(false);

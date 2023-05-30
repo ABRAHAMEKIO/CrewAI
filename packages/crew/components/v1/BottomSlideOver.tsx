@@ -8,6 +8,7 @@ import PromptClient from '../../domain/prompt/promptClient';
 import { PromptAttributes } from '../../db/models/prompt';
 import sendTransaction from '../../helpers/sendTransaction';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
+import ErrorModalContext from '../../context/error-modal-context';
 import { web3PromptPrice } from '../../config';
 
 function BottomSlideOver({
@@ -18,7 +19,6 @@ function BottomSlideOver({
   socketId,
   modalClose,
   parentId,
-  setOpenErrorModal,
 }: {
   loading: boolean;
   setLoading: (bool: boolean) => void;
@@ -27,7 +27,6 @@ function BottomSlideOver({
   modalOpen: boolean;
   socketId: string;
   modalClose: () => void;
-  setOpenErrorModal: (title: string, message: string, bool: boolean) => void;
 }) {
   const [text, setText] = useState<string>('');
   const { chain } = useNetwork();
@@ -36,6 +35,7 @@ function BottomSlideOver({
   const { openChainModal } = useChainModal();
 
   const navNewPromptContext = useContext(NavNewPromptContext);
+  const errorModalContext = useContext(ErrorModalContext);
 
   useEffect(() => {
     setText(prompt.prompt);
@@ -69,10 +69,11 @@ function BottomSlideOver({
 
         if ('success' in response && !response.success) {
           setLoading(false);
-          setOpenErrorModal(
-            'Generate Failed',
-            'Sorry, generate image couldn’t be processed',
-            true
+
+          errorModalContext?.setModalOpen(true);
+          errorModalContext?.setTitle('Generate Failed');
+          errorModalContext?.setMessage(
+            'Sorry, generate image couldn’t be processed'
           );
           return;
         }
@@ -80,10 +81,11 @@ function BottomSlideOver({
 
       modalClose();
       setLoading(false);
-      setOpenErrorModal(
-        'Transaction Failed',
-        'Sorry, this payment couldn’t be processed',
-        true
+
+      errorModalContext?.setModalOpen(true);
+      errorModalContext?.setTitle('Transaction Failed');
+      errorModalContext?.setMessage(
+        'Sorry, this payment couldn’t be processed'
       );
 
       navNewPromptContext?.setIndicatorNewPromptDisplay(false);

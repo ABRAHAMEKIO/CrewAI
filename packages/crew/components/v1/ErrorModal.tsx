@@ -1,21 +1,19 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CrossIcon, FailIcon } from './Icons';
+import ErrorModalContext from '../../context/error-modal-context';
 
-function ErrorModal({
-  modalOpen,
-  modalClose,
-  title,
-  message,
-}: {
-  modalOpen: boolean;
-  modalClose: () => void;
-  title: string;
-  message: string;
-}) {
+function ErrorModal() {
+  const { modalOpen, setModalOpen, title, message } =
+    useContext(ErrorModalContext);
+
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={modalClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={() => setModalOpen(false)}
+      >
         <Transition.Child
           as={Fragment}
           enter="transform transition ease-in-out sm:ease-in duration-500 sm:duration-300"
@@ -45,7 +43,7 @@ function ErrorModal({
                     <button
                       type="button"
                       className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-0 focus:ring-offset-0"
-                      onClick={() => modalClose()}
+                      onClick={() => setModalOpen(false)}
                     >
                       <CrossIcon fill="#959595" size={14} />
                     </button>
@@ -68,7 +66,7 @@ function ErrorModal({
                     <button
                       type="button"
                       className="inline-flex w-full justify-center rounded-md bg-black px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black-600"
-                      onClick={() => modalClose()}
+                      onClick={() => setModalOpen(false)}
                     >
                       OK
                     </button>

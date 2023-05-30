@@ -31,9 +31,6 @@ function Index({ socketId }: { socketId: string }) {
   const [modalData, setModalData] = useState<PromptAttributes>({});
   const [openBottomSlideOver, setOpenBottomSlideOver] = useState(false);
   const [openModalPrompt, setOpenModalPrompt] = useState(false);
-  const [openErrorModal, setOpenErrorModal] = useState(false);
-  const [titleErrorModal, setTitleErrorModal] = useState('');
-  const [messageErrorModal, setMessageErrorModal] = useState('');
 
   useEffect(() => {
     if (mixpanel && mixpanel.config && mixpanel.config.token) {
@@ -174,11 +171,6 @@ function Index({ socketId }: { socketId: string }) {
                               setOpenModalPrompt(bool);
                             }}
                             setBackgroundImageUrl={setBackgroundImageUrl}
-                            setOpenErrorModal={(title, message, bool) => {
-                              setTitleErrorModal(title);
-                              setMessageErrorModal(message);
-                              setOpenErrorModal(bool);
-                            }}
                           />
                         </div>
                       );
@@ -197,11 +189,6 @@ function Index({ socketId }: { socketId: string }) {
             prompt={modalData}
             modalOpen={openBottomSlideOver}
             modalClose={() => setOpenBottomSlideOver(false)}
-            setOpenErrorModal={(title, message, bool) => {
-              setTitleErrorModal(title);
-              setMessageErrorModal(message);
-              setOpenErrorModal(bool);
-            }}
           />
 
           <ModalPrompt
@@ -212,19 +199,9 @@ function Index({ socketId }: { socketId: string }) {
             prompt={modalData}
             modalOpen={openModalPrompt}
             modalClose={() => setOpenModalPrompt(false)}
-            setOpenErrorModal={(title, message, bool) => {
-              setTitleErrorModal(title);
-              setMessageErrorModal(message);
-              setOpenErrorModal(bool);
-            }}
           />
 
-          <ErrorModal
-            modalOpen={openErrorModal}
-            modalClose={() => setOpenErrorModal(false)}
-            title={titleErrorModal}
-            message={messageErrorModal}
-          />
+          <ErrorModal />
         </Wrap>
       )}
     </LoadingContext.Consumer>
