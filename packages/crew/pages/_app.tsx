@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
@@ -22,7 +22,10 @@ import { MixpanelProvider } from 'react-mixpanel-browser';
 import io from 'socket.io-client';
 import { dev, mixPanelId, server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
-import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
+import {
+  IsNaughtySuccessResponse,
+  WebhookSuccessResponse,
+} from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
@@ -30,6 +33,7 @@ import ErrorModalContext from '../context/error-modal-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
+import { WarningIcon } from '../components/v1/Icons';
 
 let socket;
 
@@ -73,10 +77,16 @@ function CustomApp({
   const [loading, setLoading] = useState<boolean>(false);
 
   const [newPrompt, setNewPrompt] = useState<PromptAttributes>(null);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
+  const [errorModalTitle, setErrorModalTitle] = useState<string>(null);
+  const [errorModalMessage, setErrorMessage] = useState<string>(null);
+  const [errorModalIcon, setErrorModalIcon] = useState<JSX.Element>(null);
 
   const [promptId, setPromptId] = useState<number>(null);
   const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
     useState<boolean>(false);
+  const { setModalOpen, setTitle, setMessage, setIcon } =
+    useContext(ErrorModalContext);
 
   useEffect(() => {
     fetch(`${server}/api/socket`)
@@ -91,17 +101,23 @@ function CustomApp({
 
         socket.on(
           MidjourneyCommand.ModelResults.toString(),
-          (val: WebhookSuccessResponse) => {
+          (val: WebhookSuccessResponse | IsNaughtySuccessResponse) => {
             // eslint-disable-next-line no-console
             console.info(val);
             setLoading(false);
 
             if ('prompt' in val) {
               setNewPrompt(val.prompt);
-            } else {
-              // @TODO implement flow fail generate
-              // eslint-disable-next-line no-alert
-              window.alert('GENERATE FAIL');
+            }
+
+            if ('isNaughty' in val && val.isNaughty) {
+              setIndicatorNewPromptDisplay(false);
+              setErrorModalOpen(true);
+              setErrorModalIcon(<WarningIcon />);
+              setErrorModalTitle('Generate Failed');
+              setErrorMessage(
+                'Sorry, this generate failed. Credit will be returned'
+              );
               setIndicatorNewPromptDisplay(false);
             }
           }
@@ -111,7 +127,13 @@ function CustomApp({
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, [setIndicatorNewPromptDisplay]);
+  }, [
+    setIcon,
+    setIndicatorNewPromptDisplay,
+    setMessage,
+    setModalOpen,
+    setTitle,
+  ]);
 
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const NavNewPromptContextValue = {
@@ -120,11 +142,6 @@ function CustomApp({
     indicatorNewPromptDisplay,
     setIndicatorNewPromptDisplay,
   };
-
-  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(true);
-  const [errorModalTitle, setErrorModalTitle] = useState<string>(null);
-  const [errorModalMessage, setErrorMessage] = useState<string>(null);
-  const [errorModalIcon, setErrorModalIcon] = useState<JSX.Element>(null);
 
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const ErrorModalContextValue = {
