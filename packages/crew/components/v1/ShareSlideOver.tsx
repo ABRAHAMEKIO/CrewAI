@@ -7,7 +7,6 @@ import {
   TelegramIcon,
   FacebookIcon,
   TickIcon,
-  CreditFlatIcon,
 } from './Icons';
 import { displayUrl } from '../../helpers/component';
 
