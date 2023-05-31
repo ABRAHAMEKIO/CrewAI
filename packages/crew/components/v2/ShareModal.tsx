@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CrossIcon } from '../v1/Icons';
 import ShareContent from './ShareContent';
@@ -14,8 +14,6 @@ function ShareModal({
   url: string;
   promptId: number;
 }) {
-  const [copied, setCopied] = useState(false);
-
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
       <Dialog
@@ -23,7 +21,6 @@ function ShareModal({
         className="relative z-10"
         onClose={() => {
           modalClose();
-          setCopied(false);
         }}
       >
         <Transition.Child

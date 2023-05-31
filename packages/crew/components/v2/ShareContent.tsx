@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import {
   WhatsappIcon,
@@ -7,9 +7,11 @@ import {
   FacebookIcon,
   TickIcon,
   CreditFlatIcon,
+  CreditIcon,
 } from '../v1/Icons';
 import { displayUrl } from '../../helpers/component';
 import PromptClient from '../../domain/prompt/promptClient';
+import ErrorModalContext from '../../context/error-modal-context';
 
 function ShareContent({
   modalOpen,
@@ -25,6 +27,12 @@ function ShareContent({
   const [copied, setCopied] = useState(false);
   const { status } = useSession();
   const [loading, setLoading] = useState<boolean>(false);
+  const {
+    setModalOpen: setErrorModalOpen,
+    setTitle: setErrorTitle,
+    setMessage: setErrorMessage,
+    setIcon: setErrorIcon,
+  } = useContext(ErrorModalContext);
   useEffect(() => {
     if (!modalOpen) {
       setTimeout(() => {
@@ -52,6 +60,10 @@ function ShareContent({
         const text = `Hey%20I%20found%20an%20interesting%20AI-generated%20@tryhologram%2C%20check%20this%20out%20${url}%20(Share%20Code:%20${response.share.code})`;
         modalClose();
         setLoading(false);
+        setErrorTitle('Congrats');
+        setErrorMessage('Your free credit is being processed, please wait.');
+        setErrorIcon(<CreditIcon size={66.67} />);
+        setErrorModalOpen(true);
         window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
         return;
       }
