@@ -20,7 +20,7 @@ const promptClient = new PromptClient();
 
 function Index({ socketId }: { socketId: string }) {
   const mixpanel = useMixpanel();
-  const [randomNumber] = useState(Math.floor(Math.random() * 25));
+  const [randomNumber] = useState(Math.floor(Math.random() * 40));
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [dataPrompt, setDataPrompt] = useState({
     rows: [],
