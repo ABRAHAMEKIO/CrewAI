@@ -5,6 +5,8 @@ import {
   IsNaughtySuccessResponse,
   SuccessResponse,
 } from '../midjourney/midjourneyClient';
+import { ShareAttributes } from '../../db/models/share';
+import { ShareSuccessResponse } from '../../pages/api/prompt/share';
 
 export interface ErrorResponse {
   error: string;
@@ -104,6 +106,22 @@ export default class PromptClient {
 
     const response = await axios.request<
       SuccessResponse | IsNaughtySuccessResponse
+    >(config);
+
+    return response.data;
+  }
+
+  async share(props: {
+    promptId: number;
+  }): Promise<ShareSuccessResponse | IsNaughtySuccessResponse> {
+    const { promptId } = props;
+
+    const data = { promptId };
+
+    const config = this.getConfig(data, 'api/prompt/share', 'POST', '');
+
+    const response = await axios.request<
+      ShareSuccessResponse | IsNaughtySuccessResponse
     >(config);
 
     return response.data;
