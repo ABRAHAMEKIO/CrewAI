@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
+  CreditFlatIcon,
   CrossIcon,
   FacebookIcon,
   TelegramIcon,
@@ -110,8 +111,14 @@ function ShareModal({
                               '_blank'
                             );
                           }}
-                          className="inline-block m-2"
+                          className="inline-block m-2 relative"
                         >
+                          <div className="h-4 w-full bg-primer flex absolute px-[6px] py-[1px] rounded-lg -mt-2">
+                            <span className="font-bold text-[10px] leading-[14px] text-white">
+                              Free
+                            </span>
+                            <CreditFlatIcon size="12" />
+                          </div>
                           <TwitterIcon fill="white" />
                         </button>
                         {/* <button type="button" className="inline-block m-2"> */}
