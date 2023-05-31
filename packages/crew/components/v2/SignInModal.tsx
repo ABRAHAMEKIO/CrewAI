@@ -27,32 +27,28 @@ function SignInModal({
     setError(null);
     if (!magic) throw new Error(`magic not defined`);
     if (isValidEmail(emailModal)) {
-      try {
-        const didToken = await magic.auth.loginWithMagicLink({
-          email: emailModal,
+      const didToken = await magic.auth.loginWithMagicLink({
+        email: emailModal,
+      });
+
+      if (didToken) {
+        const signin = await signIn('magic', {
+          didToken,
+          redirect: false,
         });
-
-        if (didToken) {
-          const signin = await signIn('magic', {
-            didToken,
-            redirect: false,
+        if (!signin.error) {
+          const fetchUser = await fetch(`${server}/api/user/get-profile`, {
+            method: 'POST',
           });
-          if (!signin.error) {
-            const fetchUser = await fetch(`${server}/api/user/get-profile`, {
-              method: 'POST',
-            });
 
-            const User = await fetchUser.json();
-            if (User) {
-              UserProfile.update(User.user); // eslint-disable-line
-            }
-            setIsLoading(false);
-            modalClose();
+          const User = await fetchUser.json();
+          if (User && User.user) {
+            UserProfile.update(User.user); // eslint-disable-line
           }
         }
-      } catch (e) {
-        setIsLoading(false);
       }
+      setIsLoading(false);
+      modalClose();
     } else {
       setError('Email is invalid');
     }

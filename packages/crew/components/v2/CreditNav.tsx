@@ -17,7 +17,7 @@ function CreditNav() {
         });
 
         const User = await userProfile.json();
-        if (User) {
+        if (User && User.user) {
           UserProfile.update(User.user); // eslint-disable-line
         }
       };
