@@ -10,8 +10,8 @@ import {
 import PromptClient from '../../domain/prompt/promptClient';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
 import { server, creditFee } from '../../config';
-import ShareModal from '../v1/ShareModal';
-import ShareSlideOver from '../v1/ShareSlideOver';
+import ShareModal from './ShareModal';
+import ShareSlideOver from './ShareSlideOver';
 import { classNames } from '../../helpers/component';
 import SignInModal from './SignInModal';
 import SignInSlideOver from './SignInSlideOver';

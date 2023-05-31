@@ -508,11 +508,13 @@ function HorizontalSlider({
         modalOpen={openShareModal}
         modalClose={() => setOpenShareModal(false)}
         url={shareUrl}
+        promptId={current.id}
       />
       <ShareSlideOver
         modalOpen={openShareSlideOver}
         modalClose={() => setOpenShareSlideOver(false)}
         url={shareUrl}
+        promptId={current.id}
       />
     </div>
   );

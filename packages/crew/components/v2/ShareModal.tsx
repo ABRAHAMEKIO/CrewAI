@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { useSession } from 'next-auth/react';
 import {
   CreditFlatIcon,
   CrossIcon,
@@ -8,19 +9,24 @@ import {
   TickIcon,
   TwitterIcon,
   WhatsappIcon,
-} from './Icons';
+} from '../v1/Icons';
 import { displayUrl } from '../../helpers/component';
+import PromptClient from '../../domain/prompt/promptClient';
 
 function ShareModal({
   modalOpen,
   modalClose,
   url,
+  promptId,
 }: {
   modalOpen: boolean;
   modalClose: () => void;
   url: string;
+  promptId: number;
 }) {
   const [copied, setCopied] = useState(false);
+  const { status } = useSession();
+  const [loading, setLoading] = useState<boolean>(false);
 
   async function handleSubmit(): Promise<void> {
     await navigator.clipboard.writeText(url);
@@ -29,6 +35,26 @@ function ShareModal({
       setCopied(false);
       clearTimeout(timeout);
     }, 4000);
+  }
+
+  async function twitterShare() {
+    if (loading) return;
+    setLoading(true);
+    if (status === 'authenticated') {
+      const promptClient = new PromptClient();
+      const response = await promptClient.share({ promptId });
+      if ('share' in response) {
+        const text = `Hey%20I%20found%20an%20interesting%20AI-generated%20@tryhologram%2C%20check%20this%20out%20${url}%20(Share%20Code:%20${response.share.code})`;
+        modalClose();
+        setLoading(false);
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+        return;
+      }
+    }
+    const text = `Hey%20I%20found%20an%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`;
+    modalClose();
+    setLoading(false);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
   }
 
   function handleIconShare(openUrl: string) {
@@ -109,13 +135,17 @@ function ShareModal({
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            handleIconShare(
-                              `https://twitter.com/intent/tweet?text=Hey%20I%20found%20an%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`
-                            )
-                          }
-                          className="inline-block m-2"
+                          onClick={() => twitterShare()}
+                          className="inline-block m-2 relative"
                         >
+                          {status === 'authenticated' && (
+                            <div className="h-4 w-full bg-primer flex absolute px-[6px] py-[1px] rounded-lg -mt-2">
+                              <span className="font-bold text-[10px] leading-[14px] text-white">
+                                Free
+                              </span>
+                              <CreditFlatIcon size="12" />
+                            </div>
+                          )}
                           <TwitterIcon fill="white" />
                         </button>
                         {/* <button type="button" className="inline-block m-2"> */}
