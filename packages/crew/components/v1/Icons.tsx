@@ -884,6 +884,27 @@ export function WarningIcon({ fill = '#F74747', size = 68, ...props }) {
   );
 }
 
+export function CheckIcon({ fill = 'none', size = 24, ...props }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={fill}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M5 13L9 17L19 7"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 // svg source: https://react-iconly.jrgarciadev.com/
 const icons = {
   chevron: <ChevronDownIcon fill="currentColor" size={16} />,
@@ -917,6 +938,7 @@ const icons = {
   logout: <LogoutIcon fill="none" />,
   fail: <FailIcon fill="none" />,
   warning: <WarningIcon fill="currentColor" />,
+  check: <CheckIcon />,
 };
 
 export default icons;

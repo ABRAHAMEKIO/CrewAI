@@ -7,6 +7,7 @@ import SignInButton from './SignInButton';
 import CreditNav from './CreditNav';
 import LoadingContext from '../../context/loading-context';
 import { server } from '../../config';
+import NavNewPromptContext from '../../context/nav-new-prompt-context';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -18,6 +19,7 @@ const showFeature = false;
 
 function Nav({ className }: { className?: string }) {
   const { loading } = useContext(LoadingContext);
+  const { indicatorNewPromptDisplay } = useContext(NavNewPromptContext);
 
   return (
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
@@ -39,7 +41,9 @@ function Nav({ className }: { className?: string }) {
               <div className="flex flex-1 items-center justify-between sm:items-stretch">
                 <div
                   className={classNames(
-                    loading ? 'hidden' : 'flex-shrink-0 items-center space-x-4'
+                    loading || indicatorNewPromptDisplay
+                      ? 'hidden'
+                      : 'flex-shrink-0 items-center space-x-4'
                   )}
                 >
                   <a
