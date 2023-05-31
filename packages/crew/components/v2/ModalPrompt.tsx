@@ -4,10 +4,11 @@ import { useSession } from 'next-auth/react';
 import { CreditIcon, CrossIcon, WarningIcon } from '../v1/Icons';
 import { PromptAttributes } from '../../db/models/prompt';
 import PromptClient from '../../domain/prompt/promptClient';
-import { creditFee } from '../../config';
+import { creditFee, server } from '../../config';
 import SignInModal from './SignInModal';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
 import ErrorModalContext from '../../context/error-modal-context';
+import UserProfileContext from '../../context/user-profile-context';
 
 function ModalPrompt({
   loading,
@@ -33,6 +34,7 @@ function ModalPrompt({
   const { setIndicatorNewPromptDisplay } = useContext(NavNewPromptContext);
   const { setModalOpen, setTitle, setMessage, setIcon } =
     useContext(ErrorModalContext);
+  const UserProfile = useContext(UserProfileContext);
 
   useEffect(() => {
     setText(prompt.prompt);
@@ -50,6 +52,20 @@ function ModalPrompt({
         msg: text,
         socketId,
       });
+
+      const fetchDataUser = async () => {
+        const fetchUserProfile = await fetch(`${server}/api/user/get-profile`, {
+          method: 'POST',
+        });
+        if (fetchUserProfile.status === 200) {
+          const User = await fetchUserProfile.json();
+          if (User && User.user) {
+            UserProfile.update(User.user); // eslint-disable-line
+          }
+        }
+      };
+      // eslint-disable-next-line no-console
+      fetchDataUser().catch(console.error);
 
       modalClose();
       if ('isNaughty' in response && response.isNaughty) {
