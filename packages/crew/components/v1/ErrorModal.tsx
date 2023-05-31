@@ -17,7 +17,9 @@ function ErrorModal() {
 
   useEffect(() => {
     if (!modalOpen) {
-      setJsxIcon(<FailIcon fill="none" />);
+      setTimeout(() => {
+        setJsxIcon(<FailIcon fill="none" />);
+      }, 1000);
     }
   }, [modalOpen]);
 

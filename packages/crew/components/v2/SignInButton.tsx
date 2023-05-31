@@ -11,7 +11,7 @@ function SignInButton() {
   const [openLogoutSlideOver, setOpenLogoutSlideOver] = useState(false);
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
   const { data: session, status } = useSession();
-  const [isSignin, setIsSignin] = useState(false);
+  const [isSignIn, setIsSignIn] = useState(false);
 
   async function handleClickSlideOver() {
     setOpenSignInSlideOver(true);
@@ -23,7 +23,7 @@ function SignInButton() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      setIsSignin(true);
+      setIsSignIn(true);
     }
   }, [status]);
 
@@ -37,7 +37,7 @@ function SignInButton() {
 
   return (
     <>
-      {!isSignin ? (
+      {!isSignIn ? (
         <>
           <div className="block sm:hidden">
             <button
@@ -67,7 +67,7 @@ function SignInButton() {
               className="relative w-10 h-10 rounded-full bg-gray-130 text-center"
             >
               <div className="align-middle text-base text-gray-170 font-bold">
-                {session?.user?.email.charAt(0).toUpperCase()}
+                {session?.user?.email?.charAt(0).toUpperCase()}
               </div>
             </button>
           </div>
@@ -78,7 +78,7 @@ function SignInButton() {
               className="relative w-10 h-10 rounded-full bg-gray-130 text-center"
             >
               <div className="align-middle text-base text-gray-170 font-bold">
-                {session?.user?.email.charAt(0).toUpperCase()}
+                {session?.user?.email?.charAt(0).toUpperCase()}
               </div>
             </button>
           </div>
