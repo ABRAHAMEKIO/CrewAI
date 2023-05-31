@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Disclosure } from '@headlessui/react';
+import Image from 'next/image';
+import LoadingContext from '../../context/loading-context';
 import Section from './Section';
 import ConnectWallet from './ConnectWallet';
 import NavNewPrompt from './NavNewPrompt';
@@ -19,6 +21,8 @@ function classNames(...classes) {
 const showFeature = false;
 
 function Nav({ className }: { className?: string }) {
+  const { loading } = useContext(LoadingContext);
+
   return (
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
       {({ open }) => (
@@ -37,12 +41,21 @@ function Nav({ className }: { className?: string }) {
                 </div>
               )}
               <div className="flex flex-1 items-center justify-between sm:items-stretch">
-                <div className="flex flex-shrink-0 items-center space-x-4">
+                <div
+                  className={classNames(
+                    loading ? 'hidden' : 'flex-shrink-0 items-center space-x-4'
+                  )}
+                >
                   <a
                     className="font-bold text-base sm:text-xl not-italic"
-                    href={server}
+                    href={`${server}/web3`}
                   >
-                    Hologram
+                    <Image
+                      src="/images/hologram-logo.png"
+                      alt="hologram-logo"
+                      width="113"
+                      height="22"
+                    />
                   </a>
                 </div>
                 {showFeature && (

@@ -6,6 +6,7 @@ import NavNewPrompt from '../v1/NavNewPrompt';
 import SignInButton from './SignInButton';
 import CreditNav from './CreditNav';
 import LoadingContext from '../../context/loading-context';
+import { server } from '../../config';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -41,14 +42,17 @@ function Nav({ className }: { className?: string }) {
                     loading ? 'hidden' : 'flex-shrink-0 items-center space-x-4'
                   )}
                 >
-                  <h1 className="font-bold text-base sm:text-xl not-italic">
+                  <a
+                    className="font-bold text-base sm:text-xl not-italic"
+                    href={server}
+                  >
                     <Image
                       src="/images/hologram-logo.png"
                       alt="hologram-logo"
                       width="113"
                       height="22"
                     />
-                  </h1>
+                  </a>
                 </div>
                 {showFeature && (
                   <div className="sm:ml-6 flex items-center w-full justify-center">
