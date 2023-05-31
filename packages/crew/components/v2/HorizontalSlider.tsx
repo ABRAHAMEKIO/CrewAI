@@ -1,7 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { PromptAttributes } from '../../db/models/prompt';
-import { CreditIcon, ShareButtonIcon, WarningIcon } from '../v1/Icons';
+import {
+  CreditFlatIcon,
+  CreditIcon,
+  ShareButtonIcon,
+  WarningIcon,
+} from '../v1/Icons';
 import PromptClient from '../../domain/prompt/promptClient';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
 import { server, creditFee } from '../../config';
@@ -464,13 +469,26 @@ function HorizontalSlider({
                 )}
               >
                 <div className="flex justify-center items-center space-x-[8px]">
-                  {creditFee > 0 && (
-                    <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
-                      <CreditIcon randomKey={c.name} />{' '}
-                      <span className="text-black text-xs">{creditFee}</span>
-                    </span>
+                  {status === 'authenticated' ? (
+                    <>
+                      {creditFee > 0 && (
+                        <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
+                          <CreditIcon randomKey={c.name} />{' '}
+                          <span className="text-black text-xs">
+                            {creditFee}
+                          </span>
+                        </span>
+                      )}
+                      <span>Generate Now</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="h-[24px] min-w-[24px] flex justify-center items-center">
+                        <CreditFlatIcon size={16} />{' '}
+                      </span>
+                      <span>Free Generate</span>
+                    </>
                   )}
-                  <span>Generate Now</span>
                 </div>
               </button>
             ))}
