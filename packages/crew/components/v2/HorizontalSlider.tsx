@@ -16,6 +16,7 @@ import { classNames } from '../../helpers/component';
 import SignInModal from './SignInModal';
 import SignInSlideOver from './SignInSlideOver';
 import ErrorModalContext from '../../context/error-modal-context';
+import UserProfileContext from '../../context/user-profile-context';
 
 // eslint-disable-next-line no-shadow
 enum ImageOrientation {
@@ -67,6 +68,7 @@ function HorizontalSlider({
   const { setIndicatorNewPromptDisplay } = useContext(NavNewPromptContext);
   const { setModalOpen, setTitle, setMessage, setIcon } =
     useContext(ErrorModalContext);
+  const UserProfile = useContext(UserProfileContext);
 
   const { status } = useSession();
 
@@ -120,6 +122,20 @@ function HorizontalSlider({
       msg: current.prompt,
       socketId,
     });
+
+    const fetchDataUser = async () => {
+      const fetchUserProfile = await fetch(`${server}/api/user/get-profile`, {
+        method: 'POST',
+      });
+      if (fetchUserProfile.status === 200) {
+        const User = await fetchUserProfile.json();
+        if (User && User.user) {
+          UserProfile.update(User.user); // eslint-disable-line
+        }
+      }
+    };
+    // eslint-disable-next-line no-console
+    fetchDataUser().catch(console.error);
 
     if ('isNaughty' in response && response.isNaughty) {
       setLoading(false);
