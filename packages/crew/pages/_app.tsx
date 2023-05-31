@@ -131,6 +131,23 @@ function CustomApp({
                 'Sorry, this generate failed. Credit will be returned'
               );
             }
+
+            const fetchDataUser = async () => {
+              const fetchUserProfile = await fetch(
+                `${server}/api/user/get-profile`,
+                {
+                  method: 'POST',
+                }
+              );
+              if (fetchUserProfile.status === 200) {
+                const UserProfile = await fetchUserProfile.json();
+                if (UserProfile && UserProfile.user) {
+                  setUserProfile(UserProfile.user); // eslint-disable-line
+                }
+              }
+            };
+            // eslint-disable-next-line no-console
+            fetchDataUser().catch(console.error);
           }
         );
       })
