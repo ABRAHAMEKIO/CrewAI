@@ -136,8 +136,13 @@ function BottomSlideOver({
                           <div className="flex justify-center items-center space-x-[8px]">
                             {creditFee > 0 && (
                               <span className="h-[24px] min-w-[24px] bg-white rounded-2xl flex justify-center items-center space-x-[2px] px-[8px]">
-                                <CreditIcon />{' '}
-                                <span className="text-black text-xs">
+                                <CreditIcon loading={!!loading} />{' '}
+                                <span
+                                  className={classNames(
+                                    loading ? 'text-gray-150' : 'text-black',
+                                    `text-xs`
+                                  )}
+                                >
                                   {creditFee}
                                 </span>
                               </span>

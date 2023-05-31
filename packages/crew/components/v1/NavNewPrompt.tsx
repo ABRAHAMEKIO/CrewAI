@@ -1,7 +1,7 @@
 // eslint-disable react/jsx-no-constructed-context-values
 import React, { useContext, Fragment, useEffect } from 'react';
 import { Menu, Transition } from '@headlessui/react';
-import { LoadingIcon } from './Icons';
+import { LoadingIcon, CheckIcon } from './Icons';
 import LoadingContext from '../../context/loading-context';
 import PromptContext from '../../context/prompt-context';
 import NavNewPromptContext from '../../context/nav-new-prompt-context';
@@ -55,13 +55,15 @@ function NavNewPrompt() {
                   <span className="hidden text-xs font-bold">4</span>
                 </div>
               )}
-              {newPrompt && !loading && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src={newPrompt?.imageUrl}
-                  alt=""
-                />
+              {!loading && (
+                <>
+                  <CheckIcon size={32} className="absolute" />
+                  <img
+                    className="h-10 w-10 rounded-full"
+                    src="https://crew-ai.s3.ap-southeast-1.amazonaws.com/_pbxt_6ZULilVqhW6eIqQOXftAaMl5IYFg8ebnGMnfrWjfuXYf0MuPE_out-0.png"
+                    alt=""
+                  />
+                </>
               )}
             </Menu.Button>
           </div>

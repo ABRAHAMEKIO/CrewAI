@@ -70,7 +70,6 @@ export const authOptions = {
 export default async function auth(req: any, res: any) {
   const providers = [
     CredentialsProvider({
-      id: 'ethereum',
       name: 'Ethereum',
       credentials: {
         message: {
