@@ -202,6 +202,7 @@ function CustomApp({
           >
             <RainbowKitProvider chains={chains}>
               <Head>
+                <link rel="shortcut icon" href="/images/favicon.ico" />
                 <title>Hologram</title>
                 <meta
                   httpEquiv="ScreenOrientation"
