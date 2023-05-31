@@ -43,7 +43,7 @@ function SignInSlideOver({
           });
 
           const User = await fetchUser.json();
-          if (User) {
+          if (User && User.user) {
             UserProfile.update(User.user); // eslint-disable-line
           }
           setIsLoading(false);
