@@ -4,7 +4,7 @@ import { server } from '../config';
 import HeadSEO from '../components/v2/HeadSEO';
 
 type MetaTags = {
-  id: number;
+  id?: number;
   title: string;
   description: string;
   imageUrl: string;
@@ -31,10 +31,20 @@ function Index({
 }
 
 export async function getServerSideProps({ query }) {
+  const defaultMetaTags = {
+    id: null,
+    title: 'Unleash Artistry: Hologram - Explore Generative AI',
+    description:
+      'Hologram: Companion that transforms idle moments into captivating AI-generated art experiences.' +
+      ' Discover mesmerizing holographic images, share favorites on social media,' +
+      ' and anticipate upcoming NFT integration. Rediscover the joy of AI art like never before!',
+    imageUrl: `${server}/share/default.png`,
+  };
+
   if (!query.v) {
     return {
       props: {
-        metaTags: {},
+        metaTags: defaultMetaTags,
       },
     };
   }
@@ -50,13 +60,13 @@ export async function getServerSideProps({ query }) {
     }
     return {
       props: {
-        metaTags: {},
+        metaTags: defaultMetaTags,
       },
     };
   } catch (error) {
     return {
       props: {
-        metaTags: {},
+        metaTags: defaultMetaTags,
       },
     };
   }
