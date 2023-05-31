@@ -35,9 +35,8 @@ export async function getServerSideProps({ query }) {
     id: null,
     title: 'Unleash Artistry: Hologram - Explore Generative AI',
     description:
-      'Hologram: Companion that transforms idle moments into captivating AI-generated art experiences.' +
-      ' Discover mesmerizing holographic images, share favorites on social media,' +
-      ' and anticipate upcoming NFT integration. Rediscover the joy of AI art like never before!',
+      "Transform idle moments with captivating AI-generated art. Discover Hologram, where mesmerizing 'Holograms' come to life. " +
+      'Share favorites on social media, and anticipate upcoming NFT integration. Rediscover the joy of AI art like never before!',
     imageUrl: `${server}/share/default.png`,
   };
 

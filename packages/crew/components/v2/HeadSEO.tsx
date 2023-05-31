@@ -43,9 +43,12 @@ function HeadSEO(metaTags: MetaTags) {
           <meta property="og:image" content={imageUrl} />
           <meta name="twitter:image" content={imageUrl} />
           <meta property="og:type" content="website" />
-          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:card" content="summary_large_image" />
         </>
       )}
+      <meta name="twitter:site" content="@tryhologram" />
+      <meta name="twitter:site:id" content="@tryhologram" />
+      <meta name="twitter:creator" content="@tryhologram" />
     </Head>
   );
 }
