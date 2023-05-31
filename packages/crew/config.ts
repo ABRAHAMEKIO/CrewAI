@@ -1,12 +1,9 @@
 export const dev = process.env.NODE_ENV !== 'production';
 
+const hostName = process.env.HOSTNAME || 'hologram-ai.fly.dev';
 // TODO: make it environment variable (2  :))
-export const server = dev
-  ? 'http://localhost:4200'
-  : 'https://hologram-ai.fly.dev';
-export const wsServer = dev
-  ? 'ws://localhost:4200'
-  : 'wss://hologram-ai.fly.dev';
+export const server = dev ? 'http://localhost:4200' : `https://${hostName}`;
+export const wsServer = dev ? 'ws://localhost:4200' : `wss://${hostName}`;
 export const awsId = process.env.AWS_ACCESS_KEY_ID;
 export const awsSecret = process.env.AWS_SECRET_ACCESS_KEY;
 export const awsBucket = process.env.AWS_BUCKET;
