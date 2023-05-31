@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useMixpanel } from 'react-mixpanel-browser';
 import LoadingContext from '../../context/loading-context';
 import Wrap from '../../components/v1/Wrap';
-import Nav from '../../components/v1/Nav';
+import Nav from '../../components/v2/Nav';
 import Section from '../../components/v1/Section';
 import { PromptAttributes } from '../../db/models/prompt';
 import PromptContext from '../../context/prompt-context';
@@ -11,9 +11,9 @@ import PromptClient, {
   PaginationSuccessResponse,
   ErrorResponse,
 } from '../../domain/prompt/promptClient';
-import BottomSlideOver from '../../components/v1/BottomSlideOver';
-import ModalPrompt from '../../components/v1/ModalPrompt';
-import HorizontalSlider from '../../components/v1/HorizontalSlider';
+import BottomSlideOver from '../../components/v2/BottomSlideOver';
+import ModalPrompt from '../../components/v2/ModalPrompt';
+import HorizontalSlider from '../../components/v2/HorizontalSlider';
 import ErrorModal from '../../components/v1/ErrorModal';
 
 const promptClient = new PromptClient();

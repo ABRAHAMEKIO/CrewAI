@@ -5,6 +5,8 @@ import {
   IsNaughtySuccessResponse,
   SuccessResponse,
 } from '../midjourney/midjourneyClient';
+import { ShareAttributes } from '../../db/models/share';
+import { ShareSuccessResponse } from '../../pages/api/prompt/share';
 
 export interface ErrorResponse {
   error: string;
@@ -59,6 +61,7 @@ export default class PromptClient {
     return response.data;
   }
 
+  // generate using wallet
   async generate(props: {
     promptId: number;
     msg: string;
@@ -80,6 +83,45 @@ export default class PromptClient {
 
     const response = await axios.request<
       SuccessResponse | IsNaughtySuccessResponse
+    >(config);
+
+    return response.data;
+  }
+
+  // generate using credit
+  async generateV2(props: {
+    promptId: number;
+    msg: string;
+    socketId: string;
+  }): Promise<SuccessResponse | IsNaughtySuccessResponse> {
+    const { promptId, msg, socketId } = props;
+
+    const data = {
+      promptId,
+      msg,
+      socketId,
+    };
+
+    const config = this.getConfig(data, 'api/prompt/generate-v2', 'POST', '');
+
+    const response = await axios.request<
+      SuccessResponse | IsNaughtySuccessResponse
+    >(config);
+
+    return response.data;
+  }
+
+  async share(props: {
+    promptId: number;
+  }): Promise<ShareSuccessResponse | IsNaughtySuccessResponse> {
+    const { promptId } = props;
+
+    const data = { promptId };
+
+    const config = this.getConfig(data, 'api/prompt/share', 'POST', '');
+
+    const response = await axios.request<
+      ShareSuccessResponse | IsNaughtySuccessResponse
     >(config);
 
     return response.data;

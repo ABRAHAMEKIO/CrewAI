@@ -2,9 +2,71 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { getCsrfToken } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
+import { Magic } from '@magic-sdk/admin';
+import User from '../../../db/models/user';
+import WalletFactory from '../../../domain/wallet/walletFactory';
+
+const creditFee = 3;
+
+export const authOptions = {
+  // Configure one or more authentication providers
+  providers: [
+    CredentialsProvider({
+      id: 'magic',
+      name: 'Magic Link',
+      credentials: {
+        didToken: { label: 'DID Token', type: 'text' },
+      },
+      async authorize(credentials) {
+        const magic = new Magic(process.env.MAGIC_LINK_SECRET_KEY);
+
+        try {
+          // validate magic DID token
+          magic.token.validate(credentials.didToken);
+
+          // fetch user metadata
+          const metadata = await magic.users.getMetadataByToken(
+            credentials.didToken
+          );
+
+          if (metadata) {
+            const user = await User.findOne({
+              where: { issuer: metadata.issuer },
+            });
+
+            if (user) {
+              return {
+                id: user.id.toString(),
+                email: user.email,
+              };
+            }
+
+            const newUser = await User.create({
+              issuer: metadata.issuer,
+              email: metadata.email,
+            });
+
+            if (newUser) {
+              const wallet = WalletFactory.resolver(newUser);
+              await wallet.topUp(creditFee);
+              return {
+                id: newUser.id.toString(),
+                email: newUser.email,
+              };
+            }
+          }
+          return null;
+        } catch (e) {
+          return null;
+        }
+      },
+    }),
+  ],
+};
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default async function auth(req: any, res: any) {
   const providers = [
     CredentialsProvider({
@@ -46,6 +108,7 @@ export default async function auth(req: any, res: any) {
         }
       },
     }),
+    ...authOptions.providers,
   ];
 
   const isDefaultSigninPage =
@@ -62,8 +125,10 @@ export default async function auth(req: any, res: any) {
     providers,
     session: {
       strategy: 'jwt',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
     },
     secret: process.env.NEXTAUTH_SECRET,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     callbacks: {
       async session({ session, token }: { session: any; token: any }) {
         // eslint-disable-next-line no-param-reassign

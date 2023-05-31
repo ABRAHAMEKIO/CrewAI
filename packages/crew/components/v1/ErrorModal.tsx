@@ -1,11 +1,27 @@
-import React, { Fragment, useContext } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CrossIcon, FailIcon } from './Icons';
 import ErrorModalContext from '../../context/error-modal-context';
 
 function ErrorModal() {
-  const { modalOpen, setModalOpen, title, message } =
+  const { modalOpen, setModalOpen, title, message, icon } =
     useContext(ErrorModalContext);
+
+  const [jsxIcon, setJsxIcon] = useState<JSX.Element>(<FailIcon fill="none" />);
+
+  useEffect(() => {
+    if (icon) {
+      setJsxIcon(icon);
+    }
+  }, [icon]);
+
+  useEffect(() => {
+    if (!modalOpen) {
+      setTimeout(() => {
+        setJsxIcon(<FailIcon fill="none" />);
+      }, 1000);
+    }
+  }, [modalOpen]);
 
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
@@ -49,7 +65,7 @@ function ErrorModal() {
                     </button>
                   </div>
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full">
-                    <FailIcon fill="none" />
+                    {jsxIcon}
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title

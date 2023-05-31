@@ -1,11 +1,12 @@
-import React, { Fragment } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
+import React, { useContext } from 'react';
+import { Disclosure } from '@headlessui/react';
+import Image from 'next/image';
 import LoadingContext from '../../context/loading-context';
-import { LoadingIcon } from './Icons';
 import Section from './Section';
 import ConnectWallet from './ConnectWallet';
 import NavNewPrompt from './NavNewPrompt';
 import { server } from '../../config';
+import NavNewPromptContext from '../../context/nav-new-prompt-context';
 
 const navigation = [{ name: 'For You', href: '#', current: true }];
 
@@ -21,6 +22,9 @@ function classNames(...classes) {
 const showFeature = false;
 
 function Nav({ className }: { className?: string }) {
+  const { loading } = useContext(LoadingContext);
+  const { indicatorNewPromptDisplay } = useContext(NavNewPromptContext);
+
   return (
     <Disclosure as="nav" className={className || 'bg-white border-b'}>
       {({ open }) => (
@@ -39,12 +43,23 @@ function Nav({ className }: { className?: string }) {
                 </div>
               )}
               <div className="flex flex-1 items-center justify-between sm:items-stretch">
-                <div className="flex flex-shrink-0 items-center space-x-4">
+                <div
+                  className={classNames(
+                    loading || indicatorNewPromptDisplay
+                      ? 'hidden'
+                      : 'flex-shrink-0 items-center space-x-4'
+                  )}
+                >
                   <a
                     className="font-bold text-base sm:text-xl not-italic"
-                    href={server}
+                    href={`${server}/web3`}
                   >
-                    Hologram
+                    <Image
+                      src="/images/hologram-logo.png"
+                      alt="hologram-logo"
+                      width="113"
+                      height="22"
+                    />
                   </a>
                 </div>
                 {showFeature && (

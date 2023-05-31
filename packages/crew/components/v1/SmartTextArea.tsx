@@ -24,7 +24,6 @@ function SmartTextArea(props: {
     setContent(rich);
     setPlainContent(plain);
   };
-  const fullContent = () => plainContent + suggestion;
 
   let debounceTimerOnContentChanged;
   const onChanged = useRefCallback((e) => {
@@ -71,31 +70,22 @@ function SmartTextArea(props: {
     [content]
   );
 
-  const onBlur = useRefCallback(
-    (e) => {
-      const userInput = content
-        .replace(/<span[^>]*>(.*?)<\/span>/gi, '')
-        .replace('&nbsp;', ' ');
-      setInput(content);
-      onContentBlur(content);
-      if (content === '') {
-        changeContent('', placeholderTag);
-      }
-    },
-    [content]
-  );
+  const onBlur = useRefCallback(() => {
+    setInput(content);
+    onContentBlur(content);
+    if (content === '') {
+      changeContent('', placeholderTag);
+    }
+  }, [content]);
 
-  const onFocus = useRefCallback(
-    (e) => {
-      onContentFocus();
-      if (content.includes(placeholderTag)) {
-        changeContent('', '');
-      } else if (content === '') {
-        changeContent('', '');
-      }
-    },
-    [content]
-  );
+  const onFocus = useRefCallback(() => {
+    onContentFocus();
+    if (content.includes(placeholderTag)) {
+      changeContent('', '');
+    } else if (content === '') {
+      changeContent('', '');
+    }
+  }, [content]);
 
   return (
     <div className={styles.textarea_container}>

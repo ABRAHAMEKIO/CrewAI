@@ -1,14 +1,15 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelizeConnection from '../config/connection';
 
-interface UserAttributes {
+export interface UserAttributes {
   id?: number;
-  username?: string;
+  username?: string | null;
   email?: string;
   interests?: string | null;
   occupation?: string | null;
   usage?: string | null;
   issuer?: string | null;
+  credit?: number | null;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -32,6 +33,8 @@ class User extends Model<UserAttributes, UserInput> implements UserAttributes {
 
   public issuer!: string;
 
+  public credit!: number;
+
   public readonly createdAt!: Date;
 
   public readonly updatedAt!: Date;
@@ -46,7 +49,7 @@ User.init(
       type: DataTypes.BIGINT,
     },
     username: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.STRING,
     },
     email: {
@@ -68,6 +71,11 @@ User.init(
     issuer: {
       allowNull: true,
       type: DataTypes.STRING,
+    },
+    credit: {
+      allowNull: true,
+      defaultValue: 0,
+      type: DataTypes.BIGINT,
     },
   },
   {

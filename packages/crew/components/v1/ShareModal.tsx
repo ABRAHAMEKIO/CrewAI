@@ -30,6 +30,11 @@ function ShareModal({
     }, 4000);
   }
 
+  function handleIconShare(openUrl: string) {
+    modalClose();
+    window.open(openUrl, '_blank');
+  }
+
   return (
     <Transition.Root show={modalOpen} as={Fragment}>
       <Dialog
@@ -77,12 +82,9 @@ function ShareModal({
                           onClick={() => modalClose()}
                         >
                           <span className="sr-only">Close panel</span>
-                          <button
-                            type="button"
-                            className="h-6 w-6 flex items-center justify-center"
-                          >
+                          <div className="h-6 w-6 flex items-center justify-center">
                             <CrossIcon fill="#959595" size={14} />
-                          </button>
+                          </div>
                         </button>
                       </div>
                     </div>
@@ -95,24 +97,22 @@ function ShareModal({
                       <div className="inline mx-auto w-full">
                         <button
                           type="button"
-                          onClick={() => {
-                            window.open(
-                              `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-                              '_blank'
-                            );
-                          }}
+                          onClick={() =>
+                            handleIconShare(
+                              `https://www.facebook.com/sharer/sharer.php?u=${url}`
+                            )
+                          }
                           className="inline-block m-2"
                         >
                           <FacebookIcon fill="white" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
-                            window.open(
-                              `https://twitter.com/intent/tweet?text=Hey%20I%20found%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`,
-                              '_blank'
-                            );
-                          }}
+                          onClick={() =>
+                            handleIconShare(
+                              `https://twitter.com/intent/tweet?text=Hey%20I%20found%20an%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`
+                            )
+                          }
                           className="inline-block m-2"
                         >
                           <TwitterIcon fill="white" />
@@ -122,24 +122,22 @@ function ShareModal({
                         {/* </button> */}
                         <button
                           type="button"
-                          onClick={() => {
-                            window.open(
-                              `https://t.me/share/url?url=${url}&text=Hey%20I%20found%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20`,
-                              '_blank'
-                            );
-                          }}
+                          onClick={() =>
+                            handleIconShare(
+                              `https://t.me/share/url?url=${url}&text=Hey%20I%20found%20an%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20`
+                            )
+                          }
                           className="inline-block m-2"
                         >
                           <TelegramIcon fill="white" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
-                            window.open(
-                              `https://wa.me/?text=Hey%20I%20found%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`,
-                              '_blank'
-                            );
-                          }}
+                          onClick={() =>
+                            handleIconShare(
+                              `https://wa.me/?text=Hey%20I%20found%20an%20interesting%20AI-generated%20hologram%2C%20check%20this%20out%20${url}`
+                            )
+                          }
                           className="inline-block m-2"
                         >
                           <WhatsappIcon fill="white" />

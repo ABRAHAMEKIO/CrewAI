@@ -28,3 +28,5 @@ export const openjourneyPredictionsVersion =
 
 // disabled for now because lots of bugs
 export const isAutocompleteEnabled = false;
+export const creditFee = 1;
+export const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';

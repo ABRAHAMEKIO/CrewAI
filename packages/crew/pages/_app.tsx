@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
@@ -22,14 +22,19 @@ import { MixpanelProvider } from 'react-mixpanel-browser';
 import io from 'socket.io-client';
 import { dev, mixPanelId, server, wsServer } from '../config';
 import MidjourneyCommand from '../domain/midjourney/wsCommands';
-import { WebhookSuccessResponse } from '../domain/midjourney/midjourneyClient';
+import {
+  IsNaughtySuccessResponse,
+  WebhookSuccessResponse,
+} from '../domain/midjourney/midjourneyClient';
 import PromptContext from '../context/prompt-context';
 import LoadingContext from '../context/loading-context';
 import NavNewPromptContext from '../context/nav-new-prompt-context';
+import UserProfileContext from '../context/user-profile-context';
 import ErrorModalContext from '../context/error-modal-context';
 import { PromptAttributes } from '../db/models/prompt';
 
 import '@rainbow-me/rainbowkit/styles.css';
+import { WarningIcon } from '../components/v1/Icons';
 
 let socket;
 
@@ -73,6 +78,27 @@ function CustomApp({
   const [loading, setLoading] = useState<boolean>(false);
 
   const [newPrompt, setNewPrompt] = useState<PromptAttributes>(null);
+  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
+  const [errorModalTitle, setErrorModalTitle] = useState<string>(null);
+  const [errorModalMessage, setErrorMessage] = useState<string>(null);
+  const [errorModalIcon, setErrorModalIcon] = useState<JSX.Element>(null);
+
+  const [promptId, setPromptId] = useState<number>(null);
+  const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
+    useState<boolean>(false);
+  const { setModalOpen, setTitle, setMessage, setIcon } =
+    useContext(ErrorModalContext);
+
+  const [userProfile, setUserProfile] = useState({});
+  const update = (value) => setUserProfile(value);
+
+  const valueUserProfile = useMemo(() => {
+    return {
+      ...userProfile,
+      update,
+    };
+  }, [userProfile]);
+
   useEffect(() => {
     fetch(`${server}/api/socket`)
       .then(() => {
@@ -86,11 +112,42 @@ function CustomApp({
 
         socket.on(
           MidjourneyCommand.ModelResults.toString(),
-          (val: WebhookSuccessResponse) => {
+          (val: WebhookSuccessResponse | IsNaughtySuccessResponse) => {
             // eslint-disable-next-line no-console
             console.info(val);
             setLoading(false);
-            setNewPrompt(val.prompt);
+
+            if ('prompt' in val) {
+              setIndicatorNewPromptDisplay(true);
+              setNewPrompt(val.prompt);
+            }
+
+            if ('isNaughty' in val && val.isNaughty) {
+              setIndicatorNewPromptDisplay(false);
+              setErrorModalOpen(true);
+              setErrorModalIcon(<WarningIcon />);
+              setErrorModalTitle('Generate Failed');
+              setErrorMessage(
+                'Sorry, this generate failed. Credit will be returned'
+              );
+            }
+
+            const fetchDataUser = async () => {
+              const fetchUserProfile = await fetch(
+                `${server}/api/user/get-profile`,
+                {
+                  method: 'POST',
+                }
+              );
+              if (fetchUserProfile.status === 200) {
+                const UserProfile = await fetchUserProfile.json();
+                if (UserProfile && UserProfile.user) {
+                  setUserProfile(UserProfile.user); // eslint-disable-line
+                }
+              }
+            };
+            // eslint-disable-next-line no-console
+            fetchDataUser().catch(console.error);
           }
         );
       })
@@ -98,11 +155,13 @@ function CustomApp({
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, []);
-
-  const [promptId, setPromptId] = useState<number>(null);
-  const [indicatorNewPromptDisplay, setIndicatorNewPromptDisplay] =
-    useState<boolean>(null);
+  }, [
+    setIcon,
+    setIndicatorNewPromptDisplay,
+    setMessage,
+    setModalOpen,
+    setTitle,
+  ]);
 
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const NavNewPromptContextValue = {
@@ -112,18 +171,16 @@ function CustomApp({
     setIndicatorNewPromptDisplay,
   };
 
-  const [errorModalOpen, setErrorModalOpen] = useState<boolean>(false);
-  const [errorModaltitle, setRrrorModalTitle] = useState<string>(null);
-  const [errorModalMessage, setErrorMessage] = useState<string>(null);
-
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const ErrorModalContextValue = {
     modalOpen: errorModalOpen,
     setModalOpen: setErrorModalOpen,
-    title: errorModaltitle,
-    setTitle: setRrrorModalTitle,
+    title: errorModalTitle,
+    setTitle: setErrorModalTitle,
     message: errorModalMessage,
     setMessage: setErrorMessage,
+    icon: errorModalIcon,
+    setIcon: setErrorModalIcon,
   };
 
   return (
@@ -145,6 +202,7 @@ function CustomApp({
           >
             <RainbowKitProvider chains={chains}>
               <Head>
+                <link rel="shortcut icon" href="/images/favicon.ico" />
                 <title>Hologram</title>
                 <meta
                   httpEquiv="ScreenOrientation"
@@ -158,17 +216,19 @@ function CustomApp({
                     <NavNewPromptContext.Provider
                       value={NavNewPromptContextValue}
                     >
-                      <ErrorModalContext.Provider
-                        value={ErrorModalContextValue}
-                      >
-                        {/* eslint-disable react/jsx-props-no-spreading */}
-                        <Component
-                          {...pageProps}
-                          socketId={socketId}
-                          newPrompt={newPrompt}
-                        />
-                        {/* set global socket id to component */}
-                      </ErrorModalContext.Provider>
+                      <UserProfileContext.Provider value={valueUserProfile}>
+                        <ErrorModalContext.Provider
+                          value={ErrorModalContextValue}
+                        >
+                          {/* eslint-disable react/jsx-props-no-spreading */}
+                          <Component
+                            {...pageProps}
+                            socketId={socketId}
+                            newPrompt={newPrompt}
+                          />
+                          {/* set global socket id to component */}
+                        </ErrorModalContext.Provider>
+                      </UserProfileContext.Provider>
                     </NavNewPromptContext.Provider>
                   </LoadingContext.Provider>
                 </PromptContext.Provider>
