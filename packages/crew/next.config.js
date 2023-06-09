@@ -5,6 +5,34 @@ const { withNx } = require('@nrwl/next/plugins/with-nx');
 
 const { withSentryConfig } = require('@sentry/nextjs');
 
+// /** @type {import('next').NextConfig} */
+// const moduleExports = {
+//   reactStrictMode: true,
+
+//   swcMinify: false,
+
+//   experimental: {
+//     fallbackNodePolyfills: false,
+//   },
+
+//   eslint: {
+//     ignoreDuringBuilds: true,
+//   },
+//   typescript: {
+//     ignoreBuildErrors: false,
+//   },
+
+//   distDir: 'build',
+
+//   poweredByHeader: false,
+
+//   sentry: {
+//     hideSourceMaps: true,
+//     widenClientFileUpload: true,
+//     tunnelRoute: '/api/sentry-tunnel',
+//   },
+// };
+
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
   // the following options are set automatically, and overriding them is not
@@ -16,7 +44,9 @@ const sentryWebpackPluginOptions = {
   project: 'javascript-nextjs',
 
   silent: true, // Suppresses all logs
-  hideSourceMaps: true,
+  hideSourceMaps: false,
+  // swcMinify: true,
+  // reactStrictMode: true,
 
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.

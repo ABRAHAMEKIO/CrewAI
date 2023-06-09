@@ -12,6 +12,11 @@ function Index() {
       description: `mpj is the lead developer at crew, he's long time hacker and developer and loves to read.`,
     },
     {
+      name: 'oyeins',
+      image: 'https://github.com/Oyeins-GUI.png',
+      description: `oyeins is a developer at crew, he is a good developer and loves to read.`,
+    },
+    {
       name: 'huda',
       image: 'https://github.com/hudakurniawan.png',
       description: `huda is the product manager at crew, he's long time business developer and iot engineer.`,

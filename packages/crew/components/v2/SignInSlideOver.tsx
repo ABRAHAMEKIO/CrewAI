@@ -8,6 +8,8 @@ import { isValidEmail } from '../../helpers/form';
 import { server } from '../../config';
 import UserProfileContext from '../../context/user-profile-context';
 
+// console.log(process.env);
+
 const magic =
   typeof window !== 'undefined' &&
   new Magic(process.env.NEXT_PUBLIC_MAGIC_LINK_PK);
